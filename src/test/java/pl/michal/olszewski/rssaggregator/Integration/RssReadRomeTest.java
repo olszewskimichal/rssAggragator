@@ -46,7 +46,7 @@ public class RssReadRomeTest {
         try(XmlReader reader=new XmlReader(new File("RssExample.xml"))){
             SyndFeed feed = new SyndFeedInput().build(reader);
             assertThat(feed.getDescription()).isNotNull().isEqualTo("Testowy rss");
-            assertThat(feed.getPublishedDate()).isNotNull().isEqualTo(Date.from(LocalDateTime.of(2017,10,27,16,9).atZone(ZoneId.systemDefault()).toInstant()));
+            assertThat(feed.getPublishedDate()).isNotNull().isEqualTo(Date.from(LocalDateTime.of(2017,10,27,14,9).atZone(ZoneId.of("UTC")).toInstant()));
         } catch (IOException | FeedException e) {
             Assert.fail();
         }
@@ -75,7 +75,7 @@ public class RssReadRomeTest {
             assertThat(itemsForBlog.get(0).getLink()).isEqualTo("https://item.pl");
             assertThat(itemsForBlog.get(0).getDescription()).isEqualTo("Opis");
             assertThat(itemsForBlog.get(0).getAuthor()).isEqualTo("Michał");
-            assertThat(itemsForBlog.get(0).getDate()).isEqualTo(LocalDateTime.of(2017,10,27,16,9).atZone(ZoneId.systemDefault()).toInstant());
+            assertThat(itemsForBlog.get(0).getDate()).isEqualTo(LocalDateTime.of(2017,10,27,14,9).atZone(ZoneId.of("UTC")).toInstant());
         } catch (IOException | FeedException e) {
             Assert.fail();
         }

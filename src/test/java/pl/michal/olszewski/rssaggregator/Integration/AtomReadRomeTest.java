@@ -45,7 +45,7 @@ public class AtomReadRomeTest {
     public void shouldTransformWithCorrectDescriptionAndPublicationDate(){
         try(XmlReader reader=new XmlReader(new File("AtomExample.xml"))){
             SyndFeed feed = new SyndFeedInput().build(reader);
-            assertThat(feed.getPublishedDate()).isNotNull().isEqualTo(Date.from(LocalDateTime.of(2017,10,27,16,9).atZone(ZoneId.systemDefault()).toInstant()));
+            assertThat(feed.getPublishedDate()).isNotNull().isEqualTo(Date.from(LocalDateTime.of(2017,10,27,14,9).atZone(ZoneId.of("UTC")).toInstant()));
         } catch (IOException | FeedException e) {
             Assert.fail();
         }
@@ -61,7 +61,7 @@ public class AtomReadRomeTest {
             assertThat(itemsForBlog.get(0).getLink()).isEqualTo("https://item.pl");
             assertThat(itemsForBlog.get(0).getDescription()).isEqualTo("Opis");
             assertThat(itemsForBlog.get(0).getAuthor()).isEqualTo("Michał");
-            assertThat(itemsForBlog.get(0).getDate().atZone(ZoneId.systemDefault())).isEqualTo(LocalDateTime.of(2017,10,27,16,9).atZone(ZoneId.systemDefault()));
+            assertThat(itemsForBlog.get(0).getDate().atZone(ZoneId.systemDefault())).isEqualTo(LocalDateTime.of(2017,10,27,14,9).atZone(ZoneId.of("UTC")));
         } catch (IOException | FeedException e) {
             Assert.fail();
         }
