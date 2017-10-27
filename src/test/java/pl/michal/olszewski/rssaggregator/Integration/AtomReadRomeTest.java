@@ -6,12 +6,16 @@ import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import org.junit.Assert;
 import org.junit.Test;
+import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
+import pl.michal.olszewski.rssaggregator.service.RssExtractorService;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,12 +55,13 @@ public class AtomReadRomeTest {
     public void shouldTransformWithCorrectBlogItems(){
         try(XmlReader reader=new XmlReader(new File("AtomExample.xml"))){
             SyndFeed feed = new SyndFeedInput().build(reader);
-            assertThat(feed.getEntries()).isNotEmpty().hasSize(1);
-            assertThat(feed.getEntries().get(0).getTitle()).isEqualTo("testowy item");
-            assertThat(feed.getEntries().get(0).getLink()).isEqualTo("https://item.pl");
-            assertThat(feed.getEntries().get(0).getDescription().getValue()).isEqualTo("Opis");
-            assertThat(feed.getEntries().get(0).getAuthor()).isEqualTo("Michał");
-            assertThat(feed.getEntries().get(0).getPublishedDate()).isEqualTo(Date.from(LocalDateTime.of(2017,10,27,16,9).atZone(ZoneId.systemDefault()).toInstant()));
+            List<ItemDTO> itemsForBlog = RssExtractorService.getItemsForBlog(feed);
+            assertThat(itemsForBlog).isNotEmpty().hasSize(1);
+            assertThat(itemsForBlog.get(0).getTitle()).isEqualTo("testowy item");
+            assertThat(itemsForBlog.get(0).getLink()).isEqualTo("https://item.pl");
+            assertThat(itemsForBlog.get(0).getDescription()).isEqualTo("Opis");
+            assertThat(itemsForBlog.get(0).getAuthor()).isEqualTo("Michał");
+            assertThat(itemsForBlog.get(0).getDate().atZone(ZoneId.systemDefault())).isEqualTo(LocalDateTime.of(2017,10,27,16,9).atZone(ZoneId.systemDefault()));
         } catch (IOException | FeedException e) {
             Assert.fail();
         }
