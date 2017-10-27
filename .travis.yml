@@ -1,0 +1,19 @@
+language: java
+sudo: false
+jdk: oraclejdk8
+
+install:
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+
+cache:
+  directories:
+  - .autoconf
+  - $HOME/.m2
+
+jobs:
+  include:
+    - stage: test
+      script:
+        - mvn test -B
+      after_success:
+       - bash <(curl -s https://codecov.io/bash)
