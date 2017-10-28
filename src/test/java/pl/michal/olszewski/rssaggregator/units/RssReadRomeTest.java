@@ -73,12 +73,18 @@ public class RssReadRomeTest {
         try {
             BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL");
             List<ItemDTO> itemsForBlog = blog.getItemsList();
-            assertThat(itemsForBlog).isNotEmpty().hasSize(1);
+            assertThat(itemsForBlog).isNotEmpty().hasSize(2);
             assertThat(itemsForBlog.get(0).getTitle()).isEqualTo("testowy item");
             assertThat(itemsForBlog.get(0).getLink()).isEqualTo("https://item.pl");
             assertThat(itemsForBlog.get(0).getDescription()).isEqualTo("Opis");
             assertThat(itemsForBlog.get(0).getAuthor()).isEqualTo("Michał");
             assertThat(itemsForBlog.get(0).getDate()).isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant());
+            assertThat(itemsForBlog.get(1).getTitle()).isEqualTo("testowy item2");
+            assertThat(itemsForBlog.get(1).getLink()).isEqualTo("https://item2.pl");
+            assertThat(itemsForBlog.get(1).getDescription()).isEqualTo("");
+            assertThat(itemsForBlog.get(1).getAuthor()).isEqualTo("Michał");
+            assertThat(itemsForBlog.get(1).getDate()).isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant());
+
         } catch (IOException e) {
             Assert.fail();
         }
