@@ -20,5 +20,12 @@
       <pubDate>Fri, 27 Oct 2017 14:09:00 GMT</pubDate>
       <author>Michał</author>
     </item>
+    <item>
+      <title>testowy item2</title>
+      <link>https://item2.pl</link>
+      <category>Category</category>
+      <pubDate>Fri, 27 Oct 2017 14:09:00 GMT</pubDate>
+      <author>Michał</author>
+    </item>
   </channel>
 </rss>
