@@ -84,7 +84,6 @@ public class RssReadRomeTest {
             assertThat(itemsForBlog.get(1).getDescription()).isEqualTo("");
             assertThat(itemsForBlog.get(1).getAuthor()).isEqualTo("Michał");
             assertThat(itemsForBlog.get(1).getDate()).isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant());
-
         } catch (IOException e) {
             Assert.fail();
         }
