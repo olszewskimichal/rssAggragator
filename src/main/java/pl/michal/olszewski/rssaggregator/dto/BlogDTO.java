@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 @Getter
-@ToString
-@EqualsAndHashCode
 @Builder
 public class BlogDTO {
     private final String link;

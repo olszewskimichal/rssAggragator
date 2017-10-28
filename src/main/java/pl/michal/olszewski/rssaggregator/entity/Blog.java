@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.entity;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 
@@ -11,6 +12,7 @@ import java.util.Set;
 
 @Entity
 @Getter
+@EqualsAndHashCode
 public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

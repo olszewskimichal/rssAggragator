@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
@@ -12,8 +11,7 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
+@EqualsAndHashCode(exclude = "blog")
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

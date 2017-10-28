@@ -88,7 +88,7 @@ public class BlogServiceTest {
     @Test
     public void shouldCreateBlogWith2Items() {
         //given
-        List<ItemDTO> itemsList = IntStream.rangeClosed(1, 2).mapToObj(v -> ItemDTO.builder().build()).collect(Collectors.toList());
+        List<ItemDTO> itemsList = IntStream.rangeClosed(1, 2).mapToObj(v -> ItemDTO.builder().title("title" + v).build()).collect(Collectors.toList());
         BlogDTO blogDTO = BlogDTO.builder().itemsList(itemsList).build();
         //when
         Blog blog = blogService.createBlog(blogDTO);
