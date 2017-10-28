@@ -10,6 +10,7 @@ import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.exception.RssException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class RssExtractorService {
     }
 
     private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL) {
-        return new BlogDTO(syndFeed.getLink(), syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant());
+        return new BlogDTO(syndFeed.getLink(), syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant(),new ArrayList<>());
     }
 
     public BlogDTO getBlog(XmlReader xmlReader, String feedURL) {
