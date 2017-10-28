@@ -2,6 +2,8 @@ package pl.michal.olszewski.rssaggregator.entity;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 
 import javax.persistence.*;
@@ -13,6 +15,8 @@ import java.util.Set;
 @Entity
 @Getter
 @EqualsAndHashCode
+@NoArgsConstructor
+@ToString
 public class Blog {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -33,6 +37,7 @@ public class Blog {
         this.name = name;
         this.feedURL = feedURL;
         this.publishedDate = publishedDate;
+        this.items = new HashSet<>();
     }
 
     public Set<Item> getItems() {

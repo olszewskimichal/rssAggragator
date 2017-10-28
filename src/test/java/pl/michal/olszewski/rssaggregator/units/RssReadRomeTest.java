@@ -25,7 +25,7 @@ public class RssReadRomeTest {
     @Test
     public void shouldCorrectTransformXmlToRome() {
         try {
-            BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL");
+            BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL", "blogURL");
             assertThat(blog).isNotNull();
             assertThat(blog.getFeedURL()).isEqualTo("feedURL");
             assertThat(blog.getLink()).isNotNull().isEqualTo("http://rssAggragator.pl");
@@ -37,7 +37,7 @@ public class RssReadRomeTest {
     @Test
     public void shouldTransformWithCorrectTitle() {
         try {
-            BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL");
+            BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL", "blogURL");
             assertThat(blog.getName()).isNotNull().isEqualTo("Test RSS");
         } catch (IOException e) {
             Assert.fail();
@@ -47,7 +47,7 @@ public class RssReadRomeTest {
     @Test
     public void shouldTransformWithCorrectDescriptionAndPublicationDate() {
         try {
-            BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL");
+            BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL", "blogURL");
             assertThat(blog.getDescription()).isNotNull().isEqualTo("Testowy rss");
             assertThat(blog.getPublishedDate()).isNotNull().isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant());
         } catch (IOException e) {
@@ -71,7 +71,7 @@ public class RssReadRomeTest {
     @Test
     public void shouldTransformWithCorrectBlogItems() {
         try {
-            BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL");
+            BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL", "blogURL");
             List<ItemDTO> itemsForBlog = blog.getItemsList();
             assertThat(itemsForBlog).isNotEmpty().hasSize(2);
             assertThat(itemsForBlog.get(0).getTitle()).isEqualTo("testowy item");

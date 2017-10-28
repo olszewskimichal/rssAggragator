@@ -21,14 +21,14 @@ public class RssExtractorService {
         return syndFeed.getEntries().stream().map(entry -> new ItemDTO(entry.getTitle(), entry.getDescription() != null ? entry.getDescription().getValue() : "", entry.getLink(), entry.getPublishedDate().toInstant(), entry.getAuthor())).collect(Collectors.toList());
     }
 
-    private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL) {
-        return new BlogDTO(syndFeed.getLink(), syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant(),new ArrayList<>());
+    private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
+        return new BlogDTO(syndFeed.getLink() != null ? syndFeed.getLink() : blogURL, syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant(), new ArrayList<>());
     }
 
-    public BlogDTO getBlog(XmlReader xmlReader, String feedURL) {
+    public BlogDTO getBlog(XmlReader xmlReader, String feedURL, String blogURL) {
         try (XmlReader reader = xmlReader) {
             SyndFeed feed = new SyndFeedInput().build(reader);
-            BlogDTO blogInfo = getBlogInfo(feed, feedURL);
+            BlogDTO blogInfo = getBlogInfo(feed, feedURL, blogURL);
             getItemsForBlog(feed).forEach(blogInfo::addNewItem);
             return blogInfo;
         } catch (IOException | FeedException e) {

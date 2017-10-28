@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
@@ -7,7 +8,10 @@ import pl.michal.olszewski.rssaggregator.entity.Item;
 import pl.michal.olszewski.rssaggregator.exception.BlogNotFoundException;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 
+import java.util.List;
+
 @Service
+@Slf4j
 public class BlogService {
 
     private final BlogRepository blogRepository;
@@ -32,10 +36,15 @@ public class BlogService {
     }
 
     public Blog updateBlog(BlogDTO blogDTO) {
+        log.debug(blogDTO.toString());
         Blog blog = getBlogByURL(blogDTO.getLink());
         blog.updateFromDto(blogDTO);
         blogDTO.getItemsList().stream().map(Item::new).forEach(blog::addItem);
         blogRepository.save(blog);
         return blog;
+    }
+
+    public List<Blog> getAllBlogs(){
+        return blogRepository.findAll();
     }
 }

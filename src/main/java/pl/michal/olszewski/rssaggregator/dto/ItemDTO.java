@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 
 import java.time.Instant;

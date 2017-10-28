@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.entity;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 
@@ -11,13 +12,15 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = "blog")
+@EqualsAndHashCode(exclude = {"blog","id"})
+@NoArgsConstructor
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     private String title;
+    @Column(length = 10000) //TODO TEST na to napisać
     private String description;
     private String link;
     private Instant date;

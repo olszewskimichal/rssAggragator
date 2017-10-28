@@ -1,6 +1,8 @@
 package pl.michal.olszewski.rssaggregator.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.util.List;
 
 @Getter
 @Builder
+@ToString
 public class BlogDTO {
     private final String link;
     private final String description;
