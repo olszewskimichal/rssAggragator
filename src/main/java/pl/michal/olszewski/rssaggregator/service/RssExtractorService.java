@@ -21,7 +21,7 @@ public class RssExtractorService {
     }
 
     private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL) {
-        return new BlogDTO(syndFeed.getLink(), syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getAuthor(), syndFeed.getPublishedDate().toInstant());
+        return new BlogDTO(syndFeed.getLink(), syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant());
     }
 
     public BlogDTO getBlog(XmlReader xmlReader, String feedURL) {

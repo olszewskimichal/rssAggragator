@@ -28,6 +28,7 @@ public class RssReadRomeTest {
             BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), "feedURL");
             assertThat(blog).isNotNull();
             assertThat(blog.getFeedURL()).isEqualTo("feedURL");
+            assertThat(blog.getLink()).isNotNull().isEqualTo("http://rssAggragator.pl");
         } catch (IOException e) {
             Assert.fail();
         }

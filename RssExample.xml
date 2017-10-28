@@ -3,6 +3,7 @@
   <channel>
     <title>Test RSS</title>
     <link>http://rssAggragator.pl</link>
+    <author>TEST</author>
     <description>Testowy rss</description>
     <pubDate>Fri, 27 Oct 2017 14:09:00 GMT</pubDate>
     <image>
