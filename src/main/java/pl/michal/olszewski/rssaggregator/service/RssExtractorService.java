@@ -28,7 +28,7 @@ public class RssExtractorService {
         try (XmlReader reader = xmlReader) {
             SyndFeed feed = new SyndFeedInput().build(reader);
             BlogDTO blogInfo = getBlogInfo(feed, feedURL);
-            blogInfo.setItemsList(getItemsForBlog(feed));
+            getItemsForBlog(feed).forEach(blogInfo::addNewItem);
             return blogInfo;
         } catch (IOException | FeedException e) {
             throw new RssException(feedURL);
