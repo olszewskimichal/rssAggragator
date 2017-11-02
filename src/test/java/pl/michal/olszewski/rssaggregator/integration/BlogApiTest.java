@@ -59,16 +59,6 @@ public class BlogApiTest extends IntegrationTest {
     }
 
     @Test
-    public void should_get_one_blog_byName() {
-        List<BlogDTO> blogDTOS = givenBlog()
-                .buildNumberOfBlogsDTOAndSave(1);
-
-        BlogDTO blog = thenGetOneBlogFromApiByName(blogDTOS.get(0).getName());
-
-        assertThat(blogDTOS.get(0)).isEqualToComparingFieldByField(blog);
-    }
-
-    @Test
     public void should_get_one_blog() {
         Blog blog = givenBlog()
                 .buildNumberOfBlogsAndSave(1).get(0);
@@ -116,7 +106,7 @@ public class BlogApiTest extends IntegrationTest {
         thenDeleteOneBlogFromApi(blog.getId());
 
         //then
-        assertThat(blogRepository.findOne(blog.getId())).isNull();
+        assertThat(blogRepository.findById(blog.getId())).isEmpty();
     }
 
     private BlogListFactory givenBlog() {
@@ -131,10 +121,6 @@ public class BlogApiTest extends IntegrationTest {
         return template.getForEntity(String.format("http://localhost:%s/api/v1/blogs/%s", port, id), BlogDTO.class).getBody();
     }
 
-    private BlogDTO thenGetOneBlogFromApiByName(String name) {
-        return template.getForEntity(String.format("http://localhost:%s/api/v1/blogs/name/%s", port, name), BlogDTO.class).getBody();
-    }
-
     private List<BlogDTO> thenGetNumberBlogsFromApi(int number) {
         return Arrays.asList(template.getForEntity(String.format("http://localhost:%s/api/v1/blogs?limit=%s", port, number), BlogDTO[].class).getBody());
     }
@@ -144,7 +130,7 @@ public class BlogApiTest extends IntegrationTest {
     }
 
     private void thenUpdateBlogByApi(Long blogId, BlogDTO blogDTO) {
-        template.put(String.format("http://localhost:%s/api/v1/blogs/%s", port, blogId), blogDTO);
+        template.put(String.format("http://localhost:%s/api/v1/blogs/", port), blogDTO);
     }
 
     private void thenDeleteOneBlogFromApi(Long blogId) {

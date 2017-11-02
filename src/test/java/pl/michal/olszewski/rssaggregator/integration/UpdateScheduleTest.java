@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.integration;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.exception.RssException;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
@@ -13,13 +14,17 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-
 public class UpdateScheduleTest extends IntegrationTest {
 
     @Autowired
     private UpdateBlogSchedule blogSchedule;
     @Autowired
     private BlogRepository blogRepository;
+
+    @Before
+    public void setUp() throws Exception {
+        blogRepository.deleteAll();
+    }
 
     @Test
     public void contextLoads() {

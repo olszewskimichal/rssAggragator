@@ -218,4 +218,18 @@ public class BlogServiceTest {
         //when
         assertThatThrownBy(() -> blogService.getBlogById(1L)).isNotNull().hasMessage("Nie znaleziono bloga o id = 1");
     }
+
+    @Test
+    public void shouldDeleteBlogById(){
+        given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null)));
+
+        assertThat(blogService.deleteBlog(1L)).isTrue();
+    }
+
+    @Test
+    public void shouldThrowExceptionOnDeleteWhenBlogNotExist(){
+        given(blogRepository.findById(1L)).willReturn(Optional.empty());
+
+        assertThatThrownBy(()->blogService.deleteBlog(1L)).isNotNull().hasMessage("Nie znaleziono bloga o id = 1");
+    }
 }

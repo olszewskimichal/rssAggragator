@@ -35,6 +35,7 @@ public class UpdateBlogSchedule {
             BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(v.getFeedURL())), v.getFeedURL(), v.getBlogURL());
             blogService.updateBlog(blogDTO);
         } catch (IOException e) {
+            log.error("aaa" + e.getMessage());
             log.error("wystapił bład przy aktualizacji bloga o id {} o tresci {}", v.getId(), e);
             throw new RssException(v.getFeedURL());
         }

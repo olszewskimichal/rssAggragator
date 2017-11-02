@@ -18,9 +18,9 @@ public class BlogListFactory {
     }
 
     public List<BlogDTO> buildNumberOfBlogsDTOAndSave(int numberOfBlogs) {
-        return IntStream.range(0, numberOfBlogs).mapToObj(number -> new Blog("blog" + number, "", "", "", null)).
-                peek(repository::save)
-                .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), Collections.emptyList()))
+        IntStream.range(0, numberOfBlogs).mapToObj(number -> new Blog("blog" + number, "", "", "", null)).
+                forEach(repository::save);
+        return repository.findAll().stream().map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), Collections.emptyList()))
                 .collect(Collectors.toList());
     }
 
@@ -31,8 +31,8 @@ public class BlogListFactory {
     }
 
     public List<Blog> buildNumberOfBlogsAndSave(int numberOfBlogs) {
-        return IntStream.range(0, numberOfBlogs).mapToObj(number -> new Blog("blog" + number, "", "", "", null)).
-                peek(repository::save)
-                .collect(Collectors.toList());
+        IntStream.range(0, numberOfBlogs).mapToObj(number -> new Blog("blog" + number, "", "", "", null)).
+                forEach(repository::save);
+        return repository.findAll();
     }
 }
