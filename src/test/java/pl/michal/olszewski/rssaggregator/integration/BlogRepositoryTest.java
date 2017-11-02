@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.integration;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.DataException;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.entity.Item;

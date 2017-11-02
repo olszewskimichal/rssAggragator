@@ -1,6 +1,5 @@
 package pl.michal.olszewski.rssaggregator.integration;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;

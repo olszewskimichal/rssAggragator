@@ -6,6 +6,8 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
@@ -16,6 +18,7 @@ import pl.michal.olszewski.rssaggregator.service.BlogService;
 import javax.persistence.PersistenceException;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -220,16 +223,74 @@ public class BlogServiceTest {
     }
 
     @Test
-    public void shouldDeleteBlogById(){
+    public void shouldDeleteBlogById() {
         given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null)));
 
         assertThat(blogService.deleteBlog(1L)).isTrue();
     }
 
     @Test
-    public void shouldThrowExceptionOnDeleteWhenBlogNotExist(){
+    public void shouldThrowExceptionOnDeleteWhenBlogNotExist() {
         given(blogRepository.findById(1L)).willReturn(Optional.empty());
 
-        assertThatThrownBy(()->blogService.deleteBlog(1L)).isNotNull().hasMessage("Nie znaleziono bloga o id = 1");
+        assertThatThrownBy(() -> blogService.deleteBlog(1L)).isNotNull().hasMessage("Nie znaleziono bloga o id = 1");
+    }
+
+    @Test
+    public void shouldGetBlogDTOById() {
+        //given
+        given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null)));
+        //when
+        BlogDTO blogById = blogService.getBlogDTOById(1L);
+        //then
+        assertThat(blogById).isNotNull();
+    }
+
+    @Test
+    public void shouldThrownExceptionWhenBlogDTOByIdNotExist() {
+        //given
+        given(blogRepository.findById(1L)).willReturn(Optional.empty());
+        //when
+        assertThatThrownBy(() -> blogService.getBlogDTOById(1L)).isNotNull().hasMessage("Nie znaleziono bloga o id = 1");
+    }
+
+    @Test
+    public void shouldGetEmptyBlogs() {
+        //given
+        given(blogRepository.findAll()).willReturn(Collections.emptyList());
+        //when
+        List<Blog> blogs = blogService.getAllBlogs();
+        //then
+        assertThat(blogs).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void shouldGetAllBlogs() {
+        //given
+        given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
+        //when
+        List<Blog> blogs = blogService.getAllBlogs();
+        //then
+        assertThat(blogs).isNotNull().isNotEmpty().hasSize(1);
+    }
+
+    @Test
+    public void shouldGetEmptyBlogsDTOs() {
+        //given
+        given(blogRepository.findAll(new PageRequest(0, 20))).willReturn(new PageImpl<>(Collections.emptyList()));
+        //when
+        List<BlogDTO> blogs = blogService.getAllBlogDTOs(null, null);
+        //then
+        assertThat(blogs).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void shouldGetAllBlogDTOs() {
+        //given
+        given(blogRepository.findAll(new PageRequest(0, 20))).willReturn(new PageImpl<>(Collections.singletonList(new Blog())));
+        //when
+        List<BlogDTO> blogs = blogService.getAllBlogDTOs(null,null);
+        //then
+        assertThat(blogs).isNotNull().isNotEmpty().hasSize(1);
     }
 }
