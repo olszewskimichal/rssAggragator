@@ -19,6 +19,6 @@ public class EqualsTest {
     public void itemEqualsContractTest() {
         Blog blog1 = new Blog("test", "", "", "", null);
         Blog blog2 = new Blog("test2", "", "", "", null);
-        EqualsVerifier.forClass(Item.class).withPrefabValues(Blog.class, blog1, blog2).withIgnoredFields("id","blog").verify();
+        EqualsVerifier.forClass(Item.class).withPrefabValues(Blog.class, blog1, blog2).withIgnoredFields("id", "blog").verify();
     }
 }

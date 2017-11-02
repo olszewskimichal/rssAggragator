@@ -24,6 +24,16 @@ public class BlogEndPointTest {
     private BlogService blogService;
     private MockMvc mockMvc;
 
+    private static byte[] convertObjectToJsonBytes(Object object) throws IOException {
+        ObjectMapper mapper = objectMapper();
+        return mapper.writeValueAsBytes(object);
+    }
+
+    private static ObjectMapper objectMapper() {
+        return new ObjectMapper()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
     @Before
     public void configureSystemUnderTest() {
         blogService = mock(BlogService.class);
@@ -89,16 +99,5 @@ public class BlogEndPointTest {
     public void shouldDeleteBlogReturnStatusNoContent() throws Exception {
         mockMvc.perform(delete("/api/v1/blogs/1"))
                 .andExpect(status().isNoContent());
-    }
-
-
-    private static byte[] convertObjectToJsonBytes(Object object) throws IOException {
-        ObjectMapper mapper = objectMapper();
-        return mapper.writeValueAsBytes(object);
-    }
-
-    private static ObjectMapper objectMapper() {
-        return new ObjectMapper()
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 }

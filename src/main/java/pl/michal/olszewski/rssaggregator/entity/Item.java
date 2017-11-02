@@ -12,7 +12,7 @@ import java.time.Instant;
 @Entity
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = {"blog","id"})
+@EqualsAndHashCode(exclude = {"blog", "id"})
 @NoArgsConstructor
 public class Item {
     @Id

@@ -30,7 +30,7 @@ public class BlogEndPoint {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<BlogDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit, @RequestParam(value = "page", required = false) Integer page) {
-        return blogService.getAllBlogDTOs(limit,page);
+        return blogService.getAllBlogDTOs(limit, page);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

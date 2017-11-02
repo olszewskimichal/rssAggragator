@@ -26,8 +26,9 @@ public class AtomReadRomeTest {
     public void setUp() {
         rssExtractorService = new RssExtractorService();
     }
+
     @Test
-    public void shouldCorrectTransformXmlToRome(){
+    public void shouldCorrectTransformXmlToRome() {
         try {
             BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL");
             assertThat(blog).isNotNull();
@@ -38,7 +39,7 @@ public class AtomReadRomeTest {
     }
 
     @Test
-    public void shouldTransformWithCorrectTitle(){
+    public void shouldTransformWithCorrectTitle() {
         try {
             BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL");
             assertThat(blog.getName()).isNotNull().isEqualTo("Test RSS");
@@ -48,7 +49,7 @@ public class AtomReadRomeTest {
     }
 
     @Test
-    public void shouldTransformWithCorrectDescriptionAndPublicationDate(){
+    public void shouldTransformWithCorrectDescriptionAndPublicationDate() {
         try {
             BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL");
             assertThat(blog.getPublishedDate()).isNotNull().isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant());
@@ -58,7 +59,7 @@ public class AtomReadRomeTest {
     }
 
     @Test
-    public void shouldTransformWithCorrectBlogItems(){
+    public void shouldTransformWithCorrectBlogItems() {
         try {
             BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL");
             List<ItemDTO> itemsForBlog = blog.getItemsList();
@@ -69,8 +70,8 @@ public class AtomReadRomeTest {
     }
 
     @Test
-    public void shouldThrowException(){
-        assertThatThrownBy(()->rssExtractorService.getBlog(null, "test", "blogURL")).isNotNull().hasMessage("Wystąpił błąd przy pobieraniu informacji z bloga test");
+    public void shouldThrowException() {
+        assertThatThrownBy(() -> rssExtractorService.getBlog(null, "test", "blogURL")).isNotNull().hasMessage("Wystąpił błąd przy pobieraniu informacji z bloga test");
     }
 
 }

@@ -85,16 +85,16 @@ public class BlogRepositoryTest {
         //when
         entityManager.persistAndFlush(blog);
         //then
-        assertThatThrownBy(()->entityManager.persistAndFlush(theSameBlog)).hasCauseInstanceOf(ConstraintViolationException.class).isInstanceOf(PersistenceException.class).hasMessageContaining("ConstraintViolationException");
+        assertThatThrownBy(() -> entityManager.persistAndFlush(theSameBlog)).hasCauseInstanceOf(ConstraintViolationException.class).isInstanceOf(PersistenceException.class).hasMessageContaining("ConstraintViolationException");
     }
 
     @Test
-    public void shouldThrowExceptionWhenItemDescriptionIsTooLong(){
+    public void shouldThrowExceptionWhenItemDescriptionIsTooLong() {
         Blog blog = new Blog("url", "", "", "", null);
         String desc = IntStream.range(0, 10001).mapToObj(index -> "a").collect(Collectors.joining());
         blog.addItem(new Item(ItemDTO.builder().description(desc).build()));
 
-        assertThatThrownBy(()->entityManager.persistAndFlush(blog))
+        assertThatThrownBy(() -> entityManager.persistAndFlush(blog))
                 .hasCauseInstanceOf(DataException.class)
                 .isInstanceOf(PersistenceException.class)
                 .hasMessageContaining("DataException");

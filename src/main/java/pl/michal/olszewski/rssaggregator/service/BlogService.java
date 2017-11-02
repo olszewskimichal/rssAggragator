@@ -63,12 +63,12 @@ public class BlogService {
 
     public BlogDTO getBlogDTOById(Long id) {
         Blog blogById = getBlogById(id);
-        return new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), blogById.getItems().stream().map(v->new ItemDTO(v.getTitle(),v.getDescription(),v.getLink(),v.getDate(),v.getAuthor())).collect(Collectors.toList()));
+        return new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), blogById.getItems().stream().map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor())).collect(Collectors.toList()));
     }
 
     public List<BlogDTO> getAllBlogDTOs(Integer limit, Integer page) {
         PageRequest pageRequest = new PageRequest(getPage(page), getLimit(limit));
-        return blogRepository.findAll(pageRequest).getContent().stream().map(v->new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), new ArrayList<>())).collect(Collectors.toList());
+        return blogRepository.findAll(pageRequest).getContent().stream().map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), new ArrayList<>())).collect(Collectors.toList());
     }
 
     private int getLimit(final Integer size) {

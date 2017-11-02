@@ -289,7 +289,7 @@ public class BlogServiceTest {
         //given
         given(blogRepository.findAll(new PageRequest(0, 20))).willReturn(new PageImpl<>(Collections.singletonList(new Blog())));
         //when
-        List<BlogDTO> blogs = blogService.getAllBlogDTOs(null,null);
+        List<BlogDTO> blogs = blogService.getAllBlogDTOs(null, null);
         //then
         assertThat(blogs).isNotNull().isNotEmpty().hasSize(1);
     }
