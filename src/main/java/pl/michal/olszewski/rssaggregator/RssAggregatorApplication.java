@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class RssAggregatorApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(RssAggregatorApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(RssAggregatorApplication.class, args);
+  }
 }

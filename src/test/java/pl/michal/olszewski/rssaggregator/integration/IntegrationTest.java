@@ -12,8 +12,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ActiveProfiles("test")
 public abstract class IntegrationTest {
 
-    @LocalServerPort
-    public int port;
+  @LocalServerPort
+  public int port;
 
-    public TestRestTemplate template = new TestRestTemplate();
+  public TestRestTemplate template = new TestRestTemplate();
 }
