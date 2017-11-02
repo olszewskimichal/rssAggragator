@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.integration;
 
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.exception.DataException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,11 +10,16 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
+import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
+import pl.michal.olszewski.rssaggregator.entity.Item;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 
 import javax.persistence.PersistenceException;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -82,5 +88,18 @@ public class BlogRepositoryTest {
         entityManager.persistAndFlush(blog);
         //then
         assertThatThrownBy(()->entityManager.persistAndFlush(theSameBlog)).hasCauseInstanceOf(ConstraintViolationException.class).isInstanceOf(PersistenceException.class).hasMessageContaining("ConstraintViolationException");
+    }
+
+    @Test
+    public void shouldThrowExceptionWhenItemDescriptionIsTooLong(){
+        Blog blog = new Blog("url", "", "", "", null);
+        String desc = IntStream.range(0, 10001).mapToObj(index -> "a").collect(Collectors.joining());
+        blog.addItem(new Item(ItemDTO.builder().description(desc).build()));
+
+        assertThatThrownBy(()->entityManager.persistAndFlush(blog))
+                .hasCauseInstanceOf(DataException.class)
+                .isInstanceOf(PersistenceException.class)
+                .hasMessageContaining("DataException");
+
     }
 }

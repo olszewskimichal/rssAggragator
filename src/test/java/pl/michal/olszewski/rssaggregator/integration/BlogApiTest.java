@@ -3,12 +3,9 @@ package pl.michal.olszewski.rssaggregator.integration;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.assertion.BlogListAssert;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
-import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
-import pl.michal.olszewski.rssaggregator.entity.Item;
 import pl.michal.olszewski.rssaggregator.factory.BlogListFactory;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 

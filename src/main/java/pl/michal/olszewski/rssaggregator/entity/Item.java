@@ -20,7 +20,7 @@ public class Item {
     private Long id;
 
     private String title;
-    @Column(length = 10000) //TODO TEST na to napisać
+    @Column(length = 10000)
     private String description;
     private String link;
     private Instant date;
