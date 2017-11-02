@@ -10,6 +10,7 @@ import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.exception.RssException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,15 +21,15 @@ public class RssExtractorService {
         return syndFeed.getEntries().stream().map(entry -> new ItemDTO(entry.getTitle(), entry.getDescription() != null ? entry.getDescription().getValue() : "", entry.getLink(), entry.getPublishedDate().toInstant(), entry.getAuthor())).collect(Collectors.toList());
     }
 
-    private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL) {
-        return new BlogDTO(syndFeed.getLink(), syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant());
+    private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
+        return new BlogDTO(syndFeed.getLink() != null ? syndFeed.getLink() : blogURL, syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant(), new ArrayList<>());
     }
 
-    public BlogDTO getBlog(XmlReader xmlReader, String feedURL) {
+    public BlogDTO getBlog(XmlReader xmlReader, String feedURL, String blogURL) {
         try (XmlReader reader = xmlReader) {
             SyndFeed feed = new SyndFeedInput().build(reader);
-            BlogDTO blogInfo = getBlogInfo(feed, feedURL);
-            blogInfo.setItemsList(getItemsForBlog(feed));
+            BlogDTO blogInfo = getBlogInfo(feed, feedURL, blogURL);
+            getItemsForBlog(feed).forEach(blogInfo::addNewItem);
             return blogInfo;
         } catch (IOException | FeedException e) {
             throw new RssException(feedURL);
