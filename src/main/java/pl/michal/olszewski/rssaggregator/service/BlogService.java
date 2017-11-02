@@ -1,6 +1,5 @@
 package pl.michal.olszewski.rssaggregator.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -68,7 +67,8 @@ public class BlogService {
 
   public List<BlogDTO> getAllBlogDTOs(Integer limit, Integer page) {
     PageRequest pageRequest = new PageRequest(getPage(page), getLimit(limit));
-    return blogRepository.findAll(pageRequest).getContent().stream().map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), new ArrayList<>()))
+    return blogRepository.findAll(pageRequest).getContent().stream().map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(),
+        v.getItems().stream().map(item -> new ItemDTO(item.getTitle(), item.getDescription(), item.getLink(), item.getDate(), item.getAuthor())).collect(Collectors.toList())))
         .collect(Collectors.toList());
   }
 
