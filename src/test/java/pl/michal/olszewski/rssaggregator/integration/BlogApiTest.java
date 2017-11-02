@@ -109,6 +109,16 @@ public class BlogApiTest extends IntegrationTest {
         assertThat(blogRepository.findById(blog.getId())).isEmpty();
     }
 
+    @Test
+    public void should_get_one_blogWith2Items() {
+        Blog blog = givenBlog()
+                .buildNumberOfBlogsAndSave(1).get(0);
+
+        BlogDTO blogDTO = thenGetOneBlogFromApiById(blog.getId());
+        assertThat(blogDTO.getItemsList()).isNotEmpty().hasSize(2);
+        assertThat(new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), new ArrayList<>())).isEqualToComparingFieldByField(blogDTO);
+    }
+
     private BlogListFactory givenBlog() {
         return new BlogListFactory(blogRepository);
     }
