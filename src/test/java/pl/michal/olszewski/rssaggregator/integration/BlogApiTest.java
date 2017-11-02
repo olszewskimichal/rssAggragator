@@ -117,6 +117,17 @@ public class BlogApiTest extends IntegrationTest {
     assertThat(blogDTO.getItemsList()).isNotEmpty().hasSize(2);
   }
 
+  @Test
+  public void should_get_all_blogs_with_items() {
+    givenBlog()
+        .buildBlogWithItemsAndSave(2);
+
+    List<BlogDTO> dtos = thenGetBlogsFromApi();
+    assertThat(dtos).isNotNull().isNotEmpty().hasSize(1);
+    assertThat(dtos.get(0).getItemsList()).isNotNull().isNotEmpty().hasSize(2);
+
+  }
+
   private BlogListFactory givenBlog() {
     return new BlogListFactory(blogRepository);
   }
