@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.Instant;
@@ -12,12 +13,13 @@ import java.util.List;
 @Getter
 @Builder
 @ToString
+@NoArgsConstructor
 public class BlogDTO {
-    private final String link;
-    private final String description;
-    private final String name;
-    private final String feedURL;
-    private final Instant publishedDate;
+    private String link;
+    private String description;
+    private String name;
+    private String feedURL;
+    private Instant publishedDate;
     @Builder.Default
     private List<ItemDTO> itemsList = new ArrayList<>();
 

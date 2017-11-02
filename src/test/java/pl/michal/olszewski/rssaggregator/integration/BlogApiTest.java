@@ -1,0 +1,154 @@
+package pl.michal.olszewski.rssaggregator.integration;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import pl.michal.olszewski.rssaggregator.assertion.BlogListAssert;
+import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
+import pl.michal.olszewski.rssaggregator.entity.Blog;
+import pl.michal.olszewski.rssaggregator.factory.BlogListFactory;
+import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class BlogApiTest extends IntegrationTest {
+
+    @Autowired
+    private BlogRepository blogRepository;
+
+    @Before
+    public void setUp() {
+        blogRepository.deleteAll();
+    }
+
+    @Test
+    public void should_get_empty_list_of_blogs() {
+        givenBlog()
+                .buildNumberOfBlogsDTOAndSave(0);
+
+        List<BlogDTO> blogs = thenGetBlogsFromApi();
+
+        assertThat(blogs).isEmpty();
+    }
+
+    @Test
+    public void should_get_all_blogs() {
+        givenBlog()
+                .buildNumberOfBlogsDTOAndSave(3);
+
+        List<BlogDTO> blogs = thenGetBlogsFromApi();
+
+        assertThat(blogs).hasSize(3);
+    }
+
+    @Test
+    public void should_get_limit_three_blogs() {
+        givenBlog()
+                .buildNumberOfBlogsDTOAndSave(6);
+
+        List<BlogDTO> blogDefinitionDTOS = thenGetNumberBlogsFromApi(3);
+
+        BlogListAssert.assertThat(blogDefinitionDTOS)
+                .isSuccessful()
+                .hasNumberOfItems(3);
+    }
+
+    @Test
+    public void should_get_one_blog_byName() {
+        List<BlogDTO> blogDTOS = givenBlog()
+                .buildNumberOfBlogsDTOAndSave(1);
+
+        BlogDTO blog = thenGetOneBlogFromApiByName(blogDTOS.get(0).getName());
+
+        assertThat(blogDTOS.get(0)).isEqualToComparingFieldByField(blog);
+    }
+
+    @Test
+    public void should_get_one_blog() {
+        Blog blog = givenBlog()
+                .buildNumberOfBlogsAndSave(1).get(0);
+
+        BlogDTO blogDTO = thenGetOneBlogFromApiById(blog.getId());
+        assertThat(new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), new ArrayList<>())).isEqualToComparingFieldByField(blogDTO);
+    }
+
+    @Test
+    public void should_create_a_blog() {
+        //given
+        blogRepository.deleteAll();
+        //when
+        thenCreateBlogByApi("test");
+
+        //then
+        assertThat(blogRepository.findAll().size()).isEqualTo(1);
+        assertThat(blogRepository.findAll().get(0)).isNotNull();
+    }
+
+    @Test
+    public void should_update_existing_blog() {
+        //given
+        Instant instant = Instant.now();
+        Blog blog = givenBlog()
+                .buildNumberOfBlogsAndSave(1).get(0);
+        BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "", "nazwa nowa", "", instant, new ArrayList<>());
+
+        //when
+        thenUpdateBlogByApi(blog.getId(), blogDTO);
+
+        //then
+        assertThat(blogRepository.findById(blog.getId()).get())
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("name", "nazwa nowa")
+                .hasFieldOrPropertyWithValue("publishedDate", instant);
+    }
+
+    @Test
+    public void should_delete_existing_blog() {
+        //given
+        Blog blog = givenBlog()
+                .buildNumberOfBlogsAndSave(1).get(0);
+        //when
+        thenDeleteOneBlogFromApi(blog.getId());
+
+        //then
+        assertThat(blogRepository.findOne(blog.getId())).isNull();
+    }
+
+    private BlogListFactory givenBlog() {
+        return new BlogListFactory(blogRepository);
+    }
+
+    private List<BlogDTO> thenGetBlogsFromApi() {
+        return Arrays.asList(template.getForEntity(String.format("http://localhost:%s/api/v1/blogs", port), BlogDTO[].class).getBody());
+    }
+
+    private BlogDTO thenGetOneBlogFromApiById(Long id) {
+        return template.getForEntity(String.format("http://localhost:%s/api/v1/blogs/%s", port, id), BlogDTO.class).getBody();
+    }
+
+    private BlogDTO thenGetOneBlogFromApiByName(String name) {
+        return template.getForEntity(String.format("http://localhost:%s/api/v1/blogs/name/%s", port, name), BlogDTO.class).getBody();
+    }
+
+    private List<BlogDTO> thenGetNumberBlogsFromApi(int number) {
+        return Arrays.asList(template.getForEntity(String.format("http://localhost:%s/api/v1/blogs?limit=%s", port, number), BlogDTO[].class).getBody());
+    }
+
+    private void thenCreateBlogByApi(String link) {
+        template.postForEntity(String.format("http://localhost:%s/api/v1/blogs", port), BlogDTO.builder().link(link).build(), BlogDTO.class);
+    }
+
+    private void thenUpdateBlogByApi(Long blogId, BlogDTO blogDTO) {
+        template.put(String.format("http://localhost:%s/api/v1/blogs/%s", port, blogId), blogDTO);
+    }
+
+    private void thenDeleteOneBlogFromApi(Long blogId) {
+        template.delete(String.format("http://localhost:%s/api/v1/blogs/%s", port, blogId));
+    }
+
+}
