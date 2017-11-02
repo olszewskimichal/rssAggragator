@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
+import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.entity.Item;
 import pl.michal.olszewski.rssaggregator.exception.BlogNotFoundException;
@@ -62,7 +63,7 @@ public class BlogService {
 
     public BlogDTO getBlogDTOById(Long id) {
         Blog blogById = getBlogById(id);
-        return new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), new ArrayList<>());
+        return new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), blogById.getItems().stream().map(v->new ItemDTO(v.getTitle(),v.getDescription(),v.getLink(),v.getDate(),v.getAuthor())).collect(Collectors.toList()));
     }
 
     public List<BlogDTO> getAllBlogDTOs(Integer limit, Integer page) {

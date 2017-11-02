@@ -14,6 +14,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Transactional
 public class UpdateScheduleTest extends IntegrationTest {
 
     @Autowired
@@ -21,17 +22,13 @@ public class UpdateScheduleTest extends IntegrationTest {
     @Autowired
     private BlogRepository blogRepository;
 
-    @Before
-    public void setUp() throws Exception {
-        blogRepository.deleteAll();
-    }
-
     @Test
     public void contextLoads() {
     }
 
     @Test
     public void shouldUpdateBlog() {
+        blogRepository.deleteAll();
         Blog blog = new Blog("https://devstyle.pl", "DEVSTYLE", "devstyle", "https://devstyle.pl/feed", null);
         blogRepository.save(blog);
         blogSchedule.updatesBlogs();

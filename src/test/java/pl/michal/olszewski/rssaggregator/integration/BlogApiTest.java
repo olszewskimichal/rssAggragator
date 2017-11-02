@@ -3,9 +3,12 @@ package pl.michal.olszewski.rssaggregator.integration;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.assertion.BlogListAssert;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
+import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
+import pl.michal.olszewski.rssaggregator.entity.Item;
 import pl.michal.olszewski.rssaggregator.factory.BlogListFactory;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 
@@ -15,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class BlogApiTest extends IntegrationTest {
 
@@ -112,11 +116,10 @@ public class BlogApiTest extends IntegrationTest {
     @Test
     public void should_get_one_blogWith2Items() {
         Blog blog = givenBlog()
-                .buildNumberOfBlogsAndSave(1).get(0);
+                .buildBlogWithItemsAndSave(2);
 
         BlogDTO blogDTO = thenGetOneBlogFromApiById(blog.getId());
         assertThat(blogDTO.getItemsList()).isNotEmpty().hasSize(2);
-        assertThat(new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), new ArrayList<>())).isEqualToComparingFieldByField(blogDTO);
     }
 
     private BlogListFactory givenBlog() {
