@@ -17,8 +17,9 @@ public class NewestItemService {
   }
 
   public List<ItemDTO> getNewestItems(int size) {
-    return itemRepository.findAllByOrderByDateDesc(new PageRequest(0, size)).getContent().stream().map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()))
-        .collect(
-            Collectors.toList());
+    return itemRepository.findAllByOrderByDateDesc(new PageRequest(0, size)).getContent()
+        .stream()
+        .map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()))
+        .collect(Collectors.toList());
   }
 }
