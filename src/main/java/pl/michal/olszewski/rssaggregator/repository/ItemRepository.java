@@ -9,6 +9,6 @@ import pl.michal.olszewski.rssaggregator.entity.Item;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-  Page<Item> findAllOrderByDateDesc(Pageable pageable);
+  Page<Item> findAllByOrderByDateDesc(Pageable pageable);
 
 }
