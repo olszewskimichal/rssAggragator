@@ -42,11 +42,27 @@ public class ItemRepositoryTest {
     entityManager.persistAndFlush(blog);
 
     //when
-    Page<Item> items = itemRepository.findAllOrderByDateDesc(new PageRequest(0, 2));
+    Page<Item> items = itemRepository.findAllByOrderByDateDesc(new PageRequest(0, 2));
 
     //then
     assertThat(items.getContent().size()).isEqualTo(2);
     assertThat(items.getContent().stream().map(Item::getDate).collect(Collectors.toList())).contains(instant, instant.plusSeconds(10));
+  }
+
+  @Test
+  public void shouldFindItemsWhenDateIsNull(){
+    //given
+    Blog blog = new Blog("url", "", "", "", null);
+    blog.addItem(new Item(ItemDTO.builder().title("title1").build()));
+    blog.addItem(new Item(ItemDTO.builder().title("title2").build()));
+    blog.addItem(new Item(ItemDTO.builder().title("title3").build()));
+
+    //when
+    Page<Item> items = itemRepository.findAllByOrderByDateDesc(new PageRequest(0, 2));
+
+    //then
+    assertThat(items.getContent().size()).isEqualTo(2);
+    items.getContent().forEach(System.out::println);
   }
 
 
