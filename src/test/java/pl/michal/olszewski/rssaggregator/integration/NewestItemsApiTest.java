@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.assertion.ItemListAssert;
@@ -15,6 +16,11 @@ public class NewestItemsApiTest extends IntegrationTest {
 
   @Autowired
   private BlogRepository repository;
+
+  @Before
+  public void setUp() {
+    repository.deleteAll();
+  }
 
   @Test
   public void should_get_empty_list_of_items() {
@@ -41,9 +47,9 @@ public class NewestItemsApiTest extends IntegrationTest {
     givenItem()
         .buildNumberOfItemsAndSave(6);
 
-    List<ItemDTO> itemDefinitionDTOS = thenGetNumberItemsFromApi(3);
+    List<ItemDTO> itemDTOS = thenGetNumberItemsFromApi(3);
 
-    ItemListAssert.assertThat(itemDefinitionDTOS)
+    ItemListAssert.assertThat(itemDTOS)
         .isSuccessful()
         .hasNumberOfItems(3);
   }

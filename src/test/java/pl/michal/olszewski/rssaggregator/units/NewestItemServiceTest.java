@@ -38,7 +38,7 @@ public class NewestItemServiceTest {
 
     given(itemRepository.findAllByOrderByDateDesc(new PageRequest(0, 10))).willReturn(new PageImpl<>(itemList));
     //when
-    List<Item> newestItems = itemService.getNewestItems(10);
+    List<ItemDTO> newestItems = itemService.getNewestItems(10);
     //then
     assertThat(newestItems).isNotNull().isNotEmpty().hasSize(10);
   }
