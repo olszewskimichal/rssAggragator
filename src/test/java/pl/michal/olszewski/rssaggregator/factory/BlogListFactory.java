@@ -33,8 +33,7 @@ public class BlogListFactory {
 
   public Blog buildBlogWithItemsAndSave(int numberOfItems) {
     Blog blog = new Blog("blog997", "", "", "", null);
-    blog.addItem(new Item(ItemDTO.builder().title("title1").build()));
-    blog.addItem(new Item(ItemDTO.builder().title("title2").build()));
+    IntStream.rangeClosed(1, numberOfItems).forEach(v -> blog.addItem(new Item(ItemDTO.builder().title("title" + v).build())));
     return repository.save(blog);
   }
 
