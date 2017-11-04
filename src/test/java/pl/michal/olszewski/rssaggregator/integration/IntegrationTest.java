@@ -15,5 +15,5 @@ public abstract class IntegrationTest {
   @LocalServerPort
   public int port;
 
-  public TestRestTemplate template = new TestRestTemplate();
+  final TestRestTemplate template = new TestRestTemplate();
 }

@@ -53,7 +53,7 @@ public class BlogService {
     return blogRepository.findAll();
   }
 
-  public boolean deleteBlog(Long id) {
+  public boolean deleteBlog(Long id) throws BlogNotFoundException {
     Blog blog = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
     blogRepository.delete(blog);
     return true;

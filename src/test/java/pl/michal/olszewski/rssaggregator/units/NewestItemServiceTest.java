@@ -26,7 +26,7 @@ public class NewestItemServiceTest {
   private ItemRepository itemRepository;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     MockitoAnnotations.initMocks(this);
     itemService = new NewestItemService(itemRepository);
   }

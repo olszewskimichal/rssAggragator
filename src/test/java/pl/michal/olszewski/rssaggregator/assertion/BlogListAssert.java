@@ -6,9 +6,9 @@ import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 
 public class BlogListAssert extends ListAssert<BlogDTO> {
 
-  private List<BlogDTO> actual;
+  private final List<BlogDTO> actual;
 
-  protected BlogListAssert(List<BlogDTO> blogList) {
+  private BlogListAssert(List<BlogDTO> blogList) {
     super(blogList);
     this.actual = blogList;
   }

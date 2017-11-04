@@ -35,7 +35,7 @@ public class BlogServiceTest {
   private BlogRepository blogRepository;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     MockitoAnnotations.initMocks(this);
     blogService = new BlogService(blogRepository);
   }

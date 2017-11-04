@@ -50,7 +50,7 @@ public class ItemRepositoryTest {
   }
 
   @Test
-  public void shouldFindItemsWhenDateIsNull(){
+  public void shouldFindItemsWhenDateIsNull() {
     //given
     Blog blog = new Blog("url", "", "", "", null);
     blog.addItem(new Item(ItemDTO.builder().title("title1").build()));
