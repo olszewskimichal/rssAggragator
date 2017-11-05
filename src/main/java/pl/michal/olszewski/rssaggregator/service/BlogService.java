@@ -3,7 +3,7 @@ package pl.michal.olszewski.rssaggregator.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +15,6 @@ import pl.michal.olszewski.rssaggregator.exception.BlogNotFoundException;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 
 @Service
-@Slf4j
 @Transactional
 public class BlogService {
 
@@ -45,7 +44,6 @@ public class BlogService {
   }
 
   public Blog updateBlog(BlogDTO blogDTO) {
-    log.debug(blogDTO.toString());
     Blog blog = getBlogByURL(blogDTO.getLink());
     blog.updateFromDto(blogDTO);
     blogDTO.getItemsList().stream()
@@ -55,8 +53,8 @@ public class BlogService {
     return blog;
   }
 
-  public List<Blog> getAllBlogs() {
-    return blogRepository.findAll();
+  public Page<Blog> getAllBlogs(int pageNumber, int pageLimit) {
+    return blogRepository.findAll(new PageRequest(pageNumber, pageLimit));
   }
 
   public boolean deleteBlog(Long id) {
