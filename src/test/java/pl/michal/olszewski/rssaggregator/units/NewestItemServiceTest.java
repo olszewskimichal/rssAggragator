@@ -11,8 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Item;
 import pl.michal.olszewski.rssaggregator.repository.ItemRepository;
@@ -36,7 +34,7 @@ public class NewestItemServiceTest {
     //given
     List<Item> itemList = IntStream.rangeClosed(1, 10).mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())).collect(Collectors.toList());
 
-    given(itemRepository.findAllByOrderByDateDesc(new PageRequest(0, 10))).willReturn(new PageImpl<>(itemList));
+    given(itemRepository.findAllByOrderByDateDesc(10)).willReturn(itemList.stream());
     //when
     List<ItemDTO> newestItems = itemService.getNewestItems(10);
     //then

@@ -5,14 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
@@ -42,11 +41,11 @@ public class ItemRepositoryTest {
     entityManager.persistAndFlush(blog);
 
     //when
-    Page<Item> items = itemRepository.findAllByOrderByDateDesc(new PageRequest(0, 2));
+    List<Item> items = itemRepository.findAllByOrderByDateDesc(2).collect(Collectors.toList());
 
     //then
-    assertThat(items.getContent().size()).isEqualTo(2);
-    assertThat(items.getContent().stream().map(Item::getDate).collect(Collectors.toList())).contains(instant, instant.plusSeconds(10));
+    assertThat(items.size()).isEqualTo(2);
+    assertThat(items.stream().map(Item::getDate).collect(Collectors.toList())).contains(instant, instant.plusSeconds(10));
   }
 
   @Test
@@ -59,11 +58,10 @@ public class ItemRepositoryTest {
     entityManager.persistAndFlush(blog);
 
     //when
-    Page<Item> items = itemRepository.findAllByOrderByDateDesc(new PageRequest(0, 2));
+    List<Item> items = itemRepository.findAllByOrderByDateDesc(2).collect(Collectors.toList());
 
     //then
-    assertThat(items.getContent().size()).isEqualTo(2);
-    items.getContent().forEach(System.out::println);
+    assertThat(items.size()).isEqualTo(2);
   }
 
 

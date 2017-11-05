@@ -4,7 +4,6 @@ import com.rometools.rome.io.XmlReader;
 import java.io.IOException;
 import java.net.URL;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
@@ -27,14 +26,7 @@ public class UpdateBlogSchedule {
   @Scheduled(fixedDelay = 15 * 60 * 1000)
   public void updatesBlogs() {
     log.debug("zaczynam aktualizacje blogów");
-    final int pageLimit = 20;
-    int pageNumber = 0;
-    Page<Blog> allBlogs = blogService.getAllBlogs(pageNumber, pageLimit);
-    while (allBlogs.hasNext()) {
-      allBlogs.getContent().forEach(this::updateBlog);
-      allBlogs = blogService.getAllBlogs(++pageNumber, pageLimit);
-    }
-    allBlogs.getContent().forEach(this::updateBlog);
+    blogService.getAllBlogs().forEach(this::updateBlog);
     log.debug("Aktualizacja zakończona");
   }
 

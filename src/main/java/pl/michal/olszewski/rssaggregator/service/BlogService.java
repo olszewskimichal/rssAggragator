@@ -3,7 +3,6 @@ package pl.michal.olszewski.rssaggregator.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,8 +52,8 @@ public class BlogService {
     return blog;
   }
 
-  public Page<Blog> getAllBlogs(int pageNumber, int pageLimit) {
-    return blogRepository.findAll(new PageRequest(pageNumber, pageLimit));
+  public List<Blog> getAllBlogs() {
+    return blogRepository.findStreamAll().collect(Collectors.toList());
   }
 
   public boolean deleteBlog(Long id) {

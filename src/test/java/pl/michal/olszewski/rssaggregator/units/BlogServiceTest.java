@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javax.persistence.PersistenceException;
 import org.junit.Before;
 import org.junit.Test;
@@ -257,9 +258,9 @@ public class BlogServiceTest {
   @Test
   public void shouldGetEmptyBlogs() {
     //given
-    given(blogRepository.findAll(new PageRequest(0, 20))).willReturn(new PageImpl<>(Collections.emptyList()));
+    given(blogRepository.findStreamAll()).willReturn(Stream.empty());
     //when
-    List<Blog> blogs = blogService.getAllBlogs(0, 20).getContent();
+    List<Blog> blogs = blogService.getAllBlogs();
     //then
     assertThat(blogs).isNotNull().isEmpty();
   }
@@ -267,9 +268,9 @@ public class BlogServiceTest {
   @Test
   public void shouldGetAllBlogs() {
     //given
-    given(blogRepository.findAll(new PageRequest(0, 20))).willReturn(new PageImpl<>(Collections.singletonList(new Blog())));
+    given(blogRepository.findStreamAll()).willReturn(Stream.of(new Blog()));
     //when
-    List<Blog> blogs = blogService.getAllBlogs(0, 20).getContent();
+    List<Blog> blogs = blogService.getAllBlogs();
     //then
     assertThat(blogs).isNotNull().isNotEmpty().hasSize(1);
   }
