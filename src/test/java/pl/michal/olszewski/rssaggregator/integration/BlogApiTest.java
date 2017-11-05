@@ -87,7 +87,7 @@ public class BlogApiTest extends IntegrationTest {
     BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "", "nazwa nowa", "", instant, new ArrayList<>());
 
     //when
-    thenUpdateBlogByApi(blog.getId(), blogDTO);
+    thenUpdateBlogByApi(blogDTO);
 
     //then
     assertThat(blogRepository.findById(blog.getId()).get())
@@ -148,7 +148,7 @@ public class BlogApiTest extends IntegrationTest {
     template.postForEntity(String.format("http://localhost:%s/api/v1/blogs", port), BlogDTO.builder().link(link).build(), BlogDTO.class);
   }
 
-  private void thenUpdateBlogByApi(Long blogId, BlogDTO blogDTO) {
+  private void thenUpdateBlogByApi(BlogDTO blogDTO) {
     template.put(String.format("http://localhost:%s/api/v1/blogs/", port), blogDTO);
   }
 

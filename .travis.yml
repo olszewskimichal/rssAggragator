@@ -17,3 +17,10 @@ jobs:
         - mvn test -B
       after_success:
        - bash <(curl -s https://codecov.io/bash)
+notifications:
+  email:
+    recipients:
+      - olszewskimichal@outlook.com
+      - olsz72@o2.pl
+    on_success: change
+    on_failure: always

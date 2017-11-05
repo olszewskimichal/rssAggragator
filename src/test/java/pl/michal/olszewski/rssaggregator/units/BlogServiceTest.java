@@ -35,7 +35,7 @@ public class BlogServiceTest {
   private BlogRepository blogRepository;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     MockitoAnnotations.initMocks(this);
     blogService = new BlogService(blogRepository);
   }
@@ -257,9 +257,9 @@ public class BlogServiceTest {
   @Test
   public void shouldGetEmptyBlogs() {
     //given
-    given(blogRepository.findAll()).willReturn(Collections.emptyList());
+    given(blogRepository.findAll(new PageRequest(0, 20))).willReturn(new PageImpl<>(Collections.emptyList()));
     //when
-    List<Blog> blogs = blogService.getAllBlogs();
+    List<Blog> blogs = blogService.getAllBlogs(0, 20).getContent();
     //then
     assertThat(blogs).isNotNull().isEmpty();
   }
@@ -267,9 +267,9 @@ public class BlogServiceTest {
   @Test
   public void shouldGetAllBlogs() {
     //given
-    given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
+    given(blogRepository.findAll(new PageRequest(0, 20))).willReturn(new PageImpl<>(Collections.singletonList(new Blog())));
     //when
-    List<Blog> blogs = blogService.getAllBlogs();
+    List<Blog> blogs = blogService.getAllBlogs(0, 20).getContent();
     //then
     assertThat(blogs).isNotNull().isNotEmpty().hasSize(1);
   }

@@ -15,6 +15,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 
 @Entity
@@ -22,6 +23,7 @@ import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 @EqualsAndHashCode
 @NoArgsConstructor
 @ToString
+@Slf4j
 public class Blog {
 
   @Id
@@ -52,6 +54,7 @@ public class Blog {
 
   public void addItem(Item item) {
     if (items.add(item)) {
+      log.debug("Dodaje nowy wpis do bloga {} o tytule {}", this.getName(), item.getTitle());
       item.setBlog(this);
     }
   }

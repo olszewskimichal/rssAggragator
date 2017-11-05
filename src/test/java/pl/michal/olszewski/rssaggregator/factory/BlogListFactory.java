@@ -18,12 +18,6 @@ public class BlogListFactory {
     this.repository = repository;
   }
 
-  public static List<BlogDTO> getNotPersistedBlogs(int numberOfBlogs) {
-    return IntStream.range(0, numberOfBlogs).mapToObj(number -> new Blog("blog" + number, "", "", "", null))
-        .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), Collections.emptyList()))
-        .collect(Collectors.toList());
-  }
-
   public List<BlogDTO> buildNumberOfBlogsDTOAndSave(int numberOfBlogs) {
     IntStream.range(0, numberOfBlogs).mapToObj(number -> new Blog("blog" + number, "", "", "", null)).
         forEach(repository::save);
@@ -33,8 +27,7 @@ public class BlogListFactory {
 
   public Blog buildBlogWithItemsAndSave(int numberOfItems) {
     Blog blog = new Blog("blog997", "", "", "", null);
-    blog.addItem(new Item(ItemDTO.builder().title("title1").build()));
-    blog.addItem(new Item(ItemDTO.builder().title("title2").build()));
+    IntStream.rangeClosed(1, numberOfItems).forEach(v -> blog.addItem(new Item(ItemDTO.builder().title("title" + v).build())));
     return repository.save(blog);
   }
 

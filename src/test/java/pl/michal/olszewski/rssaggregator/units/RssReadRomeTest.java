@@ -19,7 +19,7 @@ import pl.michal.olszewski.rssaggregator.service.RssExtractorService;
 
 public class RssReadRomeTest {
 
-  RssExtractorService rssExtractorService = new RssExtractorService();
+  private final RssExtractorService rssExtractorService = new RssExtractorService();
 
   @Test
   public void shouldCorrectTransformXmlToRome() {
