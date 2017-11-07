@@ -3,7 +3,8 @@ package pl.michal.olszewski.rssaggregator.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
@@ -23,6 +24,7 @@ public class BlogService {
     this.blogRepository = blogRepository;
   }
 
+  @CacheEvict(value = {"blogs", "blogsURL"})
   public Blog createBlog(BlogDTO blogDTO) {
     Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate());
     blogDTO.getItemsList().stream()
@@ -32,6 +34,7 @@ public class BlogService {
     return blog;
   }
 
+  @Cacheable("blogsURL")
   public Blog getBlogByURL(String url) {
     return blogRepository.findByBlogURL(url)
         .orElseThrow(() -> new BlogNotFoundException(url));
@@ -47,15 +50,18 @@ public class BlogService {
     blog.updateFromDto(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)
+        .filter(v -> !blog.getItems().contains(v))
         .forEach(blog::addItem);
     blogRepository.save(blog);
     return blog;
   }
 
+  @Cacheable("blogs")
   public List<Blog> getAllBlogs() {
     return blogRepository.findStreamAll().collect(Collectors.toList());
   }
 
+  @CacheEvict(value = {"blogs", "blogsURL"})
   public boolean deleteBlog(Long id) {
     Blog blog = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
     blogRepository.delete(blog);
@@ -67,9 +73,10 @@ public class BlogService {
     return new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById));
   }
 
-  public List<BlogDTO> getAllBlogDTOs(Integer limit, Integer page) {
-    PageRequest pageRequest = new PageRequest(getPage(page), getLimit(limit));
-    return blogRepository.findAll(pageRequest).getContent().stream()
+  @Cacheable("blogs")
+  public List<BlogDTO> getAllBlogDTOs(Integer limit) {
+    return blogRepository.findStreamAll()
+        .limit(getLimit(limit))
         .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v)))
         .collect(Collectors.toList());
   }
@@ -82,7 +89,4 @@ public class BlogService {
     return (Objects.isNull(size) ? 20 : size);
   }
 
-  private int getPage(final Integer page) {
-    return (Objects.isNull(page) ? 0 : page);
-  }
 }

@@ -23,7 +23,7 @@ public class BlogApiTest extends IntegrationTest {
   @Before
   public void setUp() {
     blogRepository.deleteAll();
-  }
+  }  //TODO evictCache
 
   @Test
   public void should_get_empty_list_of_blogs() {

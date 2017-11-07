@@ -278,9 +278,9 @@ public class BlogServiceTest {
   @Test
   public void shouldGetEmptyBlogsDTOs() {
     //given
-    given(blogRepository.findAll(new PageRequest(0, 20))).willReturn(new PageImpl<>(Collections.emptyList()));
+    given(blogRepository.findStreamAll()).willReturn(Stream.empty());
     //when
-    List<BlogDTO> blogs = blogService.getAllBlogDTOs(null, null);
+    List<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
     //then
     assertThat(blogs).isNotNull().isEmpty();
   }
@@ -288,9 +288,9 @@ public class BlogServiceTest {
   @Test
   public void shouldGetAllBlogDTOs() {
     //given
-    given(blogRepository.findAll(new PageRequest(0, 20))).willReturn(new PageImpl<>(Collections.singletonList(new Blog())));
+    given(blogRepository.findStreamAll()).willReturn(Stream.of(new Blog()));
     //when
-    List<BlogDTO> blogs = blogService.getAllBlogDTOs(null, null);
+    List<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
     //then
     assertThat(blogs).isNotNull().isNotEmpty().hasSize(1);
   }

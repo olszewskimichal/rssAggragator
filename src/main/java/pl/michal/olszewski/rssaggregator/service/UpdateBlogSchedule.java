@@ -23,7 +23,7 @@ public class UpdateBlogSchedule {
     this.rssExtractorService = new RssExtractorService();
   }
 
-  @Scheduled(fixedDelay = 15 * 60 * 1000)
+  @Scheduled(fixedDelay = 10 * 60 * 1000)
   public void updatesBlogs() {
     log.debug("zaczynam aktualizacje blogów");
     blogService.getAllBlogs().forEach(this::updateBlog);
