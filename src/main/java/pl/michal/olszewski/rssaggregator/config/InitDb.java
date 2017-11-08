@@ -1,9 +1,7 @@
 package pl.michal.olszewski.rssaggregator.config;
 
 import java.util.stream.Stream;
-import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.TaskScheduler;
@@ -17,7 +15,6 @@ import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 @Slf4j
 @Profile("development")
 @EnableScheduling
-@EnableCaching
 public class InitDb {
 
   private final BlogRepository blogRepository;
@@ -28,8 +25,8 @@ public class InitDb {
 
   //@PostConstruct
   public void populateDatabase() {
-    Stream.of("https://devstyle.pl","https://vladmihalcea.com","http://jakoszczedzacpieniadze.pl","https://kobietydokodu.pl","https://codecouple.pl")
-        .map(v->new Blog(v,"","",v+"/feed",null))
+    Stream.of("https://devstyle.pl", "https://vladmihalcea.com", "http://jakoszczedzacpieniadze.pl", "https://kobietydokodu.pl", "https://codecouple.pl")
+        .map(v -> new Blog(v, "", "", v + "/feed", null))
         .forEach(blogRepository::save);
     blogRepository.save(new Blog("http://jvm-bloggers.com", "", "JVM-Bloggers", "http://jvm-bloggers.com/pl/rss", null));
     blogRepository.save(new Blog("https://programistanaswoim.pl", "", "ProgramistaNaSwoim", "http://feeds.feedburner.com/ProgramistaNaSwoim", null));

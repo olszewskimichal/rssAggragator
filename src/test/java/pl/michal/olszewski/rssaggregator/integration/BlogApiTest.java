@@ -14,16 +14,21 @@ import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.factory.BlogListFactory;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
+import pl.michal.olszewski.rssaggregator.service.BlogService;
 
-public class BlogApiTest extends IntegrationTest {
+public class BlogApiTest extends IntegrationTestBase {
 
   @Autowired
   private BlogRepository blogRepository;
 
+  @Autowired
+  private BlogService blogService;
+
   @Before
   public void setUp() {
     blogRepository.deleteAll();
-  }  //TODO evictCache
+    blogService.evictBlogCache();
+  }
 
   @Test
   public void should_get_empty_list_of_blogs() {
