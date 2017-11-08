@@ -15,6 +15,10 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
   @Query("select b from Blog b left join fetch b.items where b.blogURL=?1")
   Optional<Blog> findByBlogURL(String url);
 
+  @Cacheable(value = "blogsURL")
+  @Query("select b from Blog b left join fetch b.items where b.name=?1")
+  Optional<Blog> findByName(String name);
+
   @Query("select b from Blog b left join fetch b.items where b.id=?1")
   Optional<Blog> findById(Long id);
 

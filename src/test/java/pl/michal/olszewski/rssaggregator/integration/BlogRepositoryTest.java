@@ -100,4 +100,26 @@ public class BlogRepositoryTest {
         .hasMessageContaining("DataException");
 
   }
+
+  @Test
+  public void shouldFindBlogByName() {
+    //given
+    Blog blog = new Blog("", "", "url", "", null);
+    entityManager.persistAndFlush(blog);
+
+    //when
+    Optional<Blog> byName = blogRepository.findByName("url");
+
+    //then
+    assertThat(byName).isPresent();
+  }
+
+  @Test
+  public void shouldNotFindBlogByNameWhenNotExists() {
+    //when
+    Optional<Blog> byName = blogRepository.findByName("name");
+
+    //then
+    assertThat(byName).isNotPresent();
+  }
 }

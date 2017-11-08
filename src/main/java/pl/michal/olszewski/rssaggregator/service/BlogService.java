@@ -24,7 +24,7 @@ public class BlogService {
     this.blogRepository = blogRepository;
   }
 
-  @CacheEvict(value = {"blogs", "blogsURL"})
+  @CacheEvict(value = {"blogs", "blogsURL","blogsDTO"}, allEntries = true)
   public Blog createBlog(BlogDTO blogDTO) {
     Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate());
     blogDTO.getItemsList().stream()
@@ -34,10 +34,13 @@ public class BlogService {
     return blog;
   }
 
-  @Cacheable("blogsURL")
   public Blog getBlogByURL(String url) {
     return blogRepository.findByBlogURL(url)
         .orElseThrow(() -> new BlogNotFoundException(url));
+  }
+
+  public Blog getBlogByName(String name) {
+    return blogRepository.findByName(name).orElseThrow(() -> new BlogNotFoundException(name));
   }
 
   public Blog getBlogById(Long id) {
@@ -45,14 +48,14 @@ public class BlogService {
         .orElseThrow(() -> new BlogNotFoundException(id));
   }
 
+  @Transactional
   public Blog updateBlog(BlogDTO blogDTO) {
-    Blog blog = getBlogByURL(blogDTO.getLink());
+    Blog blog = getBlogByName(blogDTO.getName());
     blog.updateFromDto(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)
         .filter(v -> !blog.getItems().contains(v))
         .forEach(blog::addItem);
-    blogRepository.save(blog);
     return blog;
   }
 
@@ -61,7 +64,7 @@ public class BlogService {
     return blogRepository.findStreamAll().collect(Collectors.toList());
   }
 
-  @CacheEvict(value = {"blogs", "blogsURL"})
+  @CacheEvict(value = {"blogs", "blogsURL","blogsDTO"}, allEntries = true)
   public boolean deleteBlog(Long id) {
     Blog blog = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
     blogRepository.delete(blog);
@@ -73,9 +76,14 @@ public class BlogService {
     return new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById));
   }
 
-  @Cacheable("blogs")
+  public BlogDTO getBlogDTOByName(String name) {
+    Blog blog = getBlogByName(name);
+    return new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog));
+  }
+
+  @Cacheable("blogsDTO")
   public List<BlogDTO> getAllBlogDTOs(Integer limit) {
-    return blogRepository.findStreamAll()
+    return getAllBlogs().stream()
         .limit(getLimit(limit))
         .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v)))
         .collect(Collectors.toList());

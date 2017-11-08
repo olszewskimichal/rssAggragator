@@ -27,7 +27,7 @@ public class UpdateScheduleTest extends IntegrationTest {
   @Test
   public void shouldUpdateBlog() {
     blogRepository.deleteAll();
-    Blog blog = new Blog("https://devstyle.pl", "DEVSTYLE", "devstyle", "https://devstyle.pl/feed", null);
+    Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null);
     blogRepository.save(blog);
     blogSchedule.updatesBlogs();
     Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());

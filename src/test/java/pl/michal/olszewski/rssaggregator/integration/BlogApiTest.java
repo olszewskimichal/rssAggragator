@@ -84,7 +84,7 @@ public class BlogApiTest extends IntegrationTest {
     Instant instant = Instant.now();
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
-    BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "", "nazwa nowa", "", instant, new ArrayList<>());
+    BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "desc", blog.getName(), "", instant, new ArrayList<>());
 
     //when
     thenUpdateBlogByApi(blogDTO);
@@ -92,7 +92,7 @@ public class BlogApiTest extends IntegrationTest {
     //then
     assertThat(blogRepository.findById(blog.getId()).get())
         .isNotNull()
-        .hasFieldOrPropertyWithValue("name", "nazwa nowa")
+        .hasFieldOrPropertyWithValue("description", "desc")
         .hasFieldOrPropertyWithValue("publishedDate", instant);
   }
 

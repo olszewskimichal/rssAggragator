@@ -18,7 +18,12 @@ public class RssExtractorService {
 
   private static List<ItemDTO> getItemsForBlog(SyndFeed syndFeed) {
     return syndFeed.getEntries().stream()
-        .map(entry -> new ItemDTO(entry.getTitle(), entry.getDescription() != null ? entry.getDescription().getValue() : "", entry.getLink(), entry.getPublishedDate().toInstant(), entry.getAuthor()))
+        .map(entry -> new ItemDTO(
+            entry.getTitle(),
+            entry.getDescription() != null ? entry.getDescription().getValue() : "",
+            entry.getLink(),
+            entry.getPublishedDate() == null ? entry.getUpdatedDate().toInstant() : entry.getPublishedDate().toInstant(),
+            entry.getAuthor()))
         .collect(Collectors.toList());
   }
 

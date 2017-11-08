@@ -104,4 +104,20 @@ public class BlogEndPointTest {
     mockMvc.perform(delete("/api/v1/blogs/1"))
         .andExpect(status().isNoContent());
   }
+
+  @Test
+  public void shouldGetBlogByNameReturnBlogAsJson() throws Exception {
+    given(blogService.getBlogDTOByName("name")).willReturn(new BlogDTO());
+
+    mockMvc.perform(get("/api/v1/blogs/by-name/name"))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
+  }
+
+  @Test
+  public void shouldReturnCorrectBlogByName() throws Exception {
+    given(blogService.getBlogDTOByName("nazwa")).willReturn(BlogDTO.builder().name("nazwa").build());
+
+    mockMvc.perform(get("/api/v1/blogs/by-name/nazwa"))
+        .andExpect(jsonPath("$.name", is("nazwa")));
+  }
 }

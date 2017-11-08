@@ -26,7 +26,7 @@ public class InitDb {
     this.blogRepository = blogRepository;
   }
 
-  @PostConstruct
+  //@PostConstruct
   public void populateDatabase() {
     Stream.of("https://devstyle.pl","https://vladmihalcea.com","http://jakoszczedzacpieniadze.pl","https://kobietydokodu.pl","https://codecouple.pl")
         .map(v->new Blog(v,"","",v+"/feed",null))
