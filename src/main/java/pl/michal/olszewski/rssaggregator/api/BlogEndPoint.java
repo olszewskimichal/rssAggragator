@@ -37,9 +37,16 @@ public class BlogEndPoint {
         .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
 
+  @GetMapping(value = "/by-name/{name}")
+  public ResponseEntity<BlogDTO> getBlogByName(@PathVariable("name") String name) {
+    return Optional.ofNullable(blogService.getBlogDTOByName(name))
+        .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
+        .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+  }
+
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<BlogDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit, @RequestParam(value = "page", required = false) Integer page) {
-    return blogService.getAllBlogDTOs(limit, page);
+  public List<BlogDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit) {
+    return blogService.getAllBlogDTOs(limit);
   }
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

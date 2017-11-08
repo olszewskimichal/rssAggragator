@@ -14,15 +14,20 @@ import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.factory.BlogListFactory;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
+import pl.michal.olszewski.rssaggregator.service.BlogService;
 
-public class BlogApiTest extends IntegrationTest {
+public class BlogApiTest extends IntegrationTestBase {
 
   @Autowired
   private BlogRepository blogRepository;
 
+  @Autowired
+  private BlogService blogService;
+
   @Before
   public void setUp() {
     blogRepository.deleteAll();
+    blogService.evictBlogCache();
   }
 
   @Test
@@ -84,7 +89,7 @@ public class BlogApiTest extends IntegrationTest {
     Instant instant = Instant.now();
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
-    BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "", "nazwa nowa", "", instant, new ArrayList<>());
+    BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "desc", blog.getName(), "", instant, new ArrayList<>());
 
     //when
     thenUpdateBlogByApi(blogDTO);
@@ -92,7 +97,7 @@ public class BlogApiTest extends IntegrationTest {
     //then
     assertThat(blogRepository.findById(blog.getId()).get())
         .isNotNull()
-        .hasFieldOrPropertyWithValue("name", "nazwa nowa")
+        .hasFieldOrPropertyWithValue("description", "desc")
         .hasFieldOrPropertyWithValue("publishedDate", instant);
   }
 

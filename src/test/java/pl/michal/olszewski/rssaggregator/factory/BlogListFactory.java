@@ -32,7 +32,7 @@ public class BlogListFactory {
   }
 
   public List<Blog> buildNumberOfBlogsAndSave(int numberOfBlogs) {
-    IntStream.range(0, numberOfBlogs).mapToObj(number -> new Blog("blog" + number, "", "", "", null)).
+    IntStream.range(0, numberOfBlogs).mapToObj(number -> new Blog("blog" + number, "", "blog", "", null)).
         forEach(repository::save);
     return repository.findAll();
 

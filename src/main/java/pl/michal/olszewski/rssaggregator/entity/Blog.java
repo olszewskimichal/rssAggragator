@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 
 @Entity
@@ -52,6 +53,7 @@ public class Blog {
     return Collections.unmodifiableSet(items);
   }
 
+  @CacheEvict(value = "items")
   public void addItem(Item item) {
     if (items.add(item)) {
       log.debug("Dodaje nowy wpis do bloga {} o tytule {}", this.getName(), item.getTitle());

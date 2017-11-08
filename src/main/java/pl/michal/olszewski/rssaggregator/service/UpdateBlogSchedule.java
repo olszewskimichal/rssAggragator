@@ -4,6 +4,7 @@ import com.rometools.rome.io.XmlReader;
 import java.io.IOException;
 import java.net.URL;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
@@ -17,17 +18,22 @@ public class UpdateBlogSchedule {
   private final BlogService blogService;
   private final RssExtractorService rssExtractorService;
 
+  @Value("${enableJob}")
+  private boolean enableJob;
+
 
   public UpdateBlogSchedule(BlogService blogService) {
     this.blogService = blogService;
     this.rssExtractorService = new RssExtractorService();
   }
 
-  @Scheduled(fixedDelay = 15 * 60 * 1000)
+  @Scheduled(fixedDelay = 10 * 60 * 1000)
   public void updatesBlogs() {
-    log.debug("zaczynam aktualizacje blogów");
-    blogService.getAllBlogs().forEach(this::updateBlog);
-    log.debug("Aktualizacja zakończona");
+    if (enableJob) {
+      log.debug("zaczynam aktualizacje blogów");
+      blogService.getAllBlogs().forEach(this::updateBlog);
+      log.debug("Aktualizacja zakończona");
+    }
   }
 
   private void updateBlog(Blog v) {
