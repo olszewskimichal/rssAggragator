@@ -23,6 +23,7 @@ public class NewestItemService {
 
   @Cacheable(value = "items")
   public List<ItemDTO> getNewestItems(int size) {
+    log.debug("Pobieram wpisy z limitem {}", size);
     return itemRepository.findAllByOrderByDateDesc(size)
         .map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()))
         .collect(Collectors.toList());

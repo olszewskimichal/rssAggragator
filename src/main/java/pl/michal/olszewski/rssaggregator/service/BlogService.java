@@ -28,6 +28,7 @@ public class BlogService {
 
   @CacheEvict(value = {"blogs", "blogsDTO"}, allEntries = true)
   public Blog createBlog(BlogDTO blogDTO) {
+    log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate());
     blogDTO.getItemsList().stream()
         .map(Item::new)
