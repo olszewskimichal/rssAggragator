@@ -4,10 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pl.michal.olszewski.rssaggregator.entity.Blog;
 
 @Service
 @Slf4j
-public class UpdateBlogSchedule {
+public class UpdateBlogService {
 
   private final BlogService blogService;
   private final AsyncService asyncService;
@@ -16,7 +17,7 @@ public class UpdateBlogSchedule {
   private boolean enableJob;
 
 
-  public UpdateBlogSchedule(BlogService blogService, AsyncService asyncService) {
+  public UpdateBlogService(BlogService blogService, AsyncService asyncService) {
     this.blogService = blogService;
     this.asyncService = asyncService;
   }
@@ -28,6 +29,12 @@ public class UpdateBlogSchedule {
       blogService.getAllBlogs().forEach(asyncService::updateBlog);
       log.debug("Aktualizacja zakończona");
     }
+  }
+
+  public void updateBlogFromId(Long id) {
+    log.debug("Odswiezam bloga o id {}", id);
+    Blog blog = blogService.getBlogById(id);
+    asyncService.updateBlog(blog);
   }
 
 }
