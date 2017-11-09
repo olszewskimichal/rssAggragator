@@ -1,0 +1,1 @@
+curl -i -X POST -H "Content-Type:application/json" -d "{ \"link\" : \"http://www.baeldung.com/\", \"name\" : \"Baeldung\", \"feedURL\" : \"http://feeds.feedburner.com/Baeldung/\" }" http://localhost:8082/api/v1/blogs
