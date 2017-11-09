@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +16,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.exception.RssException;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
+import pl.michal.olszewski.rssaggregator.service.AsyncService;
 import pl.michal.olszewski.rssaggregator.service.BlogService;
-import pl.michal.olszewski.rssaggregator.service.UpdateBlogSchedule;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -23,7 +25,7 @@ import pl.michal.olszewski.rssaggregator.service.UpdateBlogSchedule;
 public class UpdateScheduleTest {
 
   @Autowired
-  private UpdateBlogSchedule blogSchedule;
+  private AsyncService asyncService;
   @Autowired
   private BlogRepository blogRepository;
 
@@ -36,11 +38,12 @@ public class UpdateScheduleTest {
   }
 
   @Test
-  public void shouldUpdateBlog() {
+  public void shouldUpdateBlog() throws ExecutionException, InterruptedException {
     blogRepository.deleteAll();
     Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null);
     blogRepository.save(blog);
-    blogSchedule.updatesBlogs();
+    Future<Void> voidFuture = asyncService.updateBlog(blog);
+    voidFuture.get();
     Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
     assertThat(updatedBlog).isPresent();
     assertThat(updatedBlog.get().getItems()).isNotEmpty().hasSize(15);
@@ -50,6 +53,6 @@ public class UpdateScheduleTest {
   public void shouldNotUpdateBlog() {
     Blog blog = new Blog("https://devstyle.xxx", "DEVSTYLE", "devstyle", "https://devstyle.xxx/feed", null);
     blogRepository.save(blog);
-    assertThatThrownBy(() -> blogSchedule.updatesBlogs()).isInstanceOf(RssException.class);
+    assertThatThrownBy(() -> asyncService.updateBlog(blog).get()).isInstanceOf(ExecutionException.class).hasCauseInstanceOf(RssException.class);
   }
 }

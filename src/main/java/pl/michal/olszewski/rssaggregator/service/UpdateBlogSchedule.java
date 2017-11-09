@@ -1,49 +1,33 @@
 package pl.michal.olszewski.rssaggregator.service;
 
-import com.rometools.rome.io.XmlReader;
-import java.io.IOException;
-import java.net.URL;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
-import pl.michal.olszewski.rssaggregator.entity.Blog;
-import pl.michal.olszewski.rssaggregator.exception.RssException;
 
 @Service
 @Slf4j
 public class UpdateBlogSchedule {
 
   private final BlogService blogService;
-  private final RssExtractorService rssExtractorService;
+  private final AsyncService asyncService;
 
   @Value("${enableJob}")
   private boolean enableJob;
 
 
-  public UpdateBlogSchedule(BlogService blogService) {
+  public UpdateBlogSchedule(BlogService blogService, AsyncService asyncService) {
     this.blogService = blogService;
-    this.rssExtractorService = new RssExtractorService();
+    this.asyncService = asyncService;
   }
 
-  @Scheduled(fixedDelay = 10 * 60 * 1000)
+  @Scheduled(fixedDelay = 5 * 60 * 1000)
   public void updatesBlogs() {
     if (enableJob) {
       log.debug("zaczynam aktualizacje blogów");
-      blogService.getAllBlogs().forEach(this::updateBlog);
+      blogService.getAllBlogs().forEach(asyncService::updateBlog);
       log.debug("Aktualizacja zakończona");
     }
   }
 
-  private void updateBlog(Blog v) {
-    try {
-      BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(v.getFeedURL())), v.getFeedURL(), v.getBlogURL());
-      blogService.updateBlog(blogDTO);
-    } catch (IOException e) {
-      log.error("aaa" + e.getMessage());
-      log.error("wystapił bład przy aktualizacji bloga o id {} o tresci {}", v.getId(), e);
-      throw new RssException(v.getFeedURL());
-    }
-  }
 }
