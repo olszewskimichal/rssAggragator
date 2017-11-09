@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.units;
 
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.michal.olszewski.rssaggregator.api.RefreshBlogEndPoint;
 import pl.michal.olszewski.rssaggregator.service.UpdateBlogService;
@@ -40,7 +38,7 @@ public class RefreshBlogEndpointTest {
 
   @Test
   public void shouldRefreshBlog() throws Exception {
-    mockMvc.perform(get("/api/v1/refresh").param("blogId","1")
+    mockMvc.perform(get("/api/v1/refresh").param("blogId", "1")
         .contentType(MediaType.APPLICATION_JSON_UTF8))
         .andExpect(status().isNoContent());
   }

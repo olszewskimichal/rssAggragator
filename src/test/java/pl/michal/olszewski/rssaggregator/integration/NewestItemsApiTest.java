@@ -11,7 +11,6 @@ import pl.michal.olszewski.rssaggregator.assertion.ItemListAssert;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.factory.ItemListFactory;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
-import pl.michal.olszewski.rssaggregator.service.BlogService;
 import pl.michal.olszewski.rssaggregator.service.NewestItemService;
 
 public class NewestItemsApiTest extends IntegrationTestBase {
@@ -71,7 +70,6 @@ public class NewestItemsApiTest extends IntegrationTestBase {
   private List<ItemDTO> thenGetNumberItemsFromApi(int number) {
     return Arrays.asList(template.getForEntity(String.format("http://localhost:%s/api/v1/items?limit=%s", port, number), ItemDTO[].class).getBody());
   }
-
 
 
 }
