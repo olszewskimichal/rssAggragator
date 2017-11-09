@@ -22,7 +22,7 @@ public class UpdateBlogService {
     this.asyncService = asyncService;
   }
 
-  @Scheduled(fixedDelay = 5 * 60 * 1000)
+  @Scheduled(fixedDelay = 15 * 60 * 1000)
   public void updatesBlogs() {
     if (enableJob) {
       log.debug("zaczynam aktualizacje blogów");
