@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hibernate.exception.ConstraintViolationException;
@@ -16,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import pl.michal.olszewski.rssaggregator.config.Profiles;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.entity.Item;
@@ -23,7 +22,7 @@ import pl.michal.olszewski.rssaggregator.repository.ItemRepository;
 
 @DataJpaTest
 @RunWith(SpringRunner.class)
-@ActiveProfiles("test")
+@ActiveProfiles(Profiles.TEST)
 public class ItemRepositoryTest {
 
   @Autowired

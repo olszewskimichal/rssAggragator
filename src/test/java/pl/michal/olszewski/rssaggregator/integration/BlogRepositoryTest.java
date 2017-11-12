@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import pl.michal.olszewski.rssaggregator.config.Profiles;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.entity.Item;
@@ -23,7 +24,7 @@ import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 
 @DataJpaTest
 @RunWith(SpringRunner.class)
-@ActiveProfiles("test")
+@ActiveProfiles(Profiles.TEST)
 public class BlogRepositoryTest {
 
   @Autowired
@@ -91,7 +92,7 @@ public class BlogRepositoryTest {
   @Test
   public void shouldThrowExceptionWhenItemDescriptionIsTooLong() {
     Blog blog = new Blog("url", "", "", "", null);
-    String desc = IntStream.range(0, 10001).mapToObj(index -> "a").collect(Collectors.joining());
+    String desc = IntStream.range(0, 10001).parallel().mapToObj(index -> "a").collect(Collectors.joining());
     blog.addItem(new Item(ItemDTO.builder().description(desc).build()));
 
     assertThatThrownBy(() -> entityManager.persistAndFlush(blog))

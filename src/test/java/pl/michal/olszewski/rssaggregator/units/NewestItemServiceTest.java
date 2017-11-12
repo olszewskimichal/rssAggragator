@@ -32,7 +32,7 @@ public class NewestItemServiceTest {
   @Test
   public void shouldGet10NewestItems() {
     //given
-    List<Item> itemList = IntStream.rangeClosed(1, 10).mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())).collect(Collectors.toList());
+    List<Item> itemList = IntStream.rangeClosed(1, 10).parallel().mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())).collect(Collectors.toList());
 
     given(itemRepository.findAllByOrderByDateDesc(10)).willReturn(itemList.stream());
     //when

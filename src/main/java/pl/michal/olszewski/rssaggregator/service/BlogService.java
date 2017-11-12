@@ -30,7 +30,7 @@ public class BlogService {
   public Blog createBlog(BlogDTO blogDTO) {
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate());
-    blogDTO.getItemsList().stream()
+    blogDTO.getItemsList().stream().parallel()
         .map(Item::new)
         .forEach(blog::addItem);
     blogRepository.save(blog);
@@ -55,9 +55,9 @@ public class BlogService {
   public Blog updateBlog(BlogDTO blogDTO) {
     Blog blog = getBlogByName(blogDTO.getName());
     blog.updateFromDto(blogDTO);
-    blogDTO.getItemsList().stream()
+    blogDTO.getItemsList().stream().parallel()
         .map(Item::new)
-        .filter(v -> !blog.getItems().stream().map(Item::getLink).collect(Collectors.toSet()).contains(v.getLink()))
+        .filter(v -> !blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet()).contains(v.getLink()))
         .forEach(blog::addItem);
     return blog;
   }
@@ -65,7 +65,7 @@ public class BlogService {
   @Cacheable("blogs")
   public List<Blog> getAllBlogs() {
     log.debug("Pobieram wszystkie blogi");
-    return blogRepository.findStreamAll().collect(Collectors.toList());
+    return blogRepository.findStreamAll().parallel().collect(Collectors.toList());
   }
 
   @CacheEvict(value = {"blogs", "blogsURL", "blogsDTO"}, allEntries = true)
@@ -92,13 +92,14 @@ public class BlogService {
   public List<BlogDTO> getAllBlogDTOs(Integer limit) {
     log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
     return getAllBlogs().stream()
+        .parallel()
         .limit(getLimit(limit))
         .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v)))
         .collect(Collectors.toList());
   }
 
   private List<ItemDTO> extractItems(Blog v) {
-    return v.getItems().stream().map(item -> new ItemDTO(item.getTitle(), item.getDescription(), item.getLink(), item.getDate(), item.getAuthor())).collect(Collectors.toList());
+    return v.getItems().stream().parallel().map(item -> new ItemDTO(item.getTitle(), item.getDescription(), item.getLink(), item.getDate(), item.getAuthor())).collect(Collectors.toList());
   }
 
   private int getLimit(final Integer size) {

@@ -16,7 +16,7 @@ public class ItemListFactory {
 
   public void buildNumberOfItemsAndSave(int numberOfItems) {
     Blog blog = new Blog("blog997", "", "", "", null);
-    IntStream.rangeClosed(1, numberOfItems).forEach(v -> blog.addItem(new Item(ItemDTO.builder().title("title" + v).build())));
+    IntStream.rangeClosed(1, numberOfItems).parallel().forEach(v -> blog.addItem(new Item(ItemDTO.builder().title("title" + v).build())));
     repository.save(blog);
   }
 }
