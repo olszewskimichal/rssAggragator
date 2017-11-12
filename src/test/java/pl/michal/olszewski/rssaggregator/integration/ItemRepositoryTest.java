@@ -36,7 +36,7 @@ public class ItemRepositoryTest {
   public void shouldFind2NewestItems() {
     //given
     Blog blog = new Blog("url", "", "", "", null);
-    Instant instant = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
+    Instant instant = Instant.now();
     blog.addItem(new Item(ItemDTO.builder().title("title1").date(instant).build()));
     blog.addItem(new Item(ItemDTO.builder().title("title2").date(instant.minusSeconds(10)).build()));
     blog.addItem(new Item(ItemDTO.builder().title("title3").date(instant.plusSeconds(10)).build()));
