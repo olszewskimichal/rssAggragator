@@ -1,12 +1,14 @@
 package pl.michal.olszewski.rssaggregator.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,15 @@ public class ItemRepositoryTest {
 
     //then
     assertThat(items.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldNotCreateItemByUniqueConstraint() {
+    Blog blog = new Blog("url", "", "", "", null);
+    blog.addItem(new Item(ItemDTO.builder().link("title1").build()));
+    entityManager.persistAndFlush(blog);
+    blog.addItem(new Item(ItemDTO.builder().link("title1").description("desc").build()));
+    assertThatThrownBy(() -> entityManager.persistAndFlush(blog)).hasMessageContaining("could not execute statement").hasCauseInstanceOf(ConstraintViolationException.class);
   }
 
 

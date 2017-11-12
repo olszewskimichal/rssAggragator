@@ -57,7 +57,7 @@ public class BlogService {
     blog.updateFromDto(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)
-        .filter(v -> !blog.getItems().contains(v))
+        .filter(v -> !blog.getItems().stream().map(Item::getLink).collect(Collectors.toSet()).contains(v.getLink()))
         .forEach(blog::addItem);
     return blog;
   }

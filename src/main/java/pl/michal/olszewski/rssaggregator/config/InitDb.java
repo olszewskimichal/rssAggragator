@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
@@ -13,8 +12,7 @@ import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 
 @Service
 @Slf4j
-@Profile("development")
-@EnableScheduling
+@Profile({"development", "prod"})
 public class InitDb {
 
   private final BlogRepository blogRepository;
