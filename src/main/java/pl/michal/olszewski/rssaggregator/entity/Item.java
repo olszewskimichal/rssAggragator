@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,12 +22,12 @@ import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 @Setter
 @EqualsAndHashCode(exclude = {"blog", "id"})
 @NoArgsConstructor
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"link", "blog_id"}))
 public class Item {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
   private Long id;
-
   private String title;
   @Column(length = 10000)
   private String description;

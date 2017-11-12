@@ -1,12 +1,12 @@
 package pl.michal.olszewski.rssaggregator.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import pl.michal.olszewski.rssaggregator.config.Profiles;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.entity.Item;
@@ -21,7 +22,7 @@ import pl.michal.olszewski.rssaggregator.repository.ItemRepository;
 
 @DataJpaTest
 @RunWith(SpringRunner.class)
-@ActiveProfiles("test")
+@ActiveProfiles(Profiles.TEST)
 public class ItemRepositoryTest {
 
   @Autowired
@@ -34,7 +35,7 @@ public class ItemRepositoryTest {
   public void shouldFind2NewestItems() {
     //given
     Blog blog = new Blog("url", "", "", "", null);
-    Instant instant = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
+    Instant instant = Instant.now();
     blog.addItem(new Item(ItemDTO.builder().title("title1").date(instant).build()));
     blog.addItem(new Item(ItemDTO.builder().title("title2").date(instant.minusSeconds(10)).build()));
     blog.addItem(new Item(ItemDTO.builder().title("title3").date(instant.plusSeconds(10)).build()));
@@ -62,6 +63,15 @@ public class ItemRepositoryTest {
 
     //then
     assertThat(items.size()).isEqualTo(2);
+  }
+
+  @Test
+  public void shouldNotCreateItemByUniqueConstraint() {
+    Blog blog = new Blog("url", "", "", "", null);
+    blog.addItem(new Item(ItemDTO.builder().link("title1").build()));
+    entityManager.persistAndFlush(blog);
+    blog.addItem(new Item(ItemDTO.builder().link("title1").description("desc").build()));
+    assertThatThrownBy(() -> entityManager.persistAndFlush(blog)).hasMessageContaining("could not execute statement").hasCauseInstanceOf(ConstraintViolationException.class);
   }
 
 

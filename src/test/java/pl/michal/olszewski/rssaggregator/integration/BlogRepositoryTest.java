@@ -16,14 +16,16 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import pl.michal.olszewski.rssaggregator.config.Profiles;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.entity.Item;
+import pl.michal.olszewski.rssaggregator.factory.BlogListFactory;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 
 @DataJpaTest
 @RunWith(SpringRunner.class)
-@ActiveProfiles("test")
+@ActiveProfiles(Profiles.TEST)
 public class BlogRepositoryTest {
 
   @Autowired
@@ -35,8 +37,8 @@ public class BlogRepositoryTest {
   @Test
   public void shouldFindBlogByBlogURL() {
     //given
-    Blog blog = new Blog("url", "", "", "", null);
-    entityManager.persistAndFlush(blog);
+    givenBlog()
+        .withURL("url");
 
     //when
     Optional<Blog> byBlogURL = blogRepository.findByBlogURL("url");
@@ -48,8 +50,8 @@ public class BlogRepositoryTest {
   @Test
   public void shouldFindBlogById() {
     //given
-    Blog blog = new Blog("url", "", "", "", null);
-    entityManager.persistAndFlush(blog);
+    Blog blog = givenBlog()
+        .withURL("url");
 
     //when
     Optional<Blog> blogByID = blogRepository.findById(blog.getId());
@@ -79,19 +81,18 @@ public class BlogRepositoryTest {
   @Test
   public void shouldThrownExceptionWhenSave2BlogWithTheSameName() {
     //given
-    Blog blog = new Blog("url", "", "", "", null);
-    Blog theSameBlog = new Blog("url", "", "", "", null);
-    //when
-    entityManager.persistAndFlush(blog);
+    givenBlog()
+        .withURL("url");
     //then
-    assertThatThrownBy(() -> entityManager.persistAndFlush(theSameBlog)).hasCauseInstanceOf(ConstraintViolationException.class).isInstanceOf(PersistenceException.class)
+    assertThatThrownBy(() -> entityManager.persistAndFlush(new Blog("url", "", "", "", null))).hasCauseInstanceOf(ConstraintViolationException.class).isInstanceOf(PersistenceException.class)
         .hasMessageContaining("ConstraintViolationException");
   }
 
   @Test
   public void shouldThrowExceptionWhenItemDescriptionIsTooLong() {
-    Blog blog = new Blog("url", "", "", "", null);
-    String desc = IntStream.range(0, 10001).mapToObj(index -> "a").collect(Collectors.joining());
+    Blog blog = givenBlog()
+        .withURL("url");
+    String desc = IntStream.range(0, 10001).parallel().mapToObj(index -> "a").collect(Collectors.joining());
     blog.addItem(new Item(ItemDTO.builder().description(desc).build()));
 
     assertThatThrownBy(() -> entityManager.persistAndFlush(blog))
@@ -104,8 +105,8 @@ public class BlogRepositoryTest {
   @Test
   public void shouldFindBlogByName() {
     //given
-    Blog blog = new Blog("", "", "url", "", null);
-    entityManager.persistAndFlush(blog);
+    givenBlog()
+        .withName("url");
 
     //when
     Optional<Blog> byName = blogRepository.findByName("url");
@@ -122,4 +123,9 @@ public class BlogRepositoryTest {
     //then
     assertThat(byName).isNotPresent();
   }
+
+  private BlogListFactory givenBlog() {
+    return new BlogListFactory(blogRepository);
+  }
+
 }

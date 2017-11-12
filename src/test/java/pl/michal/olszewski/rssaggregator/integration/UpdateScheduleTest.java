@@ -8,21 +8,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.exception.RssException;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 import pl.michal.olszewski.rssaggregator.service.AsyncService;
 import pl.michal.olszewski.rssaggregator.service.BlogService;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("integrationTest")
-public class UpdateScheduleTest {
+
+public class UpdateScheduleTest extends IntegrationTestBase {
 
   @Autowired
   private AsyncService asyncService;
