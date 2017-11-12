@@ -55,7 +55,7 @@ public class BlogService {
   public Blog updateBlog(BlogDTO blogDTO) {
     Blog blog = getBlogByName(blogDTO.getName());
     blog.updateFromDto(blogDTO);
-    blogDTO.getItemsList().stream().parallel()
+    blogDTO.getItemsList().stream()
         .map(Item::new)
         .filter(v -> !blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet()).contains(v.getLink()))
         .forEach(blog::addItem);

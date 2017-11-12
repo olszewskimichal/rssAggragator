@@ -36,7 +36,8 @@ public class RssAggregatorApplication {
   @Bean(name = "threadPoolTaskExecutor")
   public Executor threadPoolTaskExecutor() {
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-    threadPoolTaskExecutor.setCorePoolSize(4);
+    threadPoolTaskExecutor.setCorePoolSize(8);
+    threadPoolTaskExecutor.setMaxPoolSize(16);
     return threadPoolTaskExecutor;
   }
 

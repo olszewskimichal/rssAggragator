@@ -24,9 +24,8 @@ public class InitDb {
   //@PostConstruct
   public void populateDatabase() {
     Stream.of("https://devstyle.pl", "https://vladmihalcea.com", "http://jakoszczedzacpieniadze.pl", "https://kobietydokodu.pl", "https://codecouple.pl", "https://geekyprimitives.wordpress.com/",
-        "https://aboullaite.me/", "http://www.javadevmatt.pl/").parallel()
+        "https://aboullaite.me/", "http://www.javadevmatt.pl/")
         .map(v -> new Blog(v, "", "", v + "/feed", null))
-        .sequential()
         .forEach(blogRepository::save);
     blogRepository.save(new Blog("http://jvm-bloggers.com", "", "JVM-Bloggers", "http://jvm-bloggers.com/pl/rss", null));
     blogRepository.save(new Blog("https://programistanaswoim.pl", "", "ProgramistaNaSwoim", "http://feeds.feedburner.com/ProgramistaNaSwoim", null));

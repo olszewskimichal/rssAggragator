@@ -27,7 +27,7 @@ public class BlogListFactory {
 
   public Blog buildBlogWithItemsAndSave(int numberOfItems) {
     Blog blog = new Blog("blog997", "", "", "", null);
-    IntStream.rangeClosed(1, numberOfItems).parallel().forEach(v -> blog.addItem(new Item(ItemDTO.builder().title("title" + v).build())));
+    IntStream.rangeClosed(1, numberOfItems).parallel().forEachOrdered(v -> blog.addItem(new Item(ItemDTO.builder().title("title" + v).build())));
     return repository.save(blog);
   }
 
@@ -36,5 +36,13 @@ public class BlogListFactory {
         forEach(repository::save);
     return repository.findAll();
 
+  }
+
+  public Blog withURL(String url) {
+    return repository.save(new Blog(url, "", "", "", null));
+  }
+
+  public Blog withName(String name) {
+    return repository.save(new Blog(name, "", name, "", null));
   }
 }
