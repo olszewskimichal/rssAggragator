@@ -185,42 +185,6 @@ public class BlogServiceTest {
   }
 
   @Test
-  public void shouldGetBlogByURL() {
-    //given
-    given(blogRepository.findByBlogURL("url")).willReturn(Optional.of(new Blog("", "", "", "", null)));
-    //when
-    Blog byURL = blogService.getBlogByURL("url");
-    //then
-    assertThat(byURL).isNotNull();
-  }
-
-  @Test
-  public void shouldThrownExceptionWhenBlogByURLNotExist() {
-    //given
-    given(blogRepository.findByBlogURL("url")).willReturn(Optional.empty());
-    //when
-    assertThatThrownBy(() -> blogService.getBlogByURL("url")).isNotNull().hasMessage("Nie znaleziono blogu = url");
-  }
-
-  @Test
-  public void shouldGetBlogById() {
-    //given
-    given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null)));
-    //when
-    Blog blogById = blogService.getBlogById(1L);
-    //then
-    assertThat(blogById).isNotNull();
-  }
-
-  @Test
-  public void shouldThrownExceptionWhenBlogByIdNotExist() {
-    //given
-    given(blogRepository.findById(1L)).willReturn(Optional.empty());
-    //when
-    assertThatThrownBy(() -> blogService.getBlogById(1L)).isNotNull().hasMessage("Nie znaleziono bloga o id = 1");
-  }
-
-  @Test
   public void shouldDeleteBlogById() {
     given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null)));
 

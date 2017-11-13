@@ -23,7 +23,6 @@ import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
-@ToString
 @Slf4j
 public class Blog {
 

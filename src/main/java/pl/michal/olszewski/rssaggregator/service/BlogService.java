@@ -37,18 +37,8 @@ public class BlogService {
     return blog;
   }
 
-  public Blog getBlogByURL(String url) {
-    return blogRepository.findByBlogURL(url)
-        .orElseThrow(() -> new BlogNotFoundException(url));
-  }
-
   private Blog getBlogByName(String name) {
     return blogRepository.findByName(name).orElseThrow(() -> new BlogNotFoundException(name));
-  }
-
-  public Blog getBlogById(Long id) {
-    return blogRepository.findById(id)
-        .orElseThrow(() -> new BlogNotFoundException(id));
   }
 
   @Transactional
@@ -76,12 +66,14 @@ public class BlogService {
     return true;
   }
 
+  @Transactional(readOnly = true)
   public BlogDTO getBlogDTOById(Long id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
-    Blog blogById = getBlogById(id);
+    Blog blogById = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
     return new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById));
   }
 
+  @Transactional(readOnly = true)
   public BlogDTO getBlogDTOByName(String name) {
     log.debug("pobieram bloga w postaci DTO o nazwie {}", name);
     Blog blog = getBlogByName(name);
@@ -89,6 +81,7 @@ public class BlogService {
   }
 
   @Cacheable("blogsDTO")
+  @Transactional(readOnly = true)
   public List<BlogDTO> getAllBlogDTOs(Integer limit) {
     log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
     return getAllBlogs().stream()
