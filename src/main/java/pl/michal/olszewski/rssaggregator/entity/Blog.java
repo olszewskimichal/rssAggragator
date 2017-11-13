@@ -53,7 +53,7 @@ public class Blog {
     return Collections.unmodifiableSet(items);
   }
 
-  @CacheEvict(value = "items")
+  @CacheEvict(value = {"blogs", "blogsDTO","items"}, allEntries = true)
   public void addItem(Item item) {
     if (items.add(item)) {
       log.debug("Dodaje nowy wpis do bloga {} o tytule {}", this.getName(), item.getTitle());
