@@ -11,12 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.exception.RssException;
+import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 import pl.michal.olszewski.rssaggregator.service.AsyncService;
 import pl.michal.olszewski.rssaggregator.service.BlogService;
 
 
-public class UpdateScheduleTest extends IntegrationTestBase {
+public class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLogger {
 
   @Autowired
   private AsyncService asyncService;

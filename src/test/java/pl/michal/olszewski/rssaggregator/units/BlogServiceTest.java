@@ -17,15 +17,19 @@ import java.util.stream.Stream;
 import javax.persistence.PersistenceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.entity.Item;
+import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 import pl.michal.olszewski.rssaggregator.service.BlogService;
 
+
+@ExtendWith(MockitoExtension.class)
 public class BlogServiceTest {
 
   private BlogService blogService;
@@ -35,7 +39,6 @@ public class BlogServiceTest {
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
     blogService = new BlogService(blogRepository);
   }
 

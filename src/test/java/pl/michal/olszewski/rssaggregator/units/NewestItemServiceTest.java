@@ -9,13 +9,16 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Item;
+import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.repository.ItemRepository;
 import pl.michal.olszewski.rssaggregator.service.NewestItemService;
 
+@ExtendWith(MockitoExtension.class)
 public class NewestItemServiceTest {
 
   private NewestItemService itemService;
@@ -25,7 +28,6 @@ public class NewestItemServiceTest {
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
     itemService = new NewestItemService(itemRepository);
   }
 

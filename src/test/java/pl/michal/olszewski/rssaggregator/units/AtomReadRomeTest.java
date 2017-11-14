@@ -12,10 +12,13 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
+import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.service.RssExtractorService;
 
+@ExtendWith(MockitoExtension.class)
 public class AtomReadRomeTest {
 
   private RssExtractorService rssExtractorService;

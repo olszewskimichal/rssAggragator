@@ -9,13 +9,15 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
+import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 import pl.michal.olszewski.rssaggregator.service.AsyncService;
 import pl.michal.olszewski.rssaggregator.service.UpdateBlogService;
 
+@ExtendWith(MockitoExtension.class)
 public class UpdateBlogServiceTest {
 
   private UpdateBlogService updateBlogService;
@@ -27,7 +29,6 @@ public class UpdateBlogServiceTest {
 
   @BeforeEach
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
     updateBlogService = new UpdateBlogService(blogRepository, asyncService);
   }
 
