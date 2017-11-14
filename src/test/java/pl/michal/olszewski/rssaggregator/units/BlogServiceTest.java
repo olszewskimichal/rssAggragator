@@ -3,6 +3,9 @@ package pl.michal.olszewski.rssaggregator.units;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -12,11 +15,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.persistence.PersistenceException;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Matchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
@@ -32,7 +33,7 @@ public class BlogServiceTest {
   @Mock
   private BlogRepository blogRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     blogService = new BlogService(blogRepository);
@@ -72,14 +73,14 @@ public class BlogServiceTest {
     Blog blog = blogService.createBlog(blogDTO);
     //then
     assertThat(blog).isNotNull();
-    Mockito.verify(blogRepository, Mockito.times(1)).save(blog);
+    verify(blogRepository, times(1)).save(blog);
   }
 
   @Test
   public void shouldNotCreateBlogWhenThrowException() {
     //given
     BlogDTO blogDTO = BlogDTO.builder().build();
-    given(blogRepository.save(Matchers.any(Blog.class))).willThrow(new PersistenceException("Blog o podanym url juz istnieje"));
+    given(blogRepository.save(any(Blog.class))).willThrow(new PersistenceException("Blog o podanym url juz istnieje"));
     //when
     //then
     assertThatThrownBy(() -> blogService.createBlog(blogDTO)).isNotNull().hasMessage("Blog o podanym url juz istnieje");

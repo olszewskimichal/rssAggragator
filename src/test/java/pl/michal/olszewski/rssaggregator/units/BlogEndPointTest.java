@@ -14,8 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.IOException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -38,7 +38,7 @@ public class BlogEndPointTest {
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 
-  @Before
+  @BeforeEach
   public void configureSystemUnderTest() {
     blogService = mock(BlogService.class);
     mockMvc = MockMvcBuilders.standaloneSetup(new BlogEndPoint(blogService))

@@ -6,8 +6,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.exception.RssException;
@@ -26,7 +26,7 @@ public class UpdateScheduleTest extends IntegrationTestBase {
   @Autowired
   private BlogService blogService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     blogService.evictBlogCache();
   }

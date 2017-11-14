@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.service.RssExtractorService;

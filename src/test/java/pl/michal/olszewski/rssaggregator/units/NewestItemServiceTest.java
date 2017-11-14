@@ -7,8 +7,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
@@ -23,7 +23,7 @@ public class NewestItemServiceTest {
   @Mock
   private ItemRepository itemRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     itemService = new NewestItemService(itemRepository);

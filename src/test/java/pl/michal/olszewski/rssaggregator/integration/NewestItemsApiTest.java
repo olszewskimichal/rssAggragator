@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.assertion.ItemListAssert;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
@@ -21,7 +21,7 @@ public class NewestItemsApiTest extends IntegrationTestBase {
   @Autowired
   private NewestItemService blogService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     repository.deleteAll();
     blogService.evictItemsCache();

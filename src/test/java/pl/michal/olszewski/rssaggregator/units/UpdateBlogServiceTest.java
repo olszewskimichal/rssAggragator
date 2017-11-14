@@ -7,12 +7,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.Optional;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
-import pl.michal.olszewski.rssaggregator.exception.BlogNotFoundException;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 import pl.michal.olszewski.rssaggregator.service.AsyncService;
 import pl.michal.olszewski.rssaggregator.service.UpdateBlogService;
@@ -26,7 +25,7 @@ public class UpdateBlogServiceTest {
   @Mock
   private AsyncService asyncService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     updateBlogService = new UpdateBlogService(blogRepository, asyncService);

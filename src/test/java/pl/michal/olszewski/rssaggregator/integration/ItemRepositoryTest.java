@@ -7,13 +7,14 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.hibernate.exception.ConstraintViolationException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
@@ -21,8 +22,9 @@ import pl.michal.olszewski.rssaggregator.entity.Item;
 import pl.michal.olszewski.rssaggregator.repository.ItemRepository;
 
 @DataJpaTest
-@RunWith(SpringRunner.class)
 @ActiveProfiles(Profiles.TEST)
+@RunWith(JUnitPlatform.class)
+@ExtendWith(org.springframework.test.context.junit.jupiter.SpringExtension.class)
 public class ItemRepositoryTest {
 
   @Autowired

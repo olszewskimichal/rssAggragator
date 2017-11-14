@@ -1,11 +1,11 @@
 package pl.michal.olszewski.rssaggregator.integration;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import java.util.Optional;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
