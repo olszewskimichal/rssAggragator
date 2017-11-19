@@ -18,7 +18,7 @@ import pl.michal.olszewski.rssaggregator.service.AsyncService;
 import pl.michal.olszewski.rssaggregator.service.UpdateBlogService;
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateBlogServiceTest {
+class UpdateBlogServiceTest {
 
   private UpdateBlogService updateBlogService;
 
@@ -28,12 +28,12 @@ public class UpdateBlogServiceTest {
   private AsyncService asyncService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     updateBlogService = new UpdateBlogService(blogRepository, asyncService);
   }
 
   @Test
-  public void shouldNotUpdateBlogFromId() {
+  void shouldNotUpdateBlogFromId() {
     //given
     given(blogRepository.findById(1L)).willReturn(Optional.empty());
     //when
@@ -42,7 +42,7 @@ public class UpdateBlogServiceTest {
   }
 
   @Test
-  public void shouldUpdateBlogFromId() {
+  void shouldUpdateBlogFromId() {
     //given
     given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog()));
     //when

@@ -14,7 +14,7 @@ import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 import pl.michal.olszewski.rssaggregator.service.BlogService;
 
 @Transactional
-public class BlogCacheTest extends IntegrationTestBase {
+class BlogCacheTest extends IntegrationTestBase {
 
   @Autowired
   private BlogService service;
@@ -23,14 +23,14 @@ public class BlogCacheTest extends IntegrationTestBase {
   private BlogRepository blogRepository;
 
   @Test
-  public void shouldReturnTheSameCollectionFromCache() {
+  void shouldReturnTheSameCollectionFromCache() {
     List<Blog> allBlogs = service.getAllBlogs();
     List<Blog> cacheBlogs = service.getAllBlogs();
     assertSame(allBlogs, cacheBlogs);
   }
 
   @Test
-  public void shouldAfterEvictCacheAndReturnNotTheSameCollection() {
+  void shouldAfterEvictCacheAndReturnNotTheSameCollection() {
     List<Blog> allBlogs = service.getAllBlogs();
     service.evictBlogCache();
     List<Blog> cacheBlogs = service.getAllBlogs();
@@ -38,7 +38,7 @@ public class BlogCacheTest extends IntegrationTestBase {
   }
 
   @Test
-  public void shouldAfterCreateNewBlogAndReturnNotTheSameCollection() {
+  void shouldAfterCreateNewBlogAndReturnNotTheSameCollection() {
     List<Blog> allBlogs = service.getAllBlogs();
     service.createBlog(BlogDTO.builder().name("nazwa2").build());
     List<Blog> cacheBlogs = service.getAllBlogs();
@@ -46,7 +46,7 @@ public class BlogCacheTest extends IntegrationTestBase {
   }
 
   @Test
-  public void shouldAfterDeleteNewBlogAndReturnNotTheSameCollection() {
+  void shouldAfterDeleteNewBlogAndReturnNotTheSameCollection() {
     Blog blog = service.createBlog(BlogDTO.builder().name("nazwa2").build());
 
     List<Blog> allBlogs = service.getAllBlogs();
@@ -60,7 +60,7 @@ public class BlogCacheTest extends IntegrationTestBase {
 
 
   @Test
-  public void shouldFindByNameFromCache() {
+  void shouldFindByNameFromCache() {
     service.createBlog(BlogDTO.builder().name("nazwa").build());
     Optional<Blog> byName = blogRepository.findByName("nazwa");
     Optional<Blog> cachedDTO = blogRepository.findByName("nazwa");
@@ -68,7 +68,7 @@ public class BlogCacheTest extends IntegrationTestBase {
   }
 
   @Test
-  public void shouldNotEvictFindByNameWhenCreate() {
+  void shouldNotEvictFindByNameWhenCreate() {
     service.createBlog(BlogDTO.builder().name("nazwa").build());
     Optional<Blog> byName = blogRepository.findByName("nazwa");
     service.createBlog(BlogDTO.builder().name("nazwa2").build());

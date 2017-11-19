@@ -37,7 +37,7 @@ public class BlogRepositoryTest {
   private BlogRepository blogRepository;
 
   @Test
-  public void shouldFindBlogByBlogURL() {
+  void shouldFindBlogByBlogURL() {
     //given
     givenBlog()
         .withURL("url");
@@ -50,7 +50,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldFindBlogById() {
+  void shouldFindBlogById() {
     //given
     Blog blog = givenBlog()
         .withURL("url");
@@ -63,7 +63,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldNotFindBlogByBlogURLWhenNotExists() {
+  void shouldNotFindBlogByBlogURLWhenNotExists() {
     //when
     Optional<Blog> byBlogURL = blogRepository.findByFeedURL("url");
 
@@ -72,7 +72,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldNotFindBlogByIdWhenNotExists() {
+  void shouldNotFindBlogByIdWhenNotExists() {
     //when
     Optional<Blog> blogById = blogRepository.findById(1L);
 
@@ -81,7 +81,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldThrownExceptionWhenSave2BlogWithTheSameName() {
+  void shouldThrownExceptionWhenSave2BlogWithTheSameName() {
     //given
     givenBlog()
         .withURL("url");
@@ -91,7 +91,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenItemDescriptionIsTooLong() {
+  void shouldThrowExceptionWhenItemDescriptionIsTooLong() {
     Blog blog = givenBlog()
         .withURL("url");
     String desc = IntStream.range(0, 10001).parallel().mapToObj(index -> "a").collect(Collectors.joining());
@@ -105,7 +105,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldFindBlogByName() {
+  void shouldFindBlogByName() {
     //given
     givenBlog()
         .withName("url");
@@ -118,7 +118,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldNotFindBlogByNameWhenNotExists() {
+  void shouldNotFindBlogByNameWhenNotExists() {
     //when
     Optional<Blog> byName = blogRepository.findByName("name");
 
