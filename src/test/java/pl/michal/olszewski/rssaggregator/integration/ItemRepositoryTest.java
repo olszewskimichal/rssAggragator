@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Instant;
 import java.util.List;
@@ -34,7 +35,7 @@ public class ItemRepositoryTest {
   private ItemRepository itemRepository;
 
   @Test
-  public void shouldFind2NewestItems() {
+  void shouldFind2NewestItems() {
     //given
     Blog blog = new Blog("url", "", "", "", null);
     Instant instant = Instant.now();
@@ -47,12 +48,14 @@ public class ItemRepositoryTest {
     List<Item> items = itemRepository.findAllByOrderByDateDesc(2).collect(Collectors.toList());
 
     //then
-    assertThat(items.size()).isEqualTo(2);
-    assertThat(items.stream().map(Item::getDate).collect(Collectors.toList())).contains(instant, instant.plusSeconds(10));
+    assertAll(
+        () -> assertThat(items.size()).isEqualTo(2),
+        () -> assertThat(items.stream().map(Item::getDate).collect(Collectors.toList())).contains(instant, instant.plusSeconds(10))
+    );
   }
 
   @Test
-  public void shouldFindItemsWhenDateIsNull() {
+  void shouldFindItemsWhenDateIsNull() {
     //given
     Blog blog = new Blog("url", "", "", "", null);
     blog.addItem(new Item(ItemDTO.builder().title("title1").build()));
@@ -68,7 +71,7 @@ public class ItemRepositoryTest {
   }
 
   @Test
-  public void shouldNotCreateItemByUniqueConstraint() {
+  void shouldNotCreateItemByUniqueConstraint() {
     Blog blog = new Blog("url", "", "", "", null);
     blog.addItem(new Item(ItemDTO.builder().link("title1").build()));
     entityManager.persistAndFlush(blog);

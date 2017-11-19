@@ -13,7 +13,7 @@ import pl.michal.olszewski.rssaggregator.factory.ItemListFactory;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 import pl.michal.olszewski.rssaggregator.service.NewestItemService;
 
-public class NewestItemsApiTest extends IntegrationTestBase {
+class NewestItemsApiTest extends IntegrationTestBase {
 
   @Autowired
   private BlogRepository repository;
@@ -22,13 +22,13 @@ public class NewestItemsApiTest extends IntegrationTestBase {
   private NewestItemService blogService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     repository.deleteAll();
     blogService.evictItemsCache();
   }
 
   @Test
-  public void should_get_empty_list_of_items() {
+  void should_get_empty_list_of_items() {
     givenItem()
         .buildNumberOfItemsAndSave(0);
 
@@ -38,7 +38,7 @@ public class NewestItemsApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_get_all_items() {
+  void should_get_all_items() {
     givenItem()
         .buildNumberOfItemsAndSave(3);
 
@@ -48,7 +48,7 @@ public class NewestItemsApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_get_limit_three_items() {
+  void should_get_limit_three_items() {
     givenItem()
         .buildNumberOfItemsAndSave(6);
 

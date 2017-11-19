@@ -18,29 +18,19 @@ import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.service.UpdateBlogService;
 
 @ExtendWith(MockitoExtension.class)
-public class RefreshBlogEndpointTest {
+class RefreshBlogEndpointTest {
 
   private MockMvc mockMvc;
 
-  private static byte[] convertObjectToJsonBytes(Object object) throws IOException {
-    ObjectMapper mapper = objectMapper();
-    return mapper.writeValueAsBytes(object);
-  }
-
-  private static ObjectMapper objectMapper() {
-    return new ObjectMapper()
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-  }
-
   @BeforeEach
-  public void configureSystemUnderTest() {
+  void configureSystemUnderTest() {
     UpdateBlogService updateBlogService = mock(UpdateBlogService.class);
     mockMvc = MockMvcBuilders.standaloneSetup(new RefreshBlogEndPoint(updateBlogService))
         .build();
   }
 
   @Test
-  public void shouldRefreshBlog() throws Exception {
+  void shouldRefreshBlog() throws Exception {
     mockMvc.perform(get("/api/v1/refresh").param("blogId", "1")
         .contentType(MediaType.APPLICATION_JSON_UTF8))
         .andExpect(status().isNoContent());

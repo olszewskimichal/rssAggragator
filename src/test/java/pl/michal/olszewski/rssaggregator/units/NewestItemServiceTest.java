@@ -18,7 +18,7 @@ import pl.michal.olszewski.rssaggregator.repository.ItemRepository;
 import pl.michal.olszewski.rssaggregator.service.NewestItemService;
 
 @ExtendWith(MockitoExtension.class)
-public class NewestItemServiceTest {
+class NewestItemServiceTest {
 
   private NewestItemService itemService;
 
@@ -26,12 +26,12 @@ public class NewestItemServiceTest {
   private ItemRepository itemRepository;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     itemService = new NewestItemService(itemRepository);
   }
 
   @Test
-  public void shouldGet10NewestItems() {
+  void shouldGet10NewestItems() {
     //given
     List<Item> itemList = IntStream.rangeClosed(1, 10).parallel().mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())).collect(Collectors.toList());
 

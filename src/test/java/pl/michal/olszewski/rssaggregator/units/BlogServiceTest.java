@@ -114,11 +114,13 @@ class BlogServiceTest {
     //then
     assertThat(blog.getItems()).isNotEmpty().hasSize(2);
     for (Item item : blog.getItems()) {
-      assertThat(item.getAuthor()).isEqualTo("autor");
-      assertThat(item.getBlog()).isEqualTo(blog);
-      assertThat(item.getDate()).isBeforeOrEqualTo(now).isAfterOrEqualTo(now);
-      assertThat(item.getTitle()).isNotNull().isNotEmpty();
-      assertThat(item.getLink()).isEqualTo("link" + item.getTitle());
+      assertAll(
+          () -> assertThat(item.getAuthor()).isEqualTo("autor"),
+          () -> assertThat(item.getBlog()).isEqualTo(blog),
+          () -> assertThat(item.getDate()).isBeforeOrEqualTo(now).isAfterOrEqualTo(now),
+          () -> assertThat(item.getTitle()).isNotNull().isNotEmpty(),
+          () -> assertThat(item.getLink()).isEqualTo("link" + item.getTitle())
+      );
     }
   }
 
@@ -132,8 +134,10 @@ class BlogServiceTest {
     //when
     Blog updateBlog = blogService.updateBlog(blogDTO);
     //then
-    assertThat(updateBlog).isEqualToIgnoringGivenFields(blog, "items");
-    assertThat(updateBlog.getItems()).isNotEmpty().hasSize(1);
+    assertAll(
+        () -> assertThat(updateBlog).isEqualToIgnoringGivenFields(blog, "items"),
+        () -> assertThat(updateBlog.getItems()).isNotEmpty().hasSize(1)
+    );
   }
 
   @Test
@@ -147,8 +151,10 @@ class BlogServiceTest {
     //when
     Blog updateBlog = blogService.updateBlog(blogDTO);
     //then
-    assertThat(updateBlog).isEqualToIgnoringGivenFields(blog, "items");
-    assertThat(updateBlog.getItems()).isNotEmpty().hasSize(2);
+    assertAll(
+        () -> assertThat(updateBlog).isEqualToIgnoringGivenFields(blog, "items"),
+        () -> assertThat(updateBlog.getItems()).isNotEmpty().hasSize(2)
+    );
   }
 
   @Test
@@ -186,8 +192,10 @@ class BlogServiceTest {
     //when
     Blog updateBlog = blogService.updateBlog(blogDTO);
     //then
-    assertThat(updateBlog).isEqualToIgnoringGivenFields(blog, "description");
-    assertThat(updateBlog.getDescription()).isEqualTo("desc");
+    assertAll(
+        () -> assertThat(updateBlog).isEqualToIgnoringGivenFields(blog, "description"),
+        () -> assertThat(updateBlog.getDescription()).isEqualTo("desc")
+    );
   }
 
   @Test
