@@ -26,7 +26,7 @@ public class BlogService {
     this.blogRepository = blogRepository;
   }
 
-  @CacheEvict(value = {"blogs", "blogsDTO"}, allEntries = true)
+  @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
   public Blog createBlog(BlogDTO blogDTO) {
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate());
@@ -41,9 +41,14 @@ public class BlogService {
     return blogRepository.findByName(name).orElseThrow(() -> new BlogNotFoundException(name));
   }
 
+  private Blog getBlogByFeedUrl(String feedUrl) {
+    return blogRepository.findByFeedURL(feedUrl).orElseThrow(() -> new BlogNotFoundException(feedUrl));
+  }
+
+
   @Transactional
   public Blog updateBlog(BlogDTO blogDTO) {
-    Blog blog = getBlogByName(blogDTO.getName());
+    Blog blog = getBlogByFeedUrl(blogDTO.getFeedURL());
     blog.updateFromDto(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)
@@ -58,7 +63,7 @@ public class BlogService {
     return blogRepository.findStreamAll().parallel().collect(Collectors.toList());
   }
 
-  @CacheEvict(value = {"blogs", "blogsURL", "blogsDTO"}, allEntries = true)
+  @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
   public boolean deleteBlog(Long id) {
     log.debug("Usuwam bloga o id {}", id);
     Blog blog = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
@@ -73,6 +78,7 @@ public class BlogService {
     return new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById));
   }
 
+  @Cacheable("blogsName")
   @Transactional(readOnly = true)
   public BlogDTO getBlogDTOByName(String name) {
     log.debug("pobieram bloga w postaci DTO o nazwie {}", name);
@@ -99,7 +105,7 @@ public class BlogService {
     return (Objects.isNull(size) ? 20 : size);
   }
 
-  @CacheEvict(value = {"blogs", "blogsURL", "blogsDTO"}, allEntries = true)
+  @CacheEvict(value = {"blogs", "blogsDTO", "blogsName"}, allEntries = true)
   public void evictBlogCache() {
     log.debug("Czyszcze cache dla blogów");
   }

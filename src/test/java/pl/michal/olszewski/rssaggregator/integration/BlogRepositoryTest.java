@@ -43,7 +43,7 @@ public class BlogRepositoryTest {
         .withURL("url");
 
     //when
-    Optional<Blog> byBlogURL = blogRepository.findByBlogURL("url");
+    Optional<Blog> byBlogURL = blogRepository.findByFeedURL("url");
 
     //then
     assertThat(byBlogURL).isPresent();
@@ -65,7 +65,7 @@ public class BlogRepositoryTest {
   @Test
   public void shouldNotFindBlogByBlogURLWhenNotExists() {
     //when
-    Optional<Blog> byBlogURL = blogRepository.findByBlogURL("url");
+    Optional<Blog> byBlogURL = blogRepository.findByFeedURL("url");
 
     //then
     assertThat(byBlogURL).isNotPresent();

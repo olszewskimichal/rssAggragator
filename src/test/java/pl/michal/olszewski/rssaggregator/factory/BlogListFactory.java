@@ -39,7 +39,7 @@ public class BlogListFactory {
   }
 
   public Blog withURL(String url) {
-    return repository.save(new Blog(url, "", "", "", null));
+    return repository.save(new Blog(url, "", "", url, null));
   }
 
   public Blog withName(String name) {
