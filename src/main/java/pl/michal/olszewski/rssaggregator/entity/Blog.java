@@ -14,7 +14,6 @@ import javax.persistence.OneToMany;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
@@ -23,7 +22,6 @@ import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
 @Getter
 @EqualsAndHashCode
 @NoArgsConstructor
-@ToString
 @Slf4j
 public class Blog {
 
@@ -53,10 +51,11 @@ public class Blog {
     return Collections.unmodifiableSet(items);
   }
 
-  @CacheEvict(value = "items")
+  @CacheEvict(value = {"blogs", "blogsDTO", "items"}, allEntries = true)
   public void addItem(Item item) {
     if (items.add(item)) {
-      log.debug("Dodaje nowy wpis do bloga {} o tytule {}", this.getName(), item.getTitle());
+      log.debug("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
+      items.add(item);
       item.setBlog(this);
     }
   }

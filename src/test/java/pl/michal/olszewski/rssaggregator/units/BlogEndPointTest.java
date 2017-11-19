@@ -14,16 +14,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.IOException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.michal.olszewski.rssaggregator.api.BlogEndPoint;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
+import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.service.BlogService;
 
-public class BlogEndPointTest {
+@ExtendWith(MockitoExtension.class)
+class BlogEndPointTest {
 
   private BlogService blogService;
   private MockMvc mockMvc;
@@ -38,15 +41,15 @@ public class BlogEndPointTest {
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 
-  @Before
-  public void configureSystemUnderTest() {
+  @BeforeEach
+  void configureSystemUnderTest() {
     blogService = mock(BlogService.class);
     mockMvc = MockMvcBuilders.standaloneSetup(new BlogEndPoint(blogService))
         .build();
   }
 
   @Test
-  public void shouldGetBlogByIdReturnStatusOK() throws Exception {
+  void shouldGetBlogByIdReturnStatusOK() throws Exception {
     given(blogService.getBlogDTOById(1L)).willReturn(new BlogDTO());
 
     mockMvc.perform(get("/api/v1/blogs/1"))
@@ -54,7 +57,7 @@ public class BlogEndPointTest {
   }
 
   @Test
-  public void shouldGetBlogByIdReturnStatusNotFoundWhenBlogNotExist() throws Exception {
+  void shouldGetBlogByIdReturnStatusNotFoundWhenBlogNotExist() throws Exception {
     given(blogService.getBlogDTOById(1L)).willReturn(null);
 
     mockMvc.perform(get("/api/v1/blogs/1"))
@@ -62,7 +65,7 @@ public class BlogEndPointTest {
   }
 
   @Test
-  public void shouldGetBlogByIdReturnBlogAsJson() throws Exception {
+  void shouldGetBlogByIdReturnBlogAsJson() throws Exception {
     given(blogService.getBlogDTOById(1L)).willReturn(new BlogDTO());
 
     mockMvc.perform(get("/api/v1/blogs/1"))
@@ -70,7 +73,7 @@ public class BlogEndPointTest {
   }
 
   @Test
-  public void shouldReturnCorrectBlogById() throws Exception {
+  void shouldReturnCorrectBlogById() throws Exception {
     given(blogService.getBlogDTOById(1L)).willReturn(BlogDTO.builder().name("nazwa").build());
 
     mockMvc.perform(get("/api/v1/blogs/1"))
@@ -78,13 +81,13 @@ public class BlogEndPointTest {
   }
 
   @Test
-  public void shouldGetBlogsReturnStatusOK() throws Exception {
+  void shouldGetBlogsReturnStatusOK() throws Exception {
     mockMvc.perform(get("/api/v1/blogs"))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void shouldUpdateBlogReturnStatusNoContent() throws Exception {
+  void shouldUpdateBlogReturnStatusNoContent() throws Exception {
     mockMvc.perform(put("/api/v1/blogs")
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         .content(convertObjectToJsonBytes(BlogDTO.builder().build())))
@@ -92,7 +95,7 @@ public class BlogEndPointTest {
   }
 
   @Test
-  public void shouldCreateBlogReturnStatusNoContent() throws Exception {
+  void shouldCreateBlogReturnStatusNoContent() throws Exception {
     mockMvc.perform(post("/api/v1/blogs")
         .contentType(MediaType.APPLICATION_JSON_UTF8)
         .content(convertObjectToJsonBytes(BlogDTO.builder().build())))
@@ -100,13 +103,13 @@ public class BlogEndPointTest {
   }
 
   @Test
-  public void shouldDeleteBlogReturnStatusNoContent() throws Exception {
+  void shouldDeleteBlogReturnStatusNoContent() throws Exception {
     mockMvc.perform(delete("/api/v1/blogs/1"))
         .andExpect(status().isNoContent());
   }
 
   @Test
-  public void shouldGetBlogByNameReturnBlogAsJson() throws Exception {
+  void shouldGetBlogByNameReturnBlogAsJson() throws Exception {
     given(blogService.getBlogDTOByName("name")).willReturn(new BlogDTO());
 
     mockMvc.perform(get("/api/v1/blogs/by-name/name"))
@@ -114,7 +117,7 @@ public class BlogEndPointTest {
   }
 
   @Test
-  public void shouldReturnCorrectBlogByName() throws Exception {
+  void shouldReturnCorrectBlogByName() throws Exception {
     given(blogService.getBlogDTOByName("nazwa")).willReturn(BlogDTO.builder().name("nazwa").build());
 
     mockMvc.perform(get("/api/v1/blogs/by-name/nazwa"))

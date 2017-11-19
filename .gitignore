@@ -29,3 +29,4 @@ mvnw.cmd
 
 *.jar
 *.log
+service/create.sql

@@ -9,13 +9,14 @@ import java.util.stream.IntStream;
 import javax.persistence.PersistenceException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.DataException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
@@ -24,8 +25,9 @@ import pl.michal.olszewski.rssaggregator.factory.BlogListFactory;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 
 @DataJpaTest
-@RunWith(SpringRunner.class)
 @ActiveProfiles(Profiles.TEST)
+@RunWith(JUnitPlatform.class)
+@ExtendWith(org.springframework.test.context.junit.jupiter.SpringExtension.class)
 public class BlogRepositoryTest {
 
   @Autowired
@@ -35,20 +37,20 @@ public class BlogRepositoryTest {
   private BlogRepository blogRepository;
 
   @Test
-  public void shouldFindBlogByBlogURL() {
+  void shouldFindBlogByBlogURL() {
     //given
     givenBlog()
         .withURL("url");
 
     //when
-    Optional<Blog> byBlogURL = blogRepository.findByBlogURL("url");
+    Optional<Blog> byBlogURL = blogRepository.findByFeedURL("url");
 
     //then
     assertThat(byBlogURL).isPresent();
   }
 
   @Test
-  public void shouldFindBlogById() {
+  void shouldFindBlogById() {
     //given
     Blog blog = givenBlog()
         .withURL("url");
@@ -61,16 +63,16 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldNotFindBlogByBlogURLWhenNotExists() {
+  void shouldNotFindBlogByBlogURLWhenNotExists() {
     //when
-    Optional<Blog> byBlogURL = blogRepository.findByBlogURL("url");
+    Optional<Blog> byBlogURL = blogRepository.findByFeedURL("url");
 
     //then
     assertThat(byBlogURL).isNotPresent();
   }
 
   @Test
-  public void shouldNotFindBlogByIdWhenNotExists() {
+  void shouldNotFindBlogByIdWhenNotExists() {
     //when
     Optional<Blog> blogById = blogRepository.findById(1L);
 
@@ -79,7 +81,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldThrownExceptionWhenSave2BlogWithTheSameName() {
+  void shouldThrownExceptionWhenSave2BlogWithTheSameName() {
     //given
     givenBlog()
         .withURL("url");
@@ -89,7 +91,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldThrowExceptionWhenItemDescriptionIsTooLong() {
+  void shouldThrowExceptionWhenItemDescriptionIsTooLong() {
     Blog blog = givenBlog()
         .withURL("url");
     String desc = IntStream.range(0, 10001).parallel().mapToObj(index -> "a").collect(Collectors.joining());
@@ -103,7 +105,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldFindBlogByName() {
+  void shouldFindBlogByName() {
     //given
     givenBlog()
         .withName("url");
@@ -116,7 +118,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  public void shouldNotFindBlogByNameWhenNotExists() {
+  void shouldNotFindBlogByNameWhenNotExists() {
     //when
     Optional<Blog> byName = blogRepository.findByName("name");
 

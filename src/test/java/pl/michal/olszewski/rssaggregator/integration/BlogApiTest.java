@@ -1,13 +1,14 @@
 package pl.michal.olszewski.rssaggregator.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.assertion.BlogListAssert;
 import pl.michal.olszewski.rssaggregator.dto.BlogDTO;
@@ -24,7 +25,7 @@ public class BlogApiTest extends IntegrationTestBase {
   @Autowired
   private BlogService blogService;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     blogRepository.deleteAll();
     blogService.evictBlogCache();
@@ -79,8 +80,10 @@ public class BlogApiTest extends IntegrationTestBase {
     thenCreateBlogByApi("test");
 
     //then
-    assertThat(blogRepository.findAll().size()).isEqualTo(1);
-    assertThat(blogRepository.findAll().get(0)).isNotNull();
+    assertAll(
+        () -> assertThat(blogRepository.findAll().size()).isEqualTo(1),
+        () -> assertThat(blogRepository.findAll().get(0)).isNotNull()
+    );
   }
 
   @Test
@@ -128,9 +131,10 @@ public class BlogApiTest extends IntegrationTestBase {
         .buildBlogWithItemsAndSave(2);
 
     List<BlogDTO> dtos = thenGetBlogsFromApi();
-    assertThat(dtos).isNotNull().isNotEmpty().hasSize(1);
-    assertThat(dtos.get(0).getItemsList()).isNotNull().isNotEmpty().hasSize(2);
-
+    assertAll(
+        () -> assertThat(dtos).isNotNull().isNotEmpty().hasSize(1),
+        () -> assertThat(dtos.get(0).getItemsList()).isNotNull().isNotEmpty().hasSize(2)
+    );
   }
 
   private BlogListFactory givenBlog() {

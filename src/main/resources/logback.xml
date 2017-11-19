@@ -6,6 +6,7 @@
   <property name="LOG_PATH" value="F:/kibana/logi/"/>
   <property name="LOG_FILE" value="${LOG_PATH}rss.log"/>
   <property name="SQL_FILE" value="${LOG_PATH}rssSQL.log"/>
+  <property name="ERRORS_FILE" value="${LOG_PATH}errors.log"/>
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ROLLIN">
     <encoder>
       <pattern>${FILE_LOG_PATTERN}</pattern>
@@ -36,9 +37,34 @@
     </triggeringPolicy>
   </appender>
 
+
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ERRORS">
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>ERROR</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <encoder>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+    <file>${ERRORS_FILE}</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>${ERRORS_FILE}%i.log</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>10</maxIndex>
+    </rollingPolicy>
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <MaxFileSize>100MB</MaxFileSize>
+    </triggeringPolicy>
+  </appender>
+
   <root level="INFO">
     <appender-ref ref="CONSOLE"/>
     <appender-ref ref="ROLLIN"/>
+  </root>
+
+  <root level="ERROR">
+    <appender-ref ref="ERRORS"/>
   </root>
 
   <logger level="INFO" name="org.springframework.web"/>
