@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
 import pl.michal.olszewski.rssaggregator.entity.Item;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;

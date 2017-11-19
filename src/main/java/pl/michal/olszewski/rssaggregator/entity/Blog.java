@@ -54,7 +54,7 @@ public class Blog {
   @CacheEvict(value = {"blogs", "blogsDTO", "items"}, allEntries = true)
   public void addItem(Item item) {
     if (items.add(item)) {
-      log.debug("Dodaje nowy wpis do bloga {} o tytule {}", this.getName(), item.getTitle());
+      log.debug("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
       items.add(item);
       item.setBlog(this);
     }
