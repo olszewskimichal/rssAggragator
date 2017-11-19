@@ -27,7 +27,7 @@ import pl.michal.olszewski.rssaggregator.exception.RssException;
 public class RssExtractorService {
 
   private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed) {
-    return syndFeed.getEntries().stream()
+    return syndFeed.getEntries().parallelStream()
         .map(entry -> new ItemDTO(
             entry.getTitle(),
             entry.getDescription() != null ? entry.getDescription().getValue() : "",
@@ -42,7 +42,7 @@ public class RssExtractorService {
       String url = new URL(linkUrl).toURI().toString();
       if (containsUnicode(url)) {
         String asciiString = UriUtils.encodeQuery(url, "UTF-8");
-        log.debug("Zamieniłem {} na {}", linkUrl, asciiString);
+        log.trace("Zamieniłem {} na {}", linkUrl, asciiString);
         return asciiString;
       }
     } catch (MalformedURLException | URISyntaxException | UnsupportedEncodingException e) {
@@ -61,12 +61,12 @@ public class RssExtractorService {
       HttpURLConnection con = (HttpURLConnection) new URL(linkUrl).openConnection();
       con.addRequestProperty("User-Agent", "Mozilla/4.76");
       con.setInstanceFollowRedirects(false);
+      con.setRequestMethod("HEAD");
+      con.setConnectTimeout(600);
       con.connect();
-      con.getInputStream();
-
       if (con.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || con.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
         String redirectUrl = con.getHeaderField("Location");
-        return getFinalURL(redirectUrl);
+        return getFinalURL(redirectUrl).replaceAll("[&?]gi.*", "");
       }
     } catch (IOException ignored) {
       log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ignored);

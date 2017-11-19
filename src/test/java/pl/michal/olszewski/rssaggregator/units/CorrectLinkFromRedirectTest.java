@@ -28,4 +28,11 @@ class CorrectLinkFromRedirectTest {
         .isEqualTo("http://www.samouczekprogramisty.pl/modyfikatory-dostepu-w-jezyku-java/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers");
   }
 
+  @Test
+  void when2TimesGetFinalLinkReturnTheSameResult() {
+    String finalURL = getFinalURL("http://jvm-bloggers.com/r/1jqCnbx");
+    String finalURL2 = getFinalURL("http://jvm-bloggers.com/r/1jqCnbx");
+    assertThat(finalURL).isEqualTo(finalURL2);
+  }
+
 }
