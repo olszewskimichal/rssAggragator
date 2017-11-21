@@ -16,6 +16,8 @@ cache:
 addons:
     sonarcloud:
         organization: "olszewskimichal-github"
+        token:
+          secure: ${SONAR_TOKEN}
 
 jobs:
   include:
