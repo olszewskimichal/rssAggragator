@@ -67,4 +67,11 @@ public class BlogEndPoint {
     blogService.deleteBlog(blogId);
   }
 
+  @PostMapping(value = "/evictCache")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void evictCache() {
+    blogService.evictBlogCache();
+  }
+
+
 }

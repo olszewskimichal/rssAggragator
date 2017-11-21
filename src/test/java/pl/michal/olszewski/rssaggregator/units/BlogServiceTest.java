@@ -56,16 +56,16 @@ class BlogServiceTest {
   void shouldCreateBlogWithCorrectProperties() {
     //given
     Instant now = Instant.now();
-    BlogDTO blogDTO = BlogDTO.builder().name("nazwa").description("desc").feedURL("url").link("blogUrl").publishedDate(now).build();  //TODO serwis do czasu
+    BlogDTO blogDTO = BlogDTO.builder().name("nazwa1").description("desc").feedURL("url").link("blogUrl1").publishedDate(now).build();  //TODO serwis do czasu
     //when
     Blog blog = blogService.createBlog(blogDTO);
     //then
     assertAll(
         () -> assertThat(blog).isNotNull(),
         () -> assertThat(blog.getDescription()).isEqualTo("desc"),
-        () -> assertThat(blog.getName()).isEqualTo("nazwa"),
+        () -> assertThat(blog.getName()).isEqualTo("nazwa1"),
         () -> assertThat(blog.getFeedURL()).isEqualTo("url"),
-        () -> assertThat(blog.getBlogURL()).isEqualTo("blogUrl"),
+        () -> assertThat(blog.getBlogURL()).isEqualTo("blogUrl1"),
         () -> assertThat(blog.getPublishedDate()).isAfterOrEqualTo(now).isBeforeOrEqualTo(now)
     );
   }

@@ -1,6 +1,7 @@
 language: java
 sudo: false
 jdk: oraclejdk8
+dist: trusty
 
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
@@ -9,12 +10,24 @@ cache:
   directories:
   - .autoconf
   - $HOME/.m2
+  - $HOME/.sonar/cache
+
+addons:
+    sonarcloud:
+        organization: "olszewskimichal-github"
+        token:
+          secure: ${SONAR_TOKEN}
+        branches:
+          - master
+          - develop
+script:
+    - sonar-scanner
 
 jobs:
   include:
     - stage: test
       script:
-        - mvn test -B
+        - mvn test sonar:sonar -B
       after_success:
        - bash <(curl -s https://codecov.io/bash)
 notifications:

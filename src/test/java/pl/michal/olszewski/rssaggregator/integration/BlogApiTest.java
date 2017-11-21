@@ -2,6 +2,8 @@ package pl.michal.olszewski.rssaggregator.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -137,6 +139,19 @@ public class BlogApiTest extends IntegrationTestBase {
     );
   }
 
+  @Test
+  void should_evictCache() {
+    List<Blog> blogs = blogService.getAllBlogs();
+    List<Blog> blogsNotCached = blogService.getAllBlogs();
+    assertSame(blogs, blogsNotCached);
+    blogService.evictBlogCache();
+
+    blogs = blogService.getAllBlogs();
+    thenEvictCache();
+    blogsNotCached = blogService.getAllBlogs();
+    assertNotSame(blogs, blogsNotCached);
+  }
+
   private BlogListFactory givenBlog() {
     return new BlogListFactory(blogRepository);
   }
@@ -165,4 +180,7 @@ public class BlogApiTest extends IntegrationTestBase {
     template.delete(String.format("http://localhost:%s/api/v1/blogs/%s", port, blogId));
   }
 
+  private void thenEvictCache() {
+    template.postForEntity(String.format("http://localhost:%s/api/v1/blogs/evictCache", port), "", String.class);
+  }
 }

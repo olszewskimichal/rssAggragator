@@ -5,7 +5,7 @@
 
   <groupId>pl.michal.olszewski</groupId>
   <artifactId>rss-aggregator</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.5-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>rss-aggregator</name>
@@ -175,9 +175,16 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <configuration>
+<!--        <configuration>
           <executable>true</executable>
-        </configuration>
+        </configuration>-->
+        <dependencies>
+          <dependency>
+            <groupId>org.springframework.boot.experimental</groupId>
+            <artifactId>spring-boot-thin-layout</artifactId>
+            <version>1.0.6.RELEASE</version>
+          </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -204,6 +211,10 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
