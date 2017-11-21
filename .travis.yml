@@ -18,6 +18,9 @@ addons:
         organization: "olszewskimichal-github"
         token:
           secure: ${SONAR_TOKEN}
+        branches:
+          - master
+          - develop
 script:
     - sonar-scanner
 
