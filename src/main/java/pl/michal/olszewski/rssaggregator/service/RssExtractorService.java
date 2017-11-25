@@ -39,7 +39,7 @@ public class RssExtractorService {
 
   public static String convertURLToAscii(String linkUrl) {
     try {
-      String url = new URL(linkUrl).toURI().toString();
+      String url = new URL(linkUrl.replaceAll(">", "%3E")).toURI().toString();
       if (containsUnicode(url)) {
         String asciiString = UriUtils.encodeQuery(url, "UTF-8");
         log.trace("Zamieniłem {} na {}", linkUrl, asciiString);
@@ -62,7 +62,7 @@ public class RssExtractorService {
       con.addRequestProperty("User-Agent", "Mozilla/4.76");
       con.setInstanceFollowRedirects(false);
       con.setRequestMethod("HEAD");
-      con.setConnectTimeout(600);
+      con.setConnectTimeout(1000);
       con.connect();
       if (con.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || con.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
         String redirectUrl = con.getHeaderField("Location");
