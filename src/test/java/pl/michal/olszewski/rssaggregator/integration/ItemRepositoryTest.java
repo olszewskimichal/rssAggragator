@@ -76,7 +76,7 @@ public class ItemRepositoryTest {
     blog.addItem(new Item(ItemDTO.builder().link("title1").build()));
     entityManager.persistAndFlush(blog);
     blog.addItem(new Item(ItemDTO.builder().link("title1").description("desc").build()));
-    assertThatThrownBy(() -> entityManager.persistAndFlush(blog)).hasMessageContaining("could not execute statement").hasCauseInstanceOf(ConstraintViolationException.class);
+    assertThatThrownBy(() -> entityManager.persistAndFlush(blog)).hasMessageContaining("could not execute").hasCauseInstanceOf(ConstraintViolationException.class);
   }
 
 
