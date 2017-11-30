@@ -1,6 +1,5 @@
 package pl.michal.olszewski.rssaggregator.service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -57,7 +56,6 @@ public class BlogService {
   public Blog updateBlog(BlogDTO blogDTO) {
     Blog blog = getBlogByFeedUrl(blogDTO.getFeedURL());
     blogDTO.getItemsList().stream()
-        .filter(item -> item.getDate().isAfter(blog.getLastUpdateDate() == null ? Instant.MIN : blog.getLastUpdateDate()))
         .map(Item::new)
         .filter(v -> !blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet()).contains(v.getLink()))
         .forEach(blog::addItem);

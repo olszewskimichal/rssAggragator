@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -26,13 +27,14 @@ import pl.michal.olszewski.rssaggregator.exception.RssException;
 @Slf4j
 public class RssExtractorService {
 
-  private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed) {
+  private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     return syndFeed.getEntries().parallelStream()
+        .filter(v -> v.getPublishedDate().toInstant().isAfter(lastUpdatedDate))
         .map(entry -> new ItemDTO(
             entry.getTitle(),
             entry.getDescription() != null ? entry.getDescription().getValue() : "",
             getFinalURL(convertURLToAscii(entry.getLink())),
-            entry.getPublishedDate() == null ? entry.getUpdatedDate().toInstant() : entry.getPublishedDate().toInstant(),
+            entry.getPublishedDate().toInstant(),
             entry.getAuthor()))
         .collect(Collectors.toSet());
   }
@@ -78,12 +80,13 @@ public class RssExtractorService {
     return new BlogDTO(syndFeed.getLink() != null ? syndFeed.getLink() : blogURL, syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant(), new ArrayList<>());
   }
 
-  public BlogDTO getBlog(XmlReader xmlReader, String feedURL, String blogURL) {
+  public BlogDTO getBlog(XmlReader xmlReader, String feedURL, String blogURL, Instant lastUpdatedDate) {
     try (XmlReader reader = xmlReader) {
       SyndFeed feed = new SyndFeedInput().build(reader);
       feed.setEncoding("UTF-8");
+      feed.getEntries().parallelStream().filter(v -> v.getPublishedDate() == null && v.getUpdatedDate() != null).forEach(v -> v.setPublishedDate(v.getUpdatedDate()));
       BlogDTO blogInfo = getBlogInfo(feed, feedURL, blogURL);
-      getItemsForBlog(feed).forEach(blogInfo::addNewItem);
+      getItemsForBlog(feed, lastUpdatedDate).forEach(blogInfo::addNewItem);
       return blogInfo;
     } catch (IOException | FeedException e) {
       throw new RssException(feedURL);

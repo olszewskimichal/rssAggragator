@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.service;
 import com.rometools.rome.io.XmlReader;
 import java.io.IOException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -30,7 +31,7 @@ public class AsyncService {
   public Future<Void> updateBlog(Blog v) {
     log.debug("Przetwarzam blog {}", v.getName());
     try {
-      BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(v.getFeedURL())), v.getFeedURL(), v.getBlogURL());
+      BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(v.getFeedURL())), v.getFeedURL(), v.getBlogURL(), v.getLastUpdateDate() == null ? Instant.MIN : v.getLastUpdateDate());
       blogService.updateBlog(blogDTO);
     } catch (IOException e) {
       log.error("aaa" + e.getMessage());
