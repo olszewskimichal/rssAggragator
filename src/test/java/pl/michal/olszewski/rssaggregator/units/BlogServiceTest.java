@@ -45,10 +45,23 @@ class BlogServiceTest {
   @Test
   void shouldCreateBlogFromDTO() {
     //given
-    BlogDTO blogDTO = BlogDTO.builder().build();
+    BlogDTO blogDTO = BlogDTO.builder().name("test").build();
     //when
     Blog blog = blogService.createBlog(blogDTO);
     //then
+    assertThat(blog).isNotNull();
+  }
+
+  @Test
+  void shouldNotTryCreatingBlogWhenExist() {
+    //given
+    given(blogRepository.findByFeedURL("nazwa")).willReturn(Optional.of(new Blog()));
+
+    BlogDTO blogDTO = BlogDTO.builder().feedURL("nazwa").build();
+    //when
+    Blog blog = blogService.createBlog(blogDTO);
+    //then
+    verify(blogRepository, times(1)).findByFeedURL("nazwa");
     assertThat(blog).isNotNull();
   }
 
