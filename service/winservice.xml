@@ -3,5 +3,5 @@
   <name>Rss Aggregator</name>
   <description>Rss Aggregator</description>
   <executable>java</executable>
-  <arguments>-jar -Dfile.encoding=UTF8 rss-aggregator-0.0.6-SNAPSHOT.jar</arguments>
+  <arguments>-jar -Dfile.encoding=UTF8 rss-aggregator-0.0.7-SNAPSHOT.jar</arguments>
 </service>
