@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,13 +29,18 @@ public class BlogService {
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
   public Blog createBlog(BlogDTO blogDTO) {
-    log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
-    Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate());
-    blogDTO.getItemsList().stream().parallel()
-        .map(Item::new)
-        .forEach(blog::addItem);
-    blogRepository.save(blog);
-    return blog;
+    Optional<Blog> byFeedURL = blogRepository.findByFeedURL(blogDTO.getFeedURL());
+    if (!byFeedURL.isPresent()) {
+      log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
+
+      Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate(), null);
+      blogDTO.getItemsList().stream()
+          .map(Item::new)
+          .forEach(blog::addItem);
+      blogRepository.save(blog);
+      return blog;
+    }
+    return byFeedURL.get();
   }
 
   private Blog getBlogByName(String name) {
@@ -49,11 +55,11 @@ public class BlogService {
   @Transactional
   public Blog updateBlog(BlogDTO blogDTO) {
     Blog blog = getBlogByFeedUrl(blogDTO.getFeedURL());
-    blog.updateFromDto(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)
         .filter(v -> !blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet()).contains(v.getLink()))
         .forEach(blog::addItem);
+    blog.updateFromDto(blogDTO);
     return blog;
   }
 

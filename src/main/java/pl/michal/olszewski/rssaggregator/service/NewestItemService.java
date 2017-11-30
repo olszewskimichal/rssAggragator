@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
@@ -21,7 +20,6 @@ public class NewestItemService {
     this.itemRepository = itemRepository;
   }
 
-  @Cacheable(value = "items")
   public List<ItemDTO> getNewestItems(int size) {
     log.debug("Pobieram wpisy z limitem {}", size);
     return itemRepository.findAllByOrderByDateDesc(size)

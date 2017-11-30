@@ -86,7 +86,7 @@ public class BlogRepositoryTest {
     givenBlog()
         .withURL("url");
     //then
-    assertThatThrownBy(() -> entityManager.persistAndFlush(new Blog("url", "", "", "", null))).hasCauseInstanceOf(ConstraintViolationException.class).isInstanceOf(PersistenceException.class)
+    assertThatThrownBy(() -> entityManager.persistAndFlush(new Blog("url", "", "", "", null, null))).hasCauseInstanceOf(ConstraintViolationException.class).isInstanceOf(PersistenceException.class)
         .hasMessageContaining("ConstraintViolationException");
   }
 
