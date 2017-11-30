@@ -140,8 +140,9 @@ class BlogServiceTest {
   @Test
   void shouldUpdateBlogWhenNewItemAdd() {
     //given
-    Blog blog = new Blog("url", "", "url", "", null);
-    List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1).mapToObj(v -> ItemDTO.builder().author("autor").description("desc").title(v + "").link("link" + v).build()).collect(Collectors.toList());
+    Blog blog = new Blog("url", "", "url", "", null, null);
+    List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1).mapToObj(v -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(v + "").link("link" + v).build())
+        .collect(Collectors.toList());
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(itemsList).build();
     given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
     //when
@@ -156,9 +157,10 @@ class BlogServiceTest {
   @Test
   void shouldAddItemForBlogWhichHaveOneItem() {
     //given
-    Blog blog = new Blog("url", "", "url", "", null);
+    Blog blog = new Blog("url", "", "url", "", null, null);
     blog.addItem(new Item(ItemDTO.builder().title("title").build()));
-    List<ItemDTO> itemsList = IntStream.rangeClosed(2, 2).mapToObj(v -> ItemDTO.builder().author("autor").description("desc").title(v + "").link("link" + v).build()).collect(Collectors.toList());
+    List<ItemDTO> itemsList = IntStream.rangeClosed(2, 2).mapToObj(v -> ItemDTO.builder().author("autor").description("desc").date(Instant.now()).title(v + "").link("link" + v).build())
+        .collect(Collectors.toList());
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(itemsList).build();
     given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
     //when
@@ -173,8 +175,8 @@ class BlogServiceTest {
   @Test
   void shouldNotAddItemWhenIsTheSame() {
     //given
-    ItemDTO itemDTO = ItemDTO.builder().title("title").build();
-    Blog blog = new Blog("url", "", "url", "", null);
+    ItemDTO itemDTO = ItemDTO.builder().title("title").date(Instant.now()).build();
+    Blog blog = new Blog("url", "", "url", "", null, null);
     blog.addItem(new Item(itemDTO));
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(Arrays.asList(itemDTO, itemDTO)).build();
     given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
@@ -187,7 +189,7 @@ class BlogServiceTest {
   @Test
   void shouldNotUpdateBlogWhenNothingChanged() {
     //given
-    Blog blog = new Blog("url", "", "url", "", null);
+    Blog blog = new Blog("url", "", "url", "", null, null);
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").build();
     given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
     //when
@@ -199,7 +201,7 @@ class BlogServiceTest {
   @Test
   void shouldUpdateBlogWhenDescriptionChanged() {
     //given
-    Blog blog = new Blog("url", "", "url", "", null);
+    Blog blog = new Blog("url", "", "url", "", null, null);
     BlogDTO blogDTO = BlogDTO.builder().feedURL("url").description("desc").name("url").build();
     given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
     //when
@@ -213,7 +215,7 @@ class BlogServiceTest {
 
   @Test
   void shouldDeleteBlogById() {
-    given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null)));
+    given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
 
     assertThat(blogService.deleteBlog(1L)).isTrue();
   }
@@ -228,7 +230,7 @@ class BlogServiceTest {
   @Test
   void shouldGetBlogDTOById() {
     //given
-    given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null)));
+    given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
     //when
     BlogDTO blogById = blogService.getBlogDTOById(1L);
     //then
@@ -286,7 +288,7 @@ class BlogServiceTest {
   @Test
   void shouldGetBlogDTOByName() {
     //given
-    given(blogRepository.findByName("name")).willReturn(Optional.of(new Blog("", "", "", "", null)));
+    given(blogRepository.findByName("name")).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
     //when
     BlogDTO blogById = blogService.getBlogDTOByName("name");
     //then

@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class BlogService {
     if (!byFeedURL.isPresent()) {
       log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
 
-      Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate());
+      Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate(), null);
       blogDTO.getItemsList().stream()
           .map(Item::new)
           .forEach(blog::addItem);
@@ -55,11 +56,12 @@ public class BlogService {
   @Transactional
   public Blog updateBlog(BlogDTO blogDTO) {
     Blog blog = getBlogByFeedUrl(blogDTO.getFeedURL());
-    blog.updateFromDto(blogDTO);
     blogDTO.getItemsList().stream()
+        .filter(item -> item.getDate().isAfter(blog.getLastUpdateDate() == null ? Instant.MIN : blog.getLastUpdateDate()))
         .map(Item::new)
         .filter(v -> !blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet()).contains(v.getLink()))
         .forEach(blog::addItem);
+    blog.updateFromDto(blogDTO);
     return blog;
   }
 

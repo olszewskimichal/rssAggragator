@@ -37,7 +37,7 @@ public class ItemRepositoryTest {
   @Test
   void shouldFind2NewestItems() {
     //given
-    Blog blog = new Blog("url", "", "", "", null);
+    Blog blog = new Blog("url", "", "", "", null, null);
     Instant instant = Instant.now();
     blog.addItem(new Item(ItemDTO.builder().title("title1").date(instant).build()));
     blog.addItem(new Item(ItemDTO.builder().title("title2").date(instant.minusSeconds(10)).build()));
@@ -57,7 +57,7 @@ public class ItemRepositoryTest {
   @Test
   void shouldFindItemsWhenDateIsNull() {
     //given
-    Blog blog = new Blog("url", "", "", "", null);
+    Blog blog = new Blog("url", "", "", "", null, null);
     blog.addItem(new Item(ItemDTO.builder().title("title1").build()));
     blog.addItem(new Item(ItemDTO.builder().title("title2").build()));
     blog.addItem(new Item(ItemDTO.builder().title("title3").build()));
@@ -72,7 +72,7 @@ public class ItemRepositoryTest {
 
   @Test
   void shouldNotCreateItemByUniqueConstraint() {
-    Blog blog = new Blog("url", "", "", "", null);
+    Blog blog = new Blog("url", "", "", "", null, null);
     blog.addItem(new Item(ItemDTO.builder().link("title1").build()));
     entityManager.persistAndFlush(blog);
     blog.addItem(new Item(ItemDTO.builder().link("title1").description("desc").build()));
