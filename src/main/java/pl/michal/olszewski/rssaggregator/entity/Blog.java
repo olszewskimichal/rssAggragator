@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.entity;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,6 +64,6 @@ public class Blog {
     this.description = blogDTO.getDescription();
     this.name = blogDTO.getName();
     this.publishedDate = blogDTO.getPublishedDate();
-    this.lastUpdateDate = Instant.now();
+    this.lastUpdateDate = Instant.now().minus(2, ChronoUnit.DAYS);
   }
 }
