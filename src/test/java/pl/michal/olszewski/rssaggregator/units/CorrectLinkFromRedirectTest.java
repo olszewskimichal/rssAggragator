@@ -24,8 +24,8 @@ class CorrectLinkFromRedirectTest {
 
   @Test
   void shouldGetFinalLinkFromRedirect() {
-    assertThat(getFinalURL("http://jvm-bloggers.com/r/%E1%B9%A1%F0%A2%8B%AD%E7%8C%B9%F0%A1%83%B9%F0%A4%9A%B4%F3%A0%84%8D%E3%AF%B1"))
-        .isEqualTo("http://www.samouczekprogramisty.pl/modyfikatory-dostepu-w-jezyku-java/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers");
+    assertThat(getFinalURL("http://jvm-bloggers.com/r/%E0%BB%80%F0%96%A8%A1%E2%BA%B3%F0%AB%89%9A%E1%A2%B5%D1%89%F0%9D%9B%8A"))
+        .isEqualTo("http://namiekko.pl/2017/11/28/recenzja-ksiazki-zawod-programista-macieja-aniserowicza/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers");
   }
 
   @Test
