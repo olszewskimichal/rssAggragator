@@ -22,11 +22,11 @@ POST /evictCache  - wyczyszczenie cache
 ```
 DELETE /{id}  - usuwanie blogu po id
 ```
-*/api/v1/items - pobiera najswieższe wpisy na blogach, domyslnie jest to 10 elementów ale jest możliwośc podania parametru limit
+* /api/v1/items - pobiera najswieższe wpisy na blogach, domyslnie jest to 10 elementów ale jest możliwośc podania parametru limit
 ```
 /api/v1/items?limit=50 - pobiera 50 wpisów
 ```
-*/api/v1/refresh?blogId= - odswieża blog tzn sprawdza na żadanie czy nie pojawiły się nowe wpisy
+* /api/v1/refresh?blogId= - odswieża blog tzn sprawdza na żadanie czy nie pojawiły się nowe wpisy
 
 ### Tworzenie nowego Bloga ###
 ```
