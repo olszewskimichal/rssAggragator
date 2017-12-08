@@ -4,9 +4,14 @@
 # rssAggragator
 Agregator RSS do śledzenia informacji na blogach
 
-Aplikacja napisana z wykorzystaniem Spring Boota 1.5 + oraz bibiolteki Rome.
+Aplikacja napisana z wykorzystaniem Spring Boota 1.5 + oraz bibioteki Rome.
 
 Aplikacja opiera się na API Restowym, aktualnie nie posiada żadnego czytelniejszego GUI.
+
+* ENDPOINTY
+```
+/api/v1/blogs
+```
 
 * Tworzenie nowego Bloga
 ```
