@@ -12,6 +12,12 @@ Aplikacja opiera się na API Restowym, aktualnie nie posiada żadnego czytelniej
 ```
 /api/v1/blogs
 ```
+```
+/api/v1/items
+```
+```
+/api/v1/refresh
+```
 
 * Tworzenie nowego Bloga
 ```
