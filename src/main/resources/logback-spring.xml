@@ -52,18 +52,29 @@
     </triggeringPolicy>
   </appender>
 
-  <root level="INFO">
-    <appender-ref ref="CONSOLE"/>
-    <appender-ref ref="ROLLIN"/>
-  </root>
+  <springProfile name="prod">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="ROLLIN"/>
+    </root>
+  </springProfile>
 
-  <root level="ERROR">
-    <appender-ref ref="ERRORS"/>
-  </root>
+  <springProfile name="test,development">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="prod">
+    <root level="ERROR">
+      <appender-ref ref="ERRORS"/>
+    </root>
+    <logger additivity="false" level="INFO" name="org.hibernate">
+      <appender-ref ref="SQL"/>
+    </logger>
+  </springProfile>
 
   <logger level="INFO" name="org.springframework.web"/>
-  <logger additivity="false" level="INFO" name="org.hibernate">
-    <appender-ref ref="SQL"/>
-  </logger>
+
 
 </configuration>
