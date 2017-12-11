@@ -17,7 +17,7 @@ public class UpdateBlogService {
   private final BlogRepository repository;
   private final AsyncService asyncService;
 
-  @Value("${enableJob}")
+  @Value("${refresh.blog.enable-job}")
   private boolean enableJob;
 
 
@@ -26,7 +26,7 @@ public class UpdateBlogService {
     this.asyncService = asyncService;
   }
 
-  @Scheduled(fixedDelay = 5 * 60 * 1000)
+  @Scheduled(fixedDelayString = "${refresh.blog.milis}")
   public void updatesBlogs() {
     if (enableJob) {
       log.debug("zaczynam aktualizacje blogów");
