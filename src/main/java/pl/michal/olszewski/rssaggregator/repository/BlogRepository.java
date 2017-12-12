@@ -19,7 +19,7 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
   @Query("select b from Blog b left join fetch b.items where b.id=?1")
   Optional<Blog> findById(Long id);
 
-  @Query(value = "SELECT b FROM Blog b LEFT JOIN FETCH b.items")
+  @Query(value = "SELECT b FROM Blog b LEFT JOIN FETCH b.items where b.active=1")
   Stream<Blog> findStreamAll();
 
 }

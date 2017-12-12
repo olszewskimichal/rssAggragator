@@ -73,8 +73,13 @@ public class BlogService {
   public boolean deleteBlog(Long id) {
     log.debug("Usuwam bloga o id {}", id);
     Blog blog = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
-    blogRepository.delete(blog);
-    return true;
+    if (blog.getItems().isEmpty()) {
+      blogRepository.delete(blog);
+      return true;
+    } else {
+      blog.deactive();
+      return false;
+    }
   }
 
   @Transactional(readOnly = true)

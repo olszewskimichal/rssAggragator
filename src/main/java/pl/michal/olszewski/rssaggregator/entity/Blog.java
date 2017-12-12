@@ -35,6 +35,7 @@ public class Blog {
   private String feedURL;
   private Instant publishedDate;
   private Instant lastUpdateDate;
+  private boolean active = true;
 
   @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<Item> items = new HashSet<>();
@@ -47,6 +48,7 @@ public class Blog {
     this.publishedDate = publishedDate;
     this.items = new HashSet<>();
     this.lastUpdateDate = lastUpdateDate;
+    this.active = true;
   }
 
   public Set<Item> getItems() {
@@ -65,5 +67,13 @@ public class Blog {
     this.name = blogDTO.getName();
     this.publishedDate = blogDTO.getPublishedDate();
     this.lastUpdateDate = Instant.now().minus(2, ChronoUnit.DAYS);
+  }
+
+  public boolean isActive() {
+    return active;
+  }
+
+  public void deactive() {
+    active = false;
   }
 }

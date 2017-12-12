@@ -302,4 +302,17 @@ class BlogServiceTest {
     //when
     assertThatThrownBy(() -> blogService.getBlogDTOByName("name")).isNotNull().hasMessage("Nie znaleziono blogu = name");
   }
+
+  @Test
+  void shouldChangeActivityBlogWhenWeTryDeleteBlogWithItems() {
+    Item item = new Item(ItemDTO.builder().link("test").build());
+    Blog blog = new Blog("", "", "", "", null, null);
+    blog.addItem(item);
+
+    given(blogRepository.findById(1L)).willReturn(Optional.of(blog));
+    //when
+    blogService.deleteBlog(1L);
+    //then
+    assertThat(blog.isActive()).isFalse();
+  }
 }

@@ -42,6 +42,12 @@ public class BlogListFactory {
     return repository.save(new Blog(url, "", "", url, null, null));
   }
 
+  public Blog notActive() {
+    Blog blog = new Blog("test", "", "", "test", null, null);
+    blog.deactive();
+    return repository.save(blog);
+  }
+
   public Blog withName(String name) {
     return repository.save(new Blog(name, "", name, "", null, null));
   }
