@@ -128,7 +128,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  void shouldGetAllBlogsIfAllAreActive(){
+  void shouldGetAllBlogsIfAllAreActive() {
     givenBlog().buildNumberOfBlogsAndSave(5);
     //when
     Stream<Blog> streamAll = blogRepository.findStreamAll();
@@ -137,7 +137,7 @@ public class BlogRepositoryTest {
   }
 
   @Test
-  void shouldNotReturnNotActiveBlog(){
+  void shouldNotReturnNotActiveBlog() {
     givenBlog().notActive();
     //when
     Stream<Blog> streamAll = blogRepository.findStreamAll();
