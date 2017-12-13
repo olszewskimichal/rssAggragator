@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -42,5 +43,11 @@ public class HomeControllerTest {
   public void shouldRenderHomePageView() throws Exception {
     mockMvc.perform(get("/"))
         .andExpect(view().name("index"));
+  }
+
+  @Test
+  public void shouldShowIndexTemplate() {
+    HomeController homeController = new HomeController();
+    assertThat(homeController.mainPage()).isEqualTo("index");
   }
 }
