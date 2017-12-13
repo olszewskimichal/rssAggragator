@@ -7,10 +7,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
@@ -50,6 +52,31 @@ class UpdateBlogServiceTest {
 
     verify(blogRepository, times(1)).findById(1L);
     verify(asyncService, times(1)).updateBlog(new Blog());
+    verifyNoMoreInteractions(blogRepository);
+  }
+
+  @Test
+  void shouldRunUpdatesForAllBlogs() {
+    //given
+    ReflectionTestUtils.setField(updateBlogService, "enableJob", true);
+    given(blogRepository.findStreamAll()).willReturn(Stream.of(new Blog()));
+    //when
+    updateBlogService.updatesBlogs();
+
+    verify(blogRepository, times(1)).findStreamAll();
+    verify(asyncService, times(1)).updateBlog(new Blog());
+    verifyNoMoreInteractions(blogRepository);
+  }
+
+  @Test
+  void shouldNotRunUpdatesWhenIsNotEnabled() {
+    //given
+    ReflectionTestUtils.setField(updateBlogService, "enableJob", false);
+    //when
+    updateBlogService.updatesBlogs();
+
+    verify(blogRepository, times(0)).findStreamAll();
+    verify(asyncService, times(0)).updateBlog(new Blog());
     verifyNoMoreInteractions(blogRepository);
   }
 }

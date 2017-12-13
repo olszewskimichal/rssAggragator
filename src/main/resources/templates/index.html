@@ -1,0 +1,84 @@
+<html>
+<head>
+  <title>Rss Aggregator</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+</head>
+<body ng-app="myApp" class="ng-cloak">
+<div class="generic-container" ng-controller="Controller as ctrl">
+  <div class="panel panel-default">
+    <div class="panel-heading"><span class="lead">Dodaj nowego bloga</span></div>
+    <div class="formcontainer">
+      <form ng-submit="ctrl.submit()" name="myForm" class="form-group">
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label class="col-md-2 control-lable" for="uname">RSS/Feed adres</label>
+            <div class="col-md-7">
+              <input type="text" ng-model="ctrl.blog.feedURL" id="uname"
+                     class="form-control input-sm" placeholder="Podaj adres RSS bloga"
+                     required="required"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label class="col-md-2 control-lable" for="name">Nazwa bloga</label>
+            <div class="col-md-7">
+              <input type="text" ng-model="ctrl.blog.name" id="name" class="form-control input-sm"
+                     placeholder="Podaj nazwe bloga"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label class="col-md-2 control-lable" for="link">Link do bloga</label>
+            <div class="col-md-7">
+              <input type="text" ng-model="ctrl.blog.link" id="link"
+                     class="form-control input-sm" placeholder="Podaj adres bloga"
+                     required="required"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-12">
+            <input type="submit" value="Dodaj nowy" class="btn btn-primary btn-sm"/>
+            <button type="button" ng-click="ctrl.reset()" class="btn btn-warning btn-sm">Reset</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading"><span class="lead">Najswieższe wpisy na blogach </span></div>
+    <div class="tablecontainer">
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>Autor</th>
+          <th>Tytuł</th>
+          <th>Link</th>
+          <th>Data</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="u in ctrl.items">
+          <td><span ng-bind="u.author"></span></td>
+          <td><span ng-bind="u.title"></span></td>
+          <td><a ng-href="{{u.link}}" ng-bind="u.link"></a></td>
+          <td><span ng-bind="u.date"></span></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="scripts/app.js"></script>
+<script src="scripts/service.js"></script>
+<script src="scripts/controller.js"></script>
+</body>
+</html>

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import javax.persistence.PersistenceException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.DataException;
@@ -124,6 +125,24 @@ public class BlogRepositoryTest {
 
     //then
     assertThat(byName).isNotPresent();
+  }
+
+  @Test
+  void shouldGetAllBlogsIfAllAreActive() {
+    givenBlog().buildNumberOfBlogsAndSave(5);
+    //when
+    Stream<Blog> streamAll = blogRepository.findStreamAll();
+    //then
+    assertThat(streamAll).hasSize(5);
+  }
+
+  @Test
+  void shouldNotReturnNotActiveBlog() {
+    givenBlog().notActive();
+    //when
+    Stream<Blog> streamAll = blogRepository.findStreamAll();
+    //then
+    assertThat(streamAll).hasSize(0);
   }
 
   private BlogListFactory givenBlog() {
