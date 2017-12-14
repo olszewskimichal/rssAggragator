@@ -1,5 +1,9 @@
 package pl.michal.olszewski.rssaggregator;
 
+import static com.google.common.base.Predicates.or;
+import static springfox.documentation.builders.PathSelectors.regex;
+
+import com.google.common.base.Predicate;
 import java.util.concurrent.Executor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +23,14 @@ import pl.michal.olszewski.rssaggregator.config.ConstantDateTimeService;
 import pl.michal.olszewski.rssaggregator.config.CurrentTimeDateTimeService;
 import pl.michal.olszewski.rssaggregator.config.DateTimeService;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableCaching
@@ -27,6 +39,7 @@ import pl.michal.olszewski.rssaggregator.config.Profiles;
     basePackageClasses = {RssAggregatorApplication.class, Jsr310JpaConverters.class}
 )
 @EnableScheduling
+@EnableSwagger2
 public class RssAggregatorApplication {
 
   public static void main(String[] args) {
@@ -67,4 +80,23 @@ public class RssAggregatorApplication {
   DateTimeProvider dateTimeProvider(DateTimeService dateTimeService) {
     return new AuditingDateTimeProvider(dateTimeService);
   }
+
+  @Bean
+  public Docket SwaggerApi() {
+    return new Docket(DocumentationType.SWAGGER_2)
+        .select()
+        .apis(RequestHandlerSelectors.basePackage("pl.michal.olszewski.rssaggregator.api"))
+        .paths(PathSelectors.any())
+        .build()
+        .apiInfo(apiInfo());
+  }
+
+  private ApiInfo apiInfo() {
+    return new ApiInfoBuilder()
+        .title("Rss Aggregator")
+        .description("Aggregator blogów ")
+        .contact(new Contact("Michał Olszewski", "https://github.com/olszewskimichal", "olszewskimichal@outlook.com"))
+        .build();
+  }
+
 }
