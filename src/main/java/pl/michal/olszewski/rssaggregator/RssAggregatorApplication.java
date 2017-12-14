@@ -67,4 +67,6 @@ public class RssAggregatorApplication {
   DateTimeProvider dateTimeProvider(DateTimeService dateTimeService) {
     return new AuditingDateTimeProvider(dateTimeService);
   }
+
+
 }

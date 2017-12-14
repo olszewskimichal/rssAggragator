@@ -9,6 +9,7 @@ Aplikacja opiera się na API Restowym, aktualnie nie posiada żadnego czytelniej
 
 
 ### ENDPOINTY ###
+* /swagger-ui.html Dokumentacja API Swagger  
 * /api/v1/blogs - zwraca wszystkie blogi
 ```
 GET /{id}  - szukanie blogu po id
