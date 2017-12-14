@@ -1,9 +1,5 @@
 package pl.michal.olszewski.rssaggregator;
 
-import static com.google.common.base.Predicates.or;
-import static springfox.documentation.builders.PathSelectors.regex;
-
-import com.google.common.base.Predicate;
 import java.util.concurrent.Executor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
