@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -138,7 +139,7 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldUpdateBlogWhenNewItemAdd() {
+  void shouldUpdateBlogWhenNewItemAdd() throws ExecutionException, InterruptedException {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1).mapToObj(v -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(v + "").link("link" + v).build())
@@ -155,7 +156,7 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldAddItemForBlogWhichHaveOneItem() {
+  void shouldAddItemForBlogWhichHaveOneItem() throws ExecutionException, InterruptedException {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
     blog.addItem(new Item(ItemDTO.builder().title("title").build()));
@@ -173,7 +174,7 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldNotAddItemWhenIsTheSame() {
+  void shouldNotAddItemWhenIsTheSame() throws ExecutionException, InterruptedException {
     //given
     ItemDTO itemDTO = ItemDTO.builder().title("title").date(Instant.now()).build();
     Blog blog = new Blog("url", "", "url", "", null, null);
@@ -187,7 +188,7 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldNotUpdateBlogWhenNothingChanged() {
+  void shouldNotUpdateBlogWhenNothingChanged() throws ExecutionException, InterruptedException {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").build();
@@ -199,7 +200,7 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldUpdateBlogWhenDescriptionChanged() {
+  void shouldUpdateBlogWhenDescriptionChanged() throws ExecutionException, InterruptedException {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
     BlogDTO blogDTO = BlogDTO.builder().feedURL("url").description("desc").name("url").build();
@@ -286,7 +287,7 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldGetBlogDTOByName() {
+  void shouldGetBlogDTOByName() throws ExecutionException, InterruptedException {
     //given
     given(blogRepository.findByName("name")).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
     //when
@@ -300,7 +301,7 @@ class BlogServiceTest {
     //given
     given(blogRepository.findByName("name")).willReturn(Optional.empty());
     //when
-    assertThatThrownBy(() -> blogService.getBlogDTOByName("name")).isNotNull().hasMessage("Nie znaleziono blogu = name");
+    assertThatThrownBy(() -> blogService.getBlogDTOByName("name")).isNotNull().hasMessageContaining("Nie znaleziono blogu = name");
   }
 
   @Test

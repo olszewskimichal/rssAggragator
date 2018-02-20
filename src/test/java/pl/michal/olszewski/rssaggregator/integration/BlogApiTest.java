@@ -89,7 +89,7 @@ public class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_update_existing_blog() {
+  public void should_update_existing_blog() throws InterruptedException {
     //given
     Instant instant = Instant.now();
     Blog blog = givenBlog()

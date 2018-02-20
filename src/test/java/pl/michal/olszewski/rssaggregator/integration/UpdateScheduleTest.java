@@ -39,7 +39,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     blogRepository.deleteAll();
     Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, null);
     blogRepository.save(blog);
-    Future<Void> voidFuture = asyncService.updateBlog(blog);
+    Future<Blog> voidFuture = asyncService.updateBlog(blog);
     voidFuture.get();
     Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
     assertAll(
@@ -54,7 +54,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     blogRepository.deleteAll();
     Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now());
     blogRepository.save(blog);
-    Future<Void> voidFuture = asyncService.updateBlog(blog);
+    Future<Blog> voidFuture = asyncService.updateBlog(blog);
     voidFuture.get();
     Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
     assertAll(

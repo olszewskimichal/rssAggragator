@@ -3,6 +3,8 @@ package pl.michal.olszewski.rssaggregator.service;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -43,8 +45,8 @@ public class BlogService {
     return byFeedURL.get();
   }
 
-  private Blog getBlogByName(String name) {
-    return blogRepository.findByName(name).orElseThrow(() -> new BlogNotFoundException(name));
+  private CompletableFuture<Blog> getBlogByName(String name) {
+    return CompletableFuture.supplyAsync(() -> blogRepository.findByName(name).orElseThrow(() -> new BlogNotFoundException(name)));
   }
 
   private Blog getBlogByFeedUrl(String feedUrl) {
@@ -91,10 +93,12 @@ public class BlogService {
 
   @Cacheable("blogsName")
   @Transactional(readOnly = true)
-  public BlogDTO getBlogDTOByName(String name) {
+  public BlogDTO getBlogDTOByName(String name) throws ExecutionException, InterruptedException {
     log.debug("pobieram bloga w postaci DTO o nazwie {}", name);
-    Blog blog = getBlogByName(name);
-    return new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog));
+    CompletableFuture<BlogDTO> future = getBlogByName(name)
+        .thenCompose(
+            blog -> CompletableFuture.supplyAsync(() -> new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog))));
+    return future.get();
   }
 
   @Cacheable("blogsDTO")

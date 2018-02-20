@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.api;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,7 +39,7 @@ public class BlogEndPoint {
   }
 
   @GetMapping(value = "/by-name/{name}")
-  public ResponseEntity<BlogDTO> getBlogByName(@PathVariable("name") String name) {
+  public ResponseEntity<BlogDTO> getBlogByName(@PathVariable("name") String name) throws ExecutionException, InterruptedException {
     return Optional.ofNullable(blogService.getBlogDTOByName(name))
         .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
         .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -51,7 +52,7 @@ public class BlogEndPoint {
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void updateBlog(@RequestBody BlogDTO blogDTO) {
+  public void updateBlog(@RequestBody BlogDTO blogDTO) throws ExecutionException, InterruptedException {
     blogService.updateBlog(blogDTO);
   }
 
