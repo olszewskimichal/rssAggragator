@@ -315,4 +315,9 @@ class BlogServiceTest {
     //then
     assertThat(blog.isActive()).isFalse();
   }
+
+  @Test
+  void shouldTest() {
+    blogService.test();
+  }
 }

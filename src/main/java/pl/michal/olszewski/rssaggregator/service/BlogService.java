@@ -51,6 +51,9 @@ public class BlogService {
     return blogRepository.findByFeedURL(feedUrl).orElseThrow(() -> new BlogNotFoundException(feedUrl));
   }
 
+  public void test() {
+    log.info("PUSTO");
+  }
 
   @Transactional
   public Blog updateBlog(BlogDTO blogDTO) {
