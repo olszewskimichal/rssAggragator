@@ -16,7 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class SwaggerConfig {
 
   @Bean
-  public Docket SwaggerApi() {
+  public Docket swaggerApi() {
     return new Docket(DocumentationType.SWAGGER_2)
         .select()
         .apis(RequestHandlerSelectors.basePackage("pl.michal.olszewski.rssaggregator.api"))
