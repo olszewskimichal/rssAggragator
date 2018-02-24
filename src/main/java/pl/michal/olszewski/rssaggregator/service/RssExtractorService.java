@@ -81,6 +81,7 @@ public class RssExtractorService {
   }
 
   public BlogDTO getBlog(XmlReader xmlReader, String feedURL, String blogURL, Instant lastUpdatedDate) {
+    log.debug("getBlogFromXml {} {}", feedURL, Thread.currentThread().getName());
     try (XmlReader reader = xmlReader) {
       SyndFeed feed = new SyndFeedInput().build(reader);
       feed.setEncoding("UTF-8");

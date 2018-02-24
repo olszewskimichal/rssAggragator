@@ -11,6 +11,7 @@ import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
 import pl.michal.olszewski.rssaggregator.exception.RssException;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
@@ -39,7 +40,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     blogRepository.deleteAll();
     Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, null);
     blogRepository.save(blog);
-    Future<Blog> voidFuture = asyncService.updateBlog(blog);
+    Future<Void> voidFuture = asyncService.updateBlog(blog);
     voidFuture.get();
     Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
     assertAll(
@@ -54,7 +55,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     blogRepository.deleteAll();
     Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now());
     blogRepository.save(blog);
-    Future<Blog> voidFuture = asyncService.updateBlog(blog);
+    Future<Void> voidFuture = asyncService.updateBlog(blog);
     voidFuture.get();
     Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
     assertAll(

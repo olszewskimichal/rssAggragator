@@ -1,8 +1,10 @@
 package pl.michal.olszewski.rssaggregator.service;
 
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.entity.Blog;
@@ -30,7 +32,7 @@ public class UpdateBlogService {
   public void updatesBlogs() {
     if (enableJob) {
       log.debug("zaczynam aktualizacje blogów");
-      repository.findStreamAll().forEach(asyncService::updateBlog);
+      repository.findStreamAll().collect(Collectors.toSet()).parallelStream().forEach(asyncService::updateBlog);
       log.debug("Aktualizacja zakończona");
     }
   }
