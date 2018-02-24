@@ -319,5 +319,6 @@ class BlogServiceTest {
   @Test
   void shouldTest() {
     blogService.test();
+    blogService.test();
   }
 }
