@@ -1,12 +1,12 @@
 package pl.michal.olszewski.rssaggregator.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 @Builder
 public class ItemDTO {
 
@@ -15,4 +15,12 @@ public class ItemDTO {
   private final String link;
   private final Instant date;
   private final String author;
+
+  public ItemDTO(String title, String description, String link, Instant date, String author) {
+    this.title = title;
+    this.description = description;
+    this.link = link;
+    this.date = date;
+    this.author = author;
+  }
 }

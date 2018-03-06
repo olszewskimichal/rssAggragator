@@ -47,7 +47,7 @@ public class RssExtractorService {
         log.trace("Zamieniłem {} na {}", linkUrl, asciiString);
         return asciiString;
       }
-    } catch (MalformedURLException | URISyntaxException | UnsupportedEncodingException e) {
+    } catch (MalformedURLException | URISyntaxException e) {
       log.error("Wystapił problem przy zamianie linku na ASCII {}", e);
     }
     return linkUrl;

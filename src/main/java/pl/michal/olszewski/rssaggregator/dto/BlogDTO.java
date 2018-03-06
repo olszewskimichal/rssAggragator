@@ -1,5 +1,8 @@
 package pl.michal.olszewski.rssaggregator.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +15,6 @@ import lombok.ToString;
 @Getter
 @Builder
 @ToString
-@NoArgsConstructor
 public class BlogDTO {
 
   private String link;
@@ -30,6 +32,10 @@ public class BlogDTO {
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
     this.itemsList = itemsList;
+  }
+
+  @JsonCreator
+  public BlogDTO() {
   }
 
   public List<ItemDTO> getItemsList() {

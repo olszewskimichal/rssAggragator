@@ -1,9 +1,7 @@
 package pl.michal.olszewski.rssaggregator.config;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.temporal.TemporalAccessor;
+import java.util.Optional;
 import org.springframework.data.auditing.DateTimeProvider;
 
 /**
@@ -23,7 +21,12 @@ public class AuditingDateTimeProvider implements DateTimeProvider {
   }
 
   @Override
+  public Optional<TemporalAccessor> getNow() {
+    return Optional.of(dateTimeService.getCurrentDateTime());
+  }
+
+  /*@Override
   public Calendar getNow() {
     return GregorianCalendar.from(ZonedDateTime.ofInstant(dateTimeService.getCurrentDateTime(), ZoneId.systemDefault()));
-  }
+  }*/
 }
