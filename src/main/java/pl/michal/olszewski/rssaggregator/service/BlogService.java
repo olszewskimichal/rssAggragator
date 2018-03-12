@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.service;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,9 +23,11 @@ import pl.michal.olszewski.rssaggregator.repository.BlogRepository;
 public class BlogService {
 
   private final BlogRepository blogRepository;
+  private final Clock clock;
 
-  public BlogService(BlogRepository blogRepository) {
+  public BlogService(BlogRepository blogRepository, Clock clock) {
     this.blogRepository = blogRepository;
+    this.clock = clock;
   }
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
@@ -95,7 +98,7 @@ public class BlogService {
   @Cacheable("blogsName")
   @Transactional(readOnly = true)
   public BlogDTO getBlogDTOByName(String name) {
-    log.debug("pobieram bloga w postaci DTO o nazwie {}", name);
+    log.debug("pobieram bloga w postaci DTO o nazwie {} {}", name, clock.instant());
     Blog blog = getBlogByName(name);
     return new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog));
   }

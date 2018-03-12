@@ -8,7 +8,9 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +41,7 @@ class BlogServiceTest {
 
   @BeforeEach
   void setUp() {
-    blogService = new BlogService(blogRepository);
+    blogService = new BlogService(blogRepository, Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault()));
   }
 
   @Test
