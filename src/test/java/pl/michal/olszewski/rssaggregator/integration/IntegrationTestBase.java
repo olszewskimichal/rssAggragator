@@ -13,7 +13,7 @@ import pl.michal.olszewski.rssaggregator.config.Profiles;
 @ExtendWith(SpringExtension.class)
 public abstract class IntegrationTestBase {
 
-  final TestRestTemplate template = new TestRestTemplate();
+  public final TestRestTemplate template = new TestRestTemplate();
   @LocalServerPort
   public int port;
 }
