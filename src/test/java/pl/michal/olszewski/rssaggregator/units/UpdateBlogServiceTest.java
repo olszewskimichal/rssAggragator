@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,7 +60,7 @@ class UpdateBlogServiceTest {
   void shouldRunUpdatesForAllBlogs() {
     //given
     ReflectionTestUtils.setField(updateBlogService, "enableJob", true);
-    given(blogRepository.findStreamAll()).willReturn(Stream.of(new Blog()));
+    given(blogRepository.findStreamAll()).willReturn(Arrays.asList(new Blog()));
     //when
     updateBlogService.updatesBlogs();
 

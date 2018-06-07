@@ -12,6 +12,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -250,7 +251,7 @@ class BlogServiceTest {
   @Test
   void shouldGetEmptyBlogs() {
     //given
-    given(blogRepository.findStreamAll()).willReturn(Stream.empty());
+    given(blogRepository.findStreamAll()).willReturn(Collections.emptyList());
     //when
     List<Blog> blogs = blogService.getAllBlogs();
     //then
@@ -260,7 +261,7 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogs() {
     //given
-    given(blogRepository.findStreamAll()).willReturn(Stream.of(new Blog()));
+    given(blogRepository.findStreamAll()).willReturn(Arrays.asList(new Blog()));
     //when
     List<Blog> blogs = blogService.getAllBlogs();
     //then
@@ -270,7 +271,7 @@ class BlogServiceTest {
   @Test
   void shouldGetEmptyBlogsDTOs() {
     //given
-    given(blogRepository.findStreamAll()).willReturn(Stream.empty());
+    given(blogRepository.findStreamAll()).willReturn(Collections.emptyList());
     //when
     List<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
     //then
@@ -280,7 +281,7 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogDTOs() {
     //given
-    given(blogRepository.findStreamAll()).willReturn(Stream.of(new Blog()));
+    given(blogRepository.findStreamAll()).willReturn(Arrays.asList(new Blog()));
     //when
     List<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
     //then

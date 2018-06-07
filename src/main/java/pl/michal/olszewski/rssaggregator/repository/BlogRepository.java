@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +21,6 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
   Optional<Blog> findById(Long id);
 
   @Query(value = "SELECT b FROM Blog b LEFT JOIN FETCH b.items where b.active=1")
-  Stream<Blog> findStreamAll();
+  List<Blog> findStreamAll();
 
 }

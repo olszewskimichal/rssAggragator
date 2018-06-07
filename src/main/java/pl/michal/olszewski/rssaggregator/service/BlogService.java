@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.service;
 
 import java.time.Clock;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -72,7 +73,7 @@ public class BlogService {
   @Cacheable("blogs")
   public List<Blog> getAllBlogs() {
     log.debug("Pobieram wszystkie blogi");
-    return blogRepository.findStreamAll().parallel().collect(Collectors.toList());
+    return new HashSet<>(blogRepository.findStreamAll()).parallelStream().collect(Collectors.toList());
   }
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)

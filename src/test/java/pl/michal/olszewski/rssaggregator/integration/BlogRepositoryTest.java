@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -131,7 +132,7 @@ public class BlogRepositoryTest {
   void shouldGetAllBlogsIfAllAreActive() {
     givenBlog().buildNumberOfBlogsAndSave(5);
     //when
-    Stream<Blog> streamAll = blogRepository.findStreamAll();
+    List<Blog> streamAll = blogRepository.findStreamAll();
     //then
     assertThat(streamAll).hasSize(5);
   }
@@ -140,7 +141,7 @@ public class BlogRepositoryTest {
   void shouldNotReturnNotActiveBlog() {
     givenBlog().notActive();
     //when
-    Stream<Blog> streamAll = blogRepository.findStreamAll();
+    List<Blog> streamAll = blogRepository.findStreamAll();
     //then
     assertThat(streamAll).hasSize(0);
   }
