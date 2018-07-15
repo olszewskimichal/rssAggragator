@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.item;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +22,8 @@ class NewestItemsEndPoint {
     this.itemService = itemService;
   }
 
-  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping
+  @Transactional
   public List<ItemDTO> getItems(@RequestParam(value = "limit", required = false) Integer limit) {
     return itemService.getNewestItems(limit == null ? 10 : limit);
   }

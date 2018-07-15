@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +23,9 @@ class BlogDTO {
   private String feedURL;
   private Instant publishedDate;
   @Builder.Default
+  @JsonProperty("itemsList")
   private List<ItemDTO> itemsList = new ArrayList<>();
+
 
   public BlogDTO(String link, String description, String name, String feedURL, Instant publishedDate, List<ItemDTO> itemsList) {
     this.link = link;
@@ -33,14 +36,14 @@ class BlogDTO {
     this.itemsList = itemsList;
   }
 
-  public List<ItemDTO> getItemsList() {
+  List<ItemDTO> getItemsList() {
     if (itemsList == null) {
       itemsList = new ArrayList<>();
     }
     return Collections.unmodifiableList(itemsList);
   }
 
-  public void addNewItem(ItemDTO itemDTO) {
+  void addNewItem(ItemDTO itemDTO) {
     this.itemsList.add(itemDTO);
   }
 }

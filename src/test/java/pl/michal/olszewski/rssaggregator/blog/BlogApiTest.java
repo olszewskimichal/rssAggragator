@@ -23,13 +23,13 @@ public class BlogApiTest extends IntegrationTestBase {
   private BlogService blogService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     blogRepository.deleteAll();
     blogService.evictBlogCache();
   }
 
   @Test
-  public void should_get_empty_list_of_blogs() {
+  void should_get_empty_list_of_blogs() {
     givenBlog()
         .buildNumberOfBlogsDTOAndSave(0);
 
@@ -39,7 +39,7 @@ public class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_get_all_blogs() {
+  void should_get_all_blogs() {
     givenBlog()
         .buildNumberOfBlogsDTOAndSave(3);
 
@@ -49,7 +49,7 @@ public class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_get_limit_three_blogs() {
+  void should_get_limit_three_blogs() {
     givenBlog()
         .buildNumberOfBlogsDTOAndSave(6);
 
@@ -61,7 +61,7 @@ public class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_get_one_blog() {
+  void should_get_one_blog() {
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
 
@@ -70,7 +70,7 @@ public class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_create_a_blog() {
+  void should_create_a_blog() {
     //given
     blogRepository.deleteAll();
     //when
@@ -84,7 +84,7 @@ public class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_update_existing_blog() {
+  void should_update_existing_blog() {
     //given
     Instant instant = Instant.now();
     Blog blog = givenBlog()
@@ -102,7 +102,7 @@ public class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_delete_existing_blog() {
+  void should_delete_existing_blog() {
     //given
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
@@ -114,7 +114,7 @@ public class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_get_one_blogWith2Items() {
+  void should_get_one_blogWith2Items() {
     Blog blog = givenBlog()
         .buildBlogWithItemsAndSave(2);
 
@@ -123,7 +123,7 @@ public class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  public void should_get_all_blogs_with_items() {
+  void should_get_all_blogs_with_items() {
     givenBlog()
         .buildBlogWithItemsAndSave(2);
 
