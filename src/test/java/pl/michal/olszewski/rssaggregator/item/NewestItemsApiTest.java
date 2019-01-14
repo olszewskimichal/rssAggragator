@@ -1,13 +1,9 @@
 package pl.michal.olszewski.rssaggregator.item;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.blog.BlogRepository;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
@@ -30,9 +26,9 @@ class NewestItemsApiTest extends IntegrationTestBase {
     givenItem()
         .buildNumberOfItemsAndSave(0);
 
-    List<ItemDTO> items = thenGetItemsFromApi();
+    ListBodySpec<ItemDTO> items = thenGetItemsFromApi();
 
-    assertThat(items).isEmpty();
+    items.hasSize(0);
   }
 
   @Test
@@ -40,9 +36,9 @@ class NewestItemsApiTest extends IntegrationTestBase {
     givenItem()
         .buildNumberOfItemsAndSave(3);
 
-    List<ItemDTO> items = thenGetItemsFromApi();
+    ListBodySpec<ItemDTO> items = thenGetItemsFromApi();
 
-    assertThat(items).hasSize(3);
+    items.hasSize(3);
   }
 
   @Test
@@ -50,23 +46,27 @@ class NewestItemsApiTest extends IntegrationTestBase {
     givenItem()
         .buildNumberOfItemsAndSave(6);
 
-    List<ItemDTO> itemDTOS = thenGetNumberItemsFromApi(3);
+    ListBodySpec<ItemDTO> itemDTOS = thenGetNumberItemsFromApi(3);
 
-    ItemListAssert.assertThat(itemDTOS)
-        .isSuccessful()
-        .hasNumberOfItems(3);
+    itemDTOS.hasSize(3);
   }
 
   private ItemListFactory givenItem() {
     return new ItemListFactory(repository);
   }
 
-  private List<ItemDTO> thenGetItemsFromApi() {
-    return Arrays.asList(Objects.requireNonNull(template.getForEntity(String.format("http://localhost:%s/api/v1/items", port), ItemDTO[].class).getBody()));
+  private ListBodySpec<ItemDTO> thenGetItemsFromApi() {
+    return webTestClient.get().uri("http://localhost:{port}/api/v1/items", port)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(ItemDTO.class);
   }
 
-  private List<ItemDTO> thenGetNumberItemsFromApi(int number) {
-    return Arrays.asList(Objects.requireNonNull(template.getForEntity(String.format("http://localhost:%s/api/v1/items?limit=%s", port, number), ItemDTO[].class).getBody()));
+  private ListBodySpec<ItemDTO> thenGetNumberItemsFromApi(int number) {
+    return webTestClient.get().uri("http://localhost:{port}/api/v1/items?limit={number}", port, number)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(ItemDTO.class);
   }
 
 
