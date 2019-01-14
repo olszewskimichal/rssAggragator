@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
-public class BlogApiTest extends IntegrationTestBase {
+class BlogApiTest extends IntegrationTestBase {
 
   @Autowired
   private BlogRepository blogRepository;

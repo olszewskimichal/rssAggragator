@@ -16,12 +16,12 @@ public class BlogListAssert extends ListAssert<BlogDTO> {
     return new BlogListAssert(actual);
   }
 
-  public BlogListAssert isSuccessful() {
+  BlogListAssert isSuccessful() {
     assertThat(actual).isNotNull();
     return this;
   }
 
-  public BlogListAssert hasNumberOfItems(int number) {
+  BlogListAssert hasNumberOfItems(int number) {
     assertThat(actual).hasSize(number);
     return this;
   }
