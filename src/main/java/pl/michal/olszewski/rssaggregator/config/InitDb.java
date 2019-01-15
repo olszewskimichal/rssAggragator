@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Profile({Profiles.DEVELOPMENT, Profiles.PRODUCTION})
 public class InitDb {
-  
+
   @Bean
   public TaskScheduler taskScheduler() {
     return new ConcurrentTaskScheduler();

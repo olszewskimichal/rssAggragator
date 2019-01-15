@@ -13,6 +13,8 @@ import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogRepository;
 import pl.michal.olszewski.rssaggregator.blog.BlogService;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Transactional
 class BlogCacheTest extends IntegrationTestBase {
@@ -25,33 +27,33 @@ class BlogCacheTest extends IntegrationTestBase {
 
   @Test
   void shouldReturnTheSameCollectionFromCache() {
-    List<Blog> allBlogs = service.getAllBlogs();
-    List<Blog> cacheBlogs = service.getAllBlogs();
+    Flux<Blog> allBlogs = service.getAllBlogs();
+    Flux<Blog> cacheBlogs = service.getAllBlogs();
     assertSame(allBlogs, cacheBlogs);
   }
 
   @Test
   void shouldAfterEvictCacheAndReturnNotTheSameCollection() {
-    List<Blog> allBlogs = service.getAllBlogs();
+    Flux<Blog> allBlogs = service.getAllBlogs();
     service.evictBlogCache();
-    List<Blog> cacheBlogs = service.getAllBlogs();
+    Flux<Blog> cacheBlogs = service.getAllBlogs();
     assertNotSame(allBlogs, cacheBlogs);
   }
 
   @Test
   void shouldAfterCreateNewBlogAndReturnNotTheSameCollection() {
-    List<Blog> allBlogs = service.getAllBlogs();
+    Flux<Blog> allBlogs = service.getAllBlogs();
     service.createBlog(BlogDTO.builder().name("nazwa2").build());
-    List<Blog> cacheBlogs = service.getAllBlogs();
+    Flux<Blog> cacheBlogs = service.getAllBlogs();
     assertNotSame(allBlogs, cacheBlogs);
   }
 
   @Test
   void shouldAfterDeleteNewBlogAndReturnNotTheSameCollection() {
-    Blog blog = service.createBlog(BlogDTO.builder().name("nazwa2").build());
+    Blog blog = service.createBlog(BlogDTO.builder().name("nazwa2").build()).block();
 
-    List<Blog> allBlogs = service.getAllBlogs();
-    List<Blog> cacheBlogs = service.getAllBlogs();
+    Flux<Blog> allBlogs = service.getAllBlogs();
+    Flux<Blog> cacheBlogs = service.getAllBlogs();
     assertSame(allBlogs, cacheBlogs);
     service.deleteBlog(blog.getId());
 

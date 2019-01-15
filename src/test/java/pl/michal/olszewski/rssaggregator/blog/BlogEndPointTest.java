@@ -24,6 +24,7 @@ import pl.michal.olszewski.rssaggregator.blog.BlogEndPoint;
 import pl.michal.olszewski.rssaggregator.blog.BlogDTO;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.blog.BlogService;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class BlogEndPointTest {
@@ -50,7 +51,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusOK() throws Exception {
-    given(blogService.getBlogDTOById(1L)).willReturn(new BlogDTO());
+    given(blogService.getBlogDTOById(1L)).willReturn(Mono.just(new BlogDTO()));
 
     mockMvc.perform(get("/api/v1/blogs/1"))
         .andExpect(status().isOk());
@@ -66,7 +67,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnBlogAsJson() throws Exception {
-    given(blogService.getBlogDTOById(1L)).willReturn(new BlogDTO());
+    given(blogService.getBlogDTOById(1L)).willReturn(Mono.just(new BlogDTO()));
 
     mockMvc.perform(get("/api/v1/blogs/1"))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
@@ -74,7 +75,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldReturnCorrectBlogById() throws Exception {
-    given(blogService.getBlogDTOById(1L)).willReturn(BlogDTO.builder().name("nazwa").build());
+    given(blogService.getBlogDTOById(1L)).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
 
     mockMvc.perform(get("/api/v1/blogs/1"))
         .andExpect(jsonPath("$.name", is("nazwa")));
@@ -110,7 +111,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByNameReturnBlogAsJson() throws Exception {
-    given(blogService.getBlogDTOByName("name")).willReturn(new BlogDTO());
+    given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(new BlogDTO()));
 
     mockMvc.perform(get("/api/v1/blogs/by-name/name"))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
@@ -118,7 +119,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldReturnCorrectBlogByName() throws Exception {
-    given(blogService.getBlogDTOByName("nazwa")).willReturn(BlogDTO.builder().name("nazwa").build());
+    given(blogService.getBlogDTOByName("nazwa")).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
 
     mockMvc.perform(get("/api/v1/blogs/by-name/nazwa"))
         .andExpect(jsonPath("$.name", is("nazwa")));

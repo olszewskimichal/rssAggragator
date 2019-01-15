@@ -123,7 +123,7 @@ public class BlogRepositoryTest {
   void shouldGetAllBlogsIfAllAreActive() {
     givenBlog().buildNumberOfBlogsAndSave(5);
     //when
-    List<Blog> streamAll = blogRepository.findStreamAll();
+    List<Blog> streamAll = blogRepository.findAll();
     //then
     assertThat(streamAll).hasSize(5);
   }
@@ -132,7 +132,7 @@ public class BlogRepositoryTest {
   void shouldNotReturnNotActiveBlog() {
     givenBlog().notActive();
     //when
-    List<Blog> streamAll = blogRepository.findStreamAll();
+    List<Blog> streamAll = blogRepository.findAll();
     //then
     assertThat(streamAll).hasSize(0);
   }

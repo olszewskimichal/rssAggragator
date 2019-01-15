@@ -19,6 +19,6 @@ public interface BlogRepository extends JpaRepository<Blog, Long> {
   Optional<Blog> findById(Long id);
 
   @Query(value = "SELECT b FROM Blog b LEFT JOIN FETCH b.items where b.active=1")
-  List<Blog> findStreamAll();
+  List<Blog> findAll();
 
 }

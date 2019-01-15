@@ -55,11 +55,11 @@ class UpdateBlogServiceTest {
   void shouldRunUpdatesForAllBlogs() {
     //given
     ReflectionTestUtils.setField(updateBlogService, "enableJob", true);
-    given(blogRepository.findStreamAll()).willReturn(Arrays.asList(new Blog()));
+    given(blogRepository.findAll()).willReturn(Arrays.asList(new Blog()));
     //when
     updateBlogService.updatesBlogs();
 
-    verify(blogRepository, times(1)).findStreamAll();
+    verify(blogRepository, times(1)).findAll();
     verify(asyncService, times(1)).updateBlog(new Blog());
     verifyNoMoreInteractions(blogRepository);
   }
@@ -71,7 +71,7 @@ class UpdateBlogServiceTest {
     //when
     updateBlogService.updatesBlogs();
 
-    verify(blogRepository, times(0)).findStreamAll();
+    verify(blogRepository, times(0)).findAll();
     verify(asyncService, times(0)).updateBlog(new Blog());
     verifyNoMoreInteractions(blogRepository);
   }

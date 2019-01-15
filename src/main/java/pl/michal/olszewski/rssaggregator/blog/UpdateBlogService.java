@@ -28,7 +28,7 @@ class UpdateBlogService {
   public void updatesBlogs() {
     if (enableJob) {
       log.debug("zaczynam aktualizacje blogów");
-      new HashSet<>(repository.findStreamAll()).forEach(asyncService::updateBlog);
+      new HashSet<>(repository.findAll()).forEach(asyncService::updateBlog);
       log.debug("Aktualizacja zakończona");
     }
   }
