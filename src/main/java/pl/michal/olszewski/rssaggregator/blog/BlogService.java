@@ -55,16 +55,19 @@ class BlogService {
 
   @Transactional
   public Mono<Blog> updateBlog(BlogDTO blogDTO) {
-    Blog blog = getBlogByFeedUrl(blogDTO.getFeedURL()).block();   //TODO poprawic
-
-    Set<String> linkSet = blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet());
-
-    blogDTO.getItemsList().stream()
-        .map(Item::new)
-        .filter(v -> !linkSet.contains(v.getLink()))
-        .forEach(blog::addItem);
-    blog.updateFromDto(blogDTO);
-    return Mono.just(blog);
+    return getBlogByFeedUrl(blogDTO.getFeedURL()).
+        flatMap(
+            blog -> {
+              log.debug("aktualizuje bloga {}", blog.getId());
+              Set<String> linkSet = blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet());
+              blogDTO.getItemsList().stream()
+                  .map(Item::new)
+                  .filter(v -> !linkSet.contains(v.getLink()))
+                  .forEach(blog::addItem);
+              blog.updateFromDto(blogDTO);
+              return Mono.just(blogRepository.save(blog));
+            }
+        );
   }
 
   @Cacheable("blogs")

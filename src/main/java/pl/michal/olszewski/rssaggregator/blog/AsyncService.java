@@ -29,7 +29,7 @@ class AsyncService {
     log.debug("Przetwarzam blog {}", v.getName());
     try {
       BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(v.getFeedURL())), v.getFeedURL(), v.getBlogURL(), v.getLastUpdateDate() == null ? Instant.MIN : v.getLastUpdateDate());
-      blogService.updateBlog(blogDTO);
+      blogService.updateBlog(blogDTO).block();
       return new AsyncResult<>(null);
     } catch (IOException e) {
       log.error("wystapił bład przy aktualizacji bloga o id {}", v.getId(), e);
