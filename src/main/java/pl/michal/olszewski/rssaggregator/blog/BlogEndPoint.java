@@ -44,20 +44,20 @@ class BlogEndPoint {
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void updateBlog(@RequestBody BlogDTO blogDTO) {
-    blogService.updateBlog(blogDTO);
-  } //TODO fixnac
+  public Mono<Blog> updateBlog(@RequestBody BlogDTO blogDTO) {
+    return blogService.updateBlog(blogDTO);
+  }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void addBlog(@RequestBody BlogDTO blogDTO) {
-    blogService.createBlog(blogDTO);
+  public Mono<Blog> addBlog(@RequestBody BlogDTO blogDTO) {
+    return blogService.createBlog(blogDTO);
   }
 
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteBlog(@PathVariable("id") Long blogId) {
-    blogService.deleteBlog(blogId);
+  public Mono<Boolean> deleteBlog(@PathVariable("id") Long blogId) {
+    return blogService.deleteBlog(blogId);
   }
 
   @PostMapping(value = "/evictCache")

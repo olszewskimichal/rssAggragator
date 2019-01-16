@@ -108,7 +108,7 @@ class BlogService {
   public Flux<BlogDTO> getAllBlogDTOs(Integer limit) {
     log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
     Flux<BlogDTO> dtoFlux = getAllBlogs()
-        .take(getLimit(limit)) //TODO jakos to wyprostowac
+        .take(getLimit(limit))
         .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v)));
     return dtoFlux.doOnEach(v -> log.debug(v.toString()));
   }
