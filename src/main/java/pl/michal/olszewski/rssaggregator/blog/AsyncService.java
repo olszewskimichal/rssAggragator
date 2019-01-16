@@ -31,8 +31,7 @@ class AsyncService {
       BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(v.getFeedURL())), v.getFeedURL(), v.getBlogURL(), v.getLastUpdateDate() == null ? Instant.MIN : v.getLastUpdateDate());
       blogService.updateBlog(blogDTO);
     } catch (IOException e) {
-      log.error("aaa" + e.getMessage());
-      log.error("wystapił bład przy aktualizacji bloga o id {} o tresci {}", v.getId(), e);
+      log.error("wystapił bład przy aktualizacji bloga o id {}", v.getId(), e);
       throw new RssException(v.getFeedURL());
     }
     return new AsyncResult<>(null);
