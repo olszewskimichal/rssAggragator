@@ -3,18 +3,12 @@ package pl.michal.olszewski.rssaggregator.blog;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import pl.michal.olszewski.rssaggregator.blog.BlogDTO;
-import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.blog.BlogRepository;
-import pl.michal.olszewski.rssaggregator.blog.BlogService;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Transactional
 class BlogCacheTest extends IntegrationTestBase {

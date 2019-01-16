@@ -8,20 +8,20 @@ install:
 
 cache:
   directories:
-  - .autoconf
-  - $HOME/.m2
-  - $HOME/.sonar/cache
+    - .autoconf
+    - $HOME/.m2
+    - $HOME/.sonar/cache
 
 addons:
-    sonarcloud:
-        organization: "olszewskimichal-github"
-        token:
-          secure: ${SONAR_TOKEN}
-        branches:
-          - master
-          - develop
+  sonarcloud:
+    organization: "olszewskimichal-github"
+    token:
+      secure: ${SONAR_TOKEN}
+    branches:
+      - master
+      - develop
 script:
-    - sonar-scanner
+  - sonar-scanner
 
 jobs:
   include:
@@ -29,7 +29,7 @@ jobs:
       script:
         - mvn test sonar:sonar -Dsonar.coverage.exclusions=**/pl/michal/olszewski/rssaggregator/config/** -B
       after_success:
-       - bash <(curl -s https://codecov.io/bash)
+        - bash <(curl -s https://codecov.io/bash)
 notifications:
   email:
     recipients:

@@ -15,8 +15,8 @@ import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
+import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @ExtendWith(MockitoExtension.class)
 class AtomReadRomeTest {

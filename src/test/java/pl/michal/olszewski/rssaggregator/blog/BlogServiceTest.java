@@ -72,7 +72,7 @@ class BlogServiceTest {
   void shouldCreateBlogWithCorrectProperties() {
     //given
     Instant now = Instant.now();
-    BlogDTO blogDTO = BlogDTO.builder().name("nazwa1").description("desc").feedURL("url").link("blogUrl1").publishedDate(now).build();  //TODO serwis do czasu
+    BlogDTO blogDTO = BlogDTO.builder().name("nazwa1").description("desc").feedURL("url").link("blogUrl1").publishedDate(now).build();
     //when
     Mono<Blog> blog = blogService.createBlog(blogDTO);
     //then
