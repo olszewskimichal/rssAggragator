@@ -1,6 +1,5 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import java.util.HashSet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,7 +27,9 @@ class UpdateBlogService {
   public void updatesBlogs() {
     if (enableJob) {
       log.debug("zaczynam aktualizacje blogów");
-      new HashSet<>(repository.findAll()).forEach(asyncService::updateBlog);
+      repository.findAll()
+          .parallelStream()
+          .forEach(asyncService::updateBlog);
       log.debug("Aktualizacja zakończona");
     }
   }

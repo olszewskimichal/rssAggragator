@@ -86,7 +86,7 @@ public class RssExtractorService {
       getItemsForBlog(feed, lastUpdatedDate).forEach(blogInfo::addNewItem);
       return blogInfo;
     } catch (IOException | FeedException e) {
-      throw new RssException(feedURL);
+      throw new RssException(feedURL, e);
     }
   }
 }
