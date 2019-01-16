@@ -139,13 +139,11 @@ class BlogServiceTest {
         .assertNext(v -> {
           assertThat(v.getItems()).isNotEmpty().hasSize(2);
           for (Item item : v.getItems()) {
-            assertAll(
-                () -> assertThat(item.getAuthor()).isEqualTo("autor"),
-                () -> assertThat(item.getBlog()).isEqualTo(blog),
-                () -> assertThat(item.getDate()).isBeforeOrEqualTo(now).isAfterOrEqualTo(now),
-                () -> assertThat(item.getTitle()).isNotNull().isNotEmpty(),
-                () -> assertThat(item.getLink()).isEqualTo("link" + item.getTitle())
-            );
+            assertThat(item.getAuthor()).isEqualTo("autor");
+            assertThat(item.getBlog()).isEqualTo(v);
+            assertThat(item.getDate()).isBeforeOrEqualTo(now).isAfterOrEqualTo(now);
+            assertThat(item.getTitle()).isNotNull().isNotEmpty();
+            assertThat(item.getLink()).isEqualTo("link" + item.getTitle());
           }
         })
         .expectComplete()
@@ -205,7 +203,10 @@ class BlogServiceTest {
     //when
     Mono<Blog> updateBlog = blogService.updateBlog(blogDTO);
     //then
-    assertThat(updateBlog).isEqualToComparingFieldByField(blog);
+    StepVerifier.create(updateBlog)
+        .assertNext(v -> assertThat(v).isEqualToComparingFieldByField(blog))
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -217,7 +218,10 @@ class BlogServiceTest {
     //when
     Mono<Blog> updateBlog = blogService.updateBlog(blogDTO);
     //then
-    assertThat(updateBlog).isEqualToComparingFieldByField(blog);
+    StepVerifier.create(updateBlog)
+        .assertNext(v -> assertThat(v).isEqualToComparingFieldByField(blog))
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -242,7 +246,10 @@ class BlogServiceTest {
   void shouldDeleteBlogById() {
     given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
 
-    assertThat(blogService.deleteBlog(1L)).isEqualTo(Mono.just(true));
+    StepVerifier.create(blogService.deleteBlog(1L))
+        .assertNext(v -> assertThat(v).isTrue())
+        .expectComplete()
+        .verify();
   }
 
   @Test

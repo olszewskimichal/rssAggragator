@@ -70,7 +70,10 @@ class BlogService {
   @Cacheable("blogs")
   public Flux<Blog> getAllBlogs() {
     log.debug("Pobieram wszystkie blogi");
-    return Flux.fromIterable(blogRepository.findAll());
+    List<Blog> all = blogRepository.findAll();
+    log.debug("Znalazlem w bazie {} blogow", all.size());
+    log.trace("Wszystkie blogi to {}", all);
+    return Flux.fromIterable(all);
   }
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
@@ -104,9 +107,10 @@ class BlogService {
   @Transactional(readOnly = true)
   public Flux<BlogDTO> getAllBlogDTOs(Integer limit) {
     log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
-    return getAllBlogs()
-        .limitRate(getLimit(limit))
+    Flux<BlogDTO> dtoFlux = getAllBlogs()
+        .take(getLimit(limit)) //TODO jakos to wyprostowac
         .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v)));
+    return dtoFlux.doOnEach(v -> log.debug(v.toString()));
   }
 
   private List<ItemDTO> extractItems(Blog v) {

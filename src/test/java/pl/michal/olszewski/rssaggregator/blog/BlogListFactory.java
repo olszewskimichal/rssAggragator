@@ -4,9 +4,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import lombok.extern.slf4j.Slf4j;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
+@Slf4j
 class BlogListFactory {
 
   private final BlogRepository repository;
@@ -25,6 +27,7 @@ class BlogListFactory {
   Blog buildBlogWithItemsAndSave(int numberOfItems) {
     Blog blog = new Blog("blog997", "", "", "", null, null);
     IntStream.rangeClosed(1, numberOfItems).parallel().forEachOrdered(v -> blog.addItem(new Item(ItemDTO.builder().title("title" + v).build())));
+    log.debug("Zapisuje do bazy blog {}", blog);
     return repository.save(blog);
   }
 
