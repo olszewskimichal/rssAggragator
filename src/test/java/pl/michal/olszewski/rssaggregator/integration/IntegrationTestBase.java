@@ -15,7 +15,7 @@ public abstract class IntegrationTestBase {
 
   @LocalServerPort
   public int port;
-  protected WebTestClient webTestClient = WebTestClient
+  final protected WebTestClient webTestClient = WebTestClient
       .bindToServer()
       .baseUrl("http://localhost:" + port)
       .build();

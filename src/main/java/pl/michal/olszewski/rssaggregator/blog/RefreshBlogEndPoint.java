@@ -20,7 +20,7 @@ class RefreshBlogEndPoint {
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void updateBlog(@RequestParam(value = "blogId", required = true) Long blogId) {
+  public void updateBlog(@RequestParam(value = "blogId") Long blogId) {
     updateBlogService.updateBlogFromId(blogId);
   }
 

@@ -48,7 +48,6 @@ public class Blog {
     this.publishedDate = publishedDate;
     this.items = new HashSet<>();
     this.lastUpdateDate = lastUpdateDate;
-    this.active = true;
   }
 
   public Set<Item> getItems() {
@@ -62,18 +61,18 @@ public class Blog {
     }
   }
 
-  public void updateFromDto(BlogDTO blogDTO) {
+  void updateFromDto(BlogDTO blogDTO) {
     this.description = blogDTO.getDescription();
     this.name = blogDTO.getName();
     this.publishedDate = blogDTO.getPublishedDate();
     this.lastUpdateDate = Instant.now().minus(2, ChronoUnit.DAYS);
   }
 
-  public boolean isActive() {
+  boolean isActive() {
     return active;
   }
 
-  public void deactive() {
+  void deactive() {
     active = false;
   }
 }

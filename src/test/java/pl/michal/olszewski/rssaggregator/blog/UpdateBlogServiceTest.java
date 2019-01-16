@@ -6,7 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +55,7 @@ class UpdateBlogServiceTest {
   void shouldRunUpdatesForAllBlogs() {
     //given
     ReflectionTestUtils.setField(updateBlogService, "enableJob", true);
-    given(blogRepository.findAll()).willReturn(Arrays.asList(new Blog()));
+    given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
     //when
     updateBlogService.updatesBlogs();
 

@@ -3,9 +3,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import java.io.IOException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -24,18 +21,8 @@ class BlogEndPointTest {
   @Autowired
   private WebTestClient webClient;
 
-  private static byte[] convertObjectToJsonBytes(Object object) throws IOException {
-    ObjectMapper mapper = objectMapper();
-    return mapper.writeValueAsBytes(object);
-  }
-
-  private static ObjectMapper objectMapper() {
-    return new ObjectMapper()
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-  }
-
   @Test
-  void shouldGetBlogByIdReturnStatusOK() throws Exception {
+  void shouldGetBlogByIdReturnStatusOK() {
     given(blogService.getBlogDTOById(1L)).willReturn(Mono.just(new BlogDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
@@ -44,7 +31,7 @@ class BlogEndPointTest {
   }
 
   @Test
-  void shouldGetBlogByIdReturnStatusNotFoundWhenBlogNotExist() throws Exception {
+  void shouldGetBlogByIdReturnStatusNotFoundWhenBlogNotExist() {
     given(blogService.getBlogDTOById(1L)).willThrow(new BlogNotFoundException("aaa"));
 
     webClient.get().uri("/api/v1/blogs/1")
@@ -54,7 +41,7 @@ class BlogEndPointTest {
   }
 
   @Test
-  void shouldGetBlogByIdReturnBlogAsJson() throws Exception {
+  void shouldGetBlogByIdReturnBlogAsJson() {
     given(blogService.getBlogDTOById(1L)).willReturn(Mono.just(new BlogDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
@@ -63,7 +50,7 @@ class BlogEndPointTest {
   }
 
   @Test
-  void shouldReturnCorrectBlogById() throws Exception {
+  void shouldReturnCorrectBlogById() {
     given(blogService.getBlogDTOById(1L)).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
 
     webClient.get().uri("/api/v1/blogs/1")
@@ -73,14 +60,14 @@ class BlogEndPointTest {
   }
 
   @Test
-  void shouldGetBlogsReturnStatusOK() throws Exception {
+  void shouldGetBlogsReturnStatusOK() {
     webClient.get().uri("/api/v1/blogs")
         .exchange()
         .expectStatus().isOk();
   }
 
   @Test
-  void shouldUpdateBlogReturnStatusNoContent() throws Exception {
+  void shouldUpdateBlogReturnStatusNoContent() {
     webClient.put().uri("/api/v1/blogs")
         .body(BodyInserters.fromObject(BlogDTO.builder().build()))
         .exchange()
@@ -89,7 +76,7 @@ class BlogEndPointTest {
   }
 
   @Test
-  void shouldCreateBlogReturnStatusNoContent() throws Exception {
+  void shouldCreateBlogReturnStatusNoContent() {
 
     webClient.post().uri("/api/v1/blogs")
         .body(BodyInserters.fromObject(BlogDTO.builder().build()))
@@ -99,7 +86,7 @@ class BlogEndPointTest {
   }
 
   @Test
-  void shouldDeleteBlogReturnStatusNoContent() throws Exception {
+  void shouldDeleteBlogReturnStatusNoContent() {
     webClient.delete().uri("/api/v1/blogs/1")
         .exchange()
         .expectStatus()
@@ -107,7 +94,7 @@ class BlogEndPointTest {
   }
 
   @Test
-  void shouldGetBlogByNameReturnBlogAsJson() throws Exception {
+  void shouldGetBlogByNameReturnBlogAsJson() {
     given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(new BlogDTO()));
 
     webClient.get().uri("/api/v1/blogs/by-name/name")
@@ -116,7 +103,7 @@ class BlogEndPointTest {
   }
 
   @Test
-  void shouldReturnCorrectBlogByName() throws Exception {
+  void shouldReturnCorrectBlogByName() {
     given(blogService.getBlogDTOByName("nazwa")).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
 
     webClient.get().uri("/api/v1/blogs/by-name/nazwa")

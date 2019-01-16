@@ -295,7 +295,7 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogs() {
     //given
-    given(blogRepository.findAll()).willReturn(Arrays.asList(new Blog()));
+    given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
     //when
     Flux<Blog> blogs = blogService.getAllBlogs();
     //then
@@ -321,7 +321,7 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogDTOs() {
     //given
-    given(blogRepository.findAll()).willReturn(Arrays.asList(new Blog()));
+    given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
     //when
     Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
     //then
