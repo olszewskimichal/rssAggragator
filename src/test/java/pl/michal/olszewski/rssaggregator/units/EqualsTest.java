@@ -2,9 +2,9 @@ package pl.michal.olszewski.rssaggregator.units;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
-import pl.michal.olszewski.rssaggregator.dto.ItemDTO;
-import pl.michal.olszewski.rssaggregator.entity.Blog;
-import pl.michal.olszewski.rssaggregator.entity.Item;
+import pl.michal.olszewski.rssaggregator.blog.Blog;
+import pl.michal.olszewski.rssaggregator.item.Item;
+import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 class EqualsTest {
 
