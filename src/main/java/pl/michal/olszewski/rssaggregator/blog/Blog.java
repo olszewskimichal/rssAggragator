@@ -56,7 +56,7 @@ public class Blog {
 
   public void addItem(Item item) {
     if (items.add(item)) {
-      log.debug("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
+      log.trace("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
       item.setBlog(this);
     }
   }

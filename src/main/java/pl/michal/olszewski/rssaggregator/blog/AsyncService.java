@@ -26,10 +26,11 @@ class AsyncService {
 
   @Async("threadPoolTaskExecutor")
   public Future<Void> updateBlog(Blog v) {
-    log.debug("Przetwarzam blog {}", v.getName());
+    log.debug("START updateBlog dla blog {}", v.getName());
     try {
       BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(v.getFeedURL())), v.getFeedURL(), v.getBlogURL(), v.getLastUpdateDate() == null ? Instant.MIN : v.getLastUpdateDate());
       blogService.updateBlog(blogDTO).block();
+      log.debug("STOP updateBlog dla blog {}", v.getName());
       return new AsyncResult<>(null);
     } catch (IOException e) {
       log.error("wystapił bład przy aktualizacji bloga o id {}", v.getId(), e);

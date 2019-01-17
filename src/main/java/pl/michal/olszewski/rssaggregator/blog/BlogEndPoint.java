@@ -29,40 +29,49 @@ class BlogEndPoint {
 
   @GetMapping(value = "/{id}")
   public Mono<BlogDTO> getBlog(@PathVariable("id") Long blogId) {
+    log.debug("GET blog by id {}", blogId);
     return blogService.getBlogDTOById(blogId);
   }
 
   @GetMapping(value = "/by-name/{name}")
   public Mono<BlogDTO> getBlogByName(@PathVariable("name") String name) {
+    log.debug("GET blog by name {}", name);
     return blogService.getBlogDTOByName(name);
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public Flux<BlogDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit) {
+    log.debug("GET blogs with limit {}", limit);
     return blogService.getAllBlogDTOs(limit);
   }
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public Mono<Blog> updateBlog(@RequestBody BlogDTO blogDTO) {
+    log.debug("PUT - updateBlog {}", blogDTO.getName());
+    log.trace("PUT - updateBlog {}", blogDTO);
     return blogService.updateBlog(blogDTO);
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public Mono<Blog> addBlog(@RequestBody BlogDTO blogDTO) {
+    log.debug("POST - addBlog {}", blogDTO.getName());
+    log.trace("POST - addBlog {}", blogDTO);
     return blogService.createBlog(blogDTO);
   }
 
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public Mono<Boolean> deleteBlog(@PathVariable("id") Long blogId) {
+    log.debug("DELETE - deleteBlog {}", blogId);
     return blogService.deleteBlog(blogId);
   }
 
   @PostMapping(value = "/evictCache")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void evictCache() {
+    log.debug("POST - evict Cache");
     blogService.evictBlogCache();
   }
 

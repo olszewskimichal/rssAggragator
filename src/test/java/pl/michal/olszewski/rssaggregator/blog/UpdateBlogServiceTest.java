@@ -36,7 +36,7 @@ class UpdateBlogServiceTest {
     given(blogRepository.findById(1L)).willReturn(Optional.empty());
     //when
     //then
-    assertThatThrownBy(() -> updateBlogService.updateBlogFromId(1L)).hasMessageContaining("Nie znaleziono bloga");
+    assertThatThrownBy(() -> updateBlogService.refreshBlogFromId(1L)).hasMessageContaining("Nie znaleziono bloga");
   }
 
   @Test
@@ -44,7 +44,7 @@ class UpdateBlogServiceTest {
     //given
     given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog()));
     //when
-    updateBlogService.updateBlogFromId(1L);
+    updateBlogService.refreshBlogFromId(1L);
 
     verify(blogRepository, times(1)).findById(1L);
     verify(asyncService, times(1)).updateBlog(new Blog());

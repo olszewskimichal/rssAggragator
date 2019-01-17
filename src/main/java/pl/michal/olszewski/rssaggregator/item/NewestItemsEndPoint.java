@@ -22,6 +22,7 @@ class NewestItemsEndPoint {
   @GetMapping
   @Transactional
   public Flux<ItemDTO> getItems(@RequestParam(value = "limit", required = false) Integer limit) {
+    log.debug("GET Items with limit {}", limit);
     return itemService.getNewestItems(limit == null ? 10 : limit);
   }
 }
