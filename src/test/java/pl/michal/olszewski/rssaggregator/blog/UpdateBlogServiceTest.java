@@ -6,7 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class UpdateBlogServiceTest {
     given(blogRepository.findById(1L)).willReturn(Optional.empty());
     //when
     //then
-    assertThatThrownBy(() -> updateBlogService.updateBlogFromId(1L)).hasMessageContaining("Nie znaleziono bloga");
+    assertThatThrownBy(() -> updateBlogService.refreshBlogFromId(1L)).hasMessageContaining("Nie znaleziono bloga");
   }
 
   @Test
@@ -44,7 +44,7 @@ class UpdateBlogServiceTest {
     //given
     given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog()));
     //when
-    updateBlogService.updateBlogFromId(1L);
+    updateBlogService.refreshBlogFromId(1L);
 
     verify(blogRepository, times(1)).findById(1L);
     verify(asyncService, times(1)).updateBlog(new Blog());
@@ -55,11 +55,11 @@ class UpdateBlogServiceTest {
   void shouldRunUpdatesForAllBlogs() {
     //given
     ReflectionTestUtils.setField(updateBlogService, "enableJob", true);
-    given(blogRepository.findStreamAll()).willReturn(Arrays.asList(new Blog()));
+    given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
     //when
     updateBlogService.updatesBlogs();
 
-    verify(blogRepository, times(1)).findStreamAll();
+    verify(blogRepository, times(1)).findAll();
     verify(asyncService, times(1)).updateBlog(new Blog());
     verifyNoMoreInteractions(blogRepository);
   }
@@ -71,7 +71,7 @@ class UpdateBlogServiceTest {
     //when
     updateBlogService.updatesBlogs();
 
-    verify(blogRepository, times(0)).findStreamAll();
+    verify(blogRepository, times(0)).findAll();
     verify(asyncService, times(0)).updateBlog(new Blog());
     verifyNoMoreInteractions(blogRepository);
   }

@@ -48,7 +48,6 @@ public class Blog {
     this.publishedDate = publishedDate;
     this.items = new HashSet<>();
     this.lastUpdateDate = lastUpdateDate;
-    this.active = true;
   }
 
   public Set<Item> getItems() {
@@ -57,23 +56,23 @@ public class Blog {
 
   public void addItem(Item item) {
     if (items.add(item)) {
-      log.debug("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
+      log.trace("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
       item.setBlog(this);
     }
   }
 
-  public void updateFromDto(BlogDTO blogDTO) {
+  void updateFromDto(BlogDTO blogDTO) {
     this.description = blogDTO.getDescription();
     this.name = blogDTO.getName();
     this.publishedDate = blogDTO.getPublishedDate();
     this.lastUpdateDate = Instant.now().minus(2, ChronoUnit.DAYS);
   }
 
-  public boolean isActive() {
+  boolean isActive() {
     return active;
   }
 
-  public void deactive() {
+  void deactive() {
     active = false;
   }
 }

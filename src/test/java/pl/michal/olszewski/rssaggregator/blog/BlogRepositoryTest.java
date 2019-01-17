@@ -11,21 +11,16 @@ import javax.persistence.PersistenceException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.exception.DataException;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.Item;
+import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @DataJpaTest
 @ActiveProfiles(Profiles.TEST)
-@RunWith(JUnitPlatform.class)
-@ExtendWith(org.springframework.test.context.junit.jupiter.SpringExtension.class)
 public class BlogRepositoryTest {
 
   @Autowired
@@ -128,7 +123,7 @@ public class BlogRepositoryTest {
   void shouldGetAllBlogsIfAllAreActive() {
     givenBlog().buildNumberOfBlogsAndSave(5);
     //when
-    List<Blog> streamAll = blogRepository.findStreamAll();
+    List<Blog> streamAll = blogRepository.findAll();
     //then
     assertThat(streamAll).hasSize(5);
   }
@@ -137,7 +132,7 @@ public class BlogRepositoryTest {
   void shouldNotReturnNotActiveBlog() {
     givenBlog().notActive();
     //when
-    List<Blog> streamAll = blogRepository.findStreamAll();
+    List<Blog> streamAll = blogRepository.findAll();
     //then
     assertThat(streamAll).hasSize(0);
   }

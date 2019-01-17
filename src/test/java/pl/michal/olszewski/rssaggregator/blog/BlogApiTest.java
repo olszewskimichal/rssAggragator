@@ -7,14 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
+import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import reactor.core.publisher.Flux;
 
-public class BlogApiTest extends IntegrationTestBase {
+class BlogApiTest extends IntegrationTestBase {
 
   @Autowired
   private BlogRepository blogRepository;
@@ -33,9 +34,9 @@ public class BlogApiTest extends IntegrationTestBase {
     givenBlog()
         .buildNumberOfBlogsDTOAndSave(0);
 
-    List<BlogDTO> blogs = thenGetBlogsFromApi();
+    ListBodySpec<BlogDTO> blogs = thenGetBlogsFromApi();
 
-    assertThat(blogs).isEmpty();
+    blogs.hasSize(0);
   }
 
   @Test
@@ -43,9 +44,9 @@ public class BlogApiTest extends IntegrationTestBase {
     givenBlog()
         .buildNumberOfBlogsDTOAndSave(3);
 
-    List<BlogDTO> blogs = thenGetBlogsFromApi();
+    ListBodySpec<BlogDTO> blogs = thenGetBlogsFromApi();
 
-    assertThat(blogs).hasSize(3);
+    blogs.hasSize(3);
   }
 
   @Test
@@ -53,20 +54,20 @@ public class BlogApiTest extends IntegrationTestBase {
     givenBlog()
         .buildNumberOfBlogsDTOAndSave(6);
 
-    List<BlogDTO> blogDefinitionDTOS = thenGetNumberBlogsFromApi(3);
+    ListBodySpec<BlogDTO> blogDefinitionDTOS = thenGetBlogsFromApiWithLimit(3);
 
-    BlogListAssert.assertThat(blogDefinitionDTOS)
-        .isSuccessful()
-        .hasNumberOfItems(3);
+    blogDefinitionDTOS.hasSize(3);
   }
 
   @Test
   void should_get_one_blog() {
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
+    BlogDTO expected = new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), new ArrayList<>());
 
-    BlogDTO blogDTO = thenGetOneBlogFromApiById(blog.getId());
-    assertThat(new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), new ArrayList<>())).isEqualToComparingFieldByField(blogDTO);
+    BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
+
+    blogDTO.value(v -> assertThat(v).isEqualToComparingFieldByField(expected));
   }
 
   @Test
@@ -118,8 +119,8 @@ public class BlogApiTest extends IntegrationTestBase {
     Blog blog = givenBlog()
         .buildBlogWithItemsAndSave(2);
 
-    BlogDTO blogDTO = thenGetOneBlogFromApiById(blog.getId());
-    assertThat(blogDTO.getItemsList()).isNotEmpty().hasSize(2);
+    BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
+    blogDTO.value(v -> assertThat(v).isNotNull());
   }
 
   @Test
@@ -127,17 +128,15 @@ public class BlogApiTest extends IntegrationTestBase {
     givenBlog()
         .buildBlogWithItemsAndSave(2);
 
-    List<BlogDTO> dtos = thenGetBlogsFromApi();
-    assertAll(
-        () -> assertThat(dtos).isNotNull().isNotEmpty().hasSize(1),
-        () -> assertThat(dtos.get(0).getItemsList()).isNotNull().isNotEmpty().hasSize(2)
-    );
+    ListBodySpec<BlogDTO> dtos = thenGetBlogsFromApi();
+    dtos.hasSize(1);
+    dtos.value(v -> assertThat(v.get(0).getItemsList()).isNotNull().hasSize(2));
   }
 
   @Test
   void should_evictCache() {
-    List<Blog> blogs = blogService.getAllBlogs();
-    List<Blog> blogsNotCached = blogService.getAllBlogs();
+    Flux<Blog> blogs = blogService.getAllBlogs();
+    Flux<Blog> blogsNotCached = blogService.getAllBlogs();
     assertSame(blogs, blogsNotCached);
     blogService.evictBlogCache();
 
@@ -151,16 +150,26 @@ public class BlogApiTest extends IntegrationTestBase {
     return new BlogListFactory(blogRepository);
   }
 
-  private List<BlogDTO> thenGetBlogsFromApi() {
-    return Arrays.asList(template.getForEntity(String.format("http://localhost:%s/api/v1/blogs", port), BlogDTO[].class).getBody());
+  private ListBodySpec<BlogDTO> thenGetBlogsFromApi() {
+    return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs", port)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(BlogDTO.class);
   }
 
-  private BlogDTO thenGetOneBlogFromApiById(Long id) {
-    return template.getForEntity(String.format("http://localhost:%s/api/v1/blogs/%s", port, id), BlogDTO.class).getBody();
+  private BodySpec<BlogDTO, ?> thenGetOneBlogFromApiById(Long id) {
+    return webTestClient.get()
+        .uri("http://localhost:{port}/api/v1/blogs/{id}", port, id)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(BlogDTO.class);
   }
 
-  private List<BlogDTO> thenGetNumberBlogsFromApi(int number) {
-    return Arrays.asList(template.getForEntity(String.format("http://localhost:%s/api/v1/blogs?limit=%s", port, number), BlogDTO[].class).getBody());
+  private ListBodySpec<BlogDTO> thenGetBlogsFromApiWithLimit(int limit) {
+    return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs?limit={limit}", port, limit)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(BlogDTO.class);
   }
 
   private void thenCreateBlogByApi(String link) {

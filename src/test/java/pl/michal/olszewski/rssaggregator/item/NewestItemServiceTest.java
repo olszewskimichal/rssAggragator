@@ -1,9 +1,9 @@
 package pl.michal.olszewski.rssaggregator.item;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -11,11 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
-import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
-import pl.michal.olszewski.rssaggregator.item.ItemRepository;
-import pl.michal.olszewski.rssaggregator.item.NewestItemService;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class NewestItemServiceTest {
@@ -35,11 +33,15 @@ class NewestItemServiceTest {
     //given
     List<Item> itemList = IntStream.rangeClosed(1, 10).parallel().mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())).collect(Collectors.toList());
 
-    given(itemRepository.findAllByOrderByDateDesc(10)).willReturn(itemList.stream());
+    given(itemRepository.findAllByOrderByDateDesc(10)).willReturn(itemList);
     //when
-    List<ItemDTO> newestItems = itemService.getNewestItems(10);
+    Flux<ItemDTO> newestItems = itemService.getNewestItems(10);
     //then
-    assertThat(newestItems).isNotNull().isNotEmpty().hasSize(10);
+    StepVerifier.create(newestItems)
+        .recordWith(ArrayList::new)
+        .expectNextCount(10)
+        .expectComplete()
+        .verify();
   }
 
 }

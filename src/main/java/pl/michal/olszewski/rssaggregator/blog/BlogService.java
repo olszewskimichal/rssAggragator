@@ -1,10 +1,10 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Clock;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @Transactional
@@ -28,7 +30,7 @@ class BlogService {
   }
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
-  public Blog createBlog(BlogDTO blogDTO) {
+  public Mono<Blog> createBlog(BlogDTO blogDTO) {
     Optional<Blog> byFeedURL = blogRepository.findByFeedURL(blogDTO.getFeedURL());
     if (!byFeedURL.isPresent()) {
       log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
@@ -38,77 +40,84 @@ class BlogService {
           .map(Item::new)
           .forEach(blog::addItem);
       blogRepository.save(blog);
-      return blog;
+      return Mono.just(blog);
     }
-    return byFeedURL.get();
+    return Mono.just(byFeedURL.get());
   }
 
-  private Blog getBlogByName(String name) {
-    return blogRepository.findByName(name).orElseThrow(() -> new BlogNotFoundException(name));
+  private Mono<Blog> getBlogByName(String name) {
+    return Mono.just(blogRepository.findByName(name).orElseThrow(() -> new BlogNotFoundException(name)));
   }
 
-  private Blog getBlogByFeedUrl(String feedUrl) {
-    return blogRepository.findByFeedURL(feedUrl).orElseThrow(() -> new BlogNotFoundException(feedUrl));
-  }
-
-  public void test() {
-    log.info("PUSTO");
+  private Mono<Blog> getBlogByFeedUrl(String feedUrl) {
+    return Mono.just(blogRepository.findByFeedURL(feedUrl).orElseThrow(() -> new BlogNotFoundException(feedUrl)));
   }
 
   @Transactional
-  public Blog updateBlog(BlogDTO blogDTO) {
-    Blog blog = getBlogByFeedUrl(blogDTO.getFeedURL());
-    blogDTO.getItemsList().stream()
-        .map(Item::new)
-        .filter(v -> !blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet()).contains(v.getLink()))
-        .forEach(blog::addItem);
-    blog.updateFromDto(blogDTO);
-    return blog;
+  public Mono<Blog> updateBlog(BlogDTO blogDTO) {
+    return getBlogByFeedUrl(blogDTO.getFeedURL()).
+        flatMap(
+            blog -> {
+              log.debug("aktualizuje bloga {}", blog.getName());
+              Set<String> linkSet = blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet());
+              blogDTO.getItemsList().stream()
+                  .map(Item::new)
+                  .filter(v -> !linkSet.contains(v.getLink()))
+                  .forEach(blog::addItem);
+              blog.updateFromDto(blogDTO);
+              return Mono.just(blogRepository.save(blog));
+            }
+        );
   }
 
   @Cacheable("blogs")
-  public List<Blog> getAllBlogs() {
+  public Flux<Blog> getAllBlogs() {
     log.debug("Pobieram wszystkie blogi");
-    return new HashSet<>(blogRepository.findStreamAll()).parallelStream().collect(Collectors.toList());
+    List<Blog> all = blogRepository.findAll();
+    log.debug("Znalazlem w bazie {} blogow", all.size());
+    log.trace("Wszystkie blogi to {}", all);
+    return Flux.fromIterable(all);
   }
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
-  public boolean deleteBlog(Long id) {
+  public Mono<Boolean> deleteBlog(Long id) {
     log.debug("Usuwam bloga o id {}", id);
     Blog blog = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
     if (blog.getItems().isEmpty()) {
       blogRepository.delete(blog);
-      return true;
+      log.debug("usunalem blog {}", id);
+      return Mono.just(true);
     } else {
+      log.debug("Nie moglem usunac bloga wiec zmieniam jego aktywnosc {}", id);
       blog.deactive();
-      return false;
+      return Mono.just(false);
     }
   }
 
   @Transactional(readOnly = true)
-  public BlogDTO getBlogDTOById(Long id) {
+  public Mono<BlogDTO> getBlogDTOById(Long id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
     Blog blogById = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
-    return new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById));
+    return Mono.just(new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById)))
+        .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", blogById));
   }
 
   @Cacheable("blogsName")
   @Transactional(readOnly = true)
-  public BlogDTO getBlogDTOByName(String name) {
+  public Mono<BlogDTO> getBlogDTOByName(String name) {
     log.debug("pobieram bloga w postaci DTO o nazwie {} {}", name, clock.instant());
-    Blog blog = getBlogByName(name);
-    return new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog));
+    return getBlogByName(name).map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v)))
+        .doOnEach(blogDTO -> log.trace("getBlogDTOByName {}", blogDTO));
   }
 
   @Cacheable("blogsDTO")
   @Transactional(readOnly = true)
-  public List<BlogDTO> getAllBlogDTOs(Integer limit) {
+  public Flux<BlogDTO> getAllBlogDTOs(Integer limit) {
     log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
-    return getAllBlogs().stream()
-        .parallel()
-        .limit(getLimit(limit))
-        .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v)))
-        .collect(Collectors.toList());
+    Flux<BlogDTO> dtoFlux = getAllBlogs()
+        .take(getLimit(limit))
+        .map(blog -> new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog)));
+    return dtoFlux.doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }
 
   private List<ItemDTO> extractItems(Blog v) {

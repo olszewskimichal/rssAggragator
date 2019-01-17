@@ -1,9 +1,7 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import java.util.stream.IntStream;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.blog.BlogRepository;
 
 class ItemListFactory {

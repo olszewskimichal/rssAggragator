@@ -1,13 +1,10 @@
 package pl.michal.olszewski.rssaggregator.item;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
-import pl.michal.olszewski.rssaggregator.item.ItemRepository;
+import reactor.core.publisher.Flux;
 
 @Service
 @Transactional(readOnly = true)
@@ -20,11 +17,10 @@ class NewestItemService {
     this.itemRepository = itemRepository;
   }
 
-  List<ItemDTO> getNewestItems(int size) {
+  Flux<ItemDTO> getNewestItems(int size) {
     log.debug("Pobieram wpisy z limitem {}", size);
-    return itemRepository.findAllByOrderByDateDesc(size)
-        .map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()))
-        .collect(Collectors.toList());
+    return Flux.fromIterable(itemRepository.findAllByOrderByDateDesc(size))
+        .map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()));
   }
 
   @CacheEvict(value = {"items"}, allEntries = true)

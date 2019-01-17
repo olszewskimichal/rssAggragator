@@ -25,6 +25,7 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 public class RssExtractorService {
 
   private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
+    log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
     return syndFeed.getEntries().parallelStream()
         .filter(v -> v.getPublishedDate().toInstant().isAfter(lastUpdatedDate))
         .map(entry -> new ItemDTO(
@@ -57,6 +58,7 @@ public class RssExtractorService {
 
   static String getFinalURL(String linkUrl) {
     try {
+      log.trace("getFinalURL for link {}", linkUrl);
       HttpURLConnection con = (HttpURLConnection) new URL(linkUrl).openConnection();
       con.addRequestProperty("User-Agent", "Mozilla/4.76");
       con.setInstanceFollowRedirects(false);
@@ -64,6 +66,7 @@ public class RssExtractorService {
       con.setConnectTimeout(1000);
       con.connect();
       if (con.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || con.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+        log.trace("wykonuje redirect dla linku {}", linkUrl);
         String redirectUrl = con.getHeaderField("Location");
         return getFinalURL(redirectUrl).replaceAll("[&?]gi.*", "");
       }
@@ -74,19 +77,22 @@ public class RssExtractorService {
   }
 
   private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
+    log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
     return new BlogDTO(syndFeed.getLink() != null ? syndFeed.getLink() : blogURL, syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant(), new ArrayList<>());
   }
 
   BlogDTO getBlog(XmlReader xmlReader, String feedURL, String blogURL, Instant lastUpdatedDate) {
+    log.trace("getBlog START {} {} {}", feedURL, blogURL, lastUpdatedDate);
     try (XmlReader reader = xmlReader) {
       SyndFeed feed = new SyndFeedInput().build(reader);
       feed.setEncoding("UTF-8");
       feed.getEntries().parallelStream().filter(v -> v.getPublishedDate() == null && v.getUpdatedDate() != null).forEach(v -> v.setPublishedDate(v.getUpdatedDate()));
       BlogDTO blogInfo = getBlogInfo(feed, feedURL, blogURL);
       getItemsForBlog(feed, lastUpdatedDate).forEach(blogInfo::addNewItem);
+      log.trace("getBlog STOP {} {} {}", feedURL, blogURL, lastUpdatedDate);
       return blogInfo;
     } catch (IOException | FeedException e) {
-      throw new RssException(feedURL);
+      throw new RssException(feedURL, e);
     }
   }
 }

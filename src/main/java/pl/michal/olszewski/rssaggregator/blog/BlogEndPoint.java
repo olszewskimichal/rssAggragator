@@ -1,11 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/blogs")
@@ -29,45 +28,50 @@ class BlogEndPoint {
   }
 
   @GetMapping(value = "/{id}")
-  public ResponseEntity<BlogDTO> getBlog(@PathVariable("id") Long blogId) {
-    return Optional.ofNullable(blogService.getBlogDTOById(blogId))
-        .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-        .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+  public Mono<BlogDTO> getBlog(@PathVariable("id") Long blogId) {
+    log.debug("GET blog by id {}", blogId);
+    return blogService.getBlogDTOById(blogId);
   }
 
   @GetMapping(value = "/by-name/{name}")
-  public ResponseEntity<BlogDTO> getBlogByName(@PathVariable("name") String name) {
-    return Optional.ofNullable(blogService.getBlogDTOByName(name))
-        .map(result -> new ResponseEntity<>(result, HttpStatus.OK))
-        .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+  public Mono<BlogDTO> getBlogByName(@PathVariable("name") String name) {
+    log.debug("GET blog by name {}", name);
+    return blogService.getBlogDTOByName(name);
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public List<BlogDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit) {
+  public Flux<BlogDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit) {
+    log.debug("GET blogs with limit {}", limit);
     return blogService.getAllBlogDTOs(limit);
   }
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void updateBlog(@RequestBody BlogDTO blogDTO) {
-    blogService.updateBlog(blogDTO);
+  public Mono<Blog> updateBlog(@RequestBody BlogDTO blogDTO) {
+    log.debug("PUT - updateBlog {}", blogDTO.getName());
+    log.trace("PUT - updateBlog {}", blogDTO);
+    return blogService.updateBlog(blogDTO);
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void addBlog(@RequestBody BlogDTO blogDTO) {
-    blogService.createBlog(blogDTO);
+  public Mono<Blog> addBlog(@RequestBody BlogDTO blogDTO) {
+    log.debug("POST - addBlog {}", blogDTO.getName());
+    log.trace("POST - addBlog {}", blogDTO);
+    return blogService.createBlog(blogDTO);
   }
 
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteBlog(@PathVariable("id") Long blogId) {
-    blogService.deleteBlog(blogId);
+  public Mono<Boolean> deleteBlog(@PathVariable("id") Long blogId) {
+    log.debug("DELETE - deleteBlog {}", blogId);
+    return blogService.deleteBlog(blogId);
   }
 
   @PostMapping(value = "/evictCache")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void evictCache() {
+    log.debug("POST - evict Cache");
     blogService.evictBlogCache();
   }
 
