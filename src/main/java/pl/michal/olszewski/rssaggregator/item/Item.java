@@ -1,43 +1,28 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import java.time.Instant;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import lombok.EqualsAndHashCode;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import pl.michal.olszewski.rssaggregator.blog.Blog;
+import lombok.ToString;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = {"blog", "id"})
+@ToString
 @NoArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"link", "blog_id"}))
-public class Item {
+public final class Item {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  private Long id;
+  private String id;
   private String title;
-  @Column(length = 10000)
   private String description;
   private String link;
   private Instant date;
   private String author;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "blog_id")
-  private Blog blog;
 
   public Item(ItemDTO itemDTO) {
     this.title = itemDTO.getTitle();
@@ -45,5 +30,27 @@ public class Item {
     this.link = itemDTO.getLink();
     this.date = itemDTO.getDate();
     this.author = itemDTO.getAuthor();
+  }
+
+  @Override
+  public final boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Item)) {
+      return false;
+    }
+    Item item = (Item) o;
+    return
+        Objects.equals(title, item.title) &&
+            Objects.equals(description, item.description) &&
+            Objects.equals(link, item.link) &&
+            Objects.equals(date, item.date) &&
+            Objects.equals(author, item.author);
+  }
+
+  @Override
+  public final int hashCode() {
+    return Objects.hash(title, description, link, date, author);
   }
 }

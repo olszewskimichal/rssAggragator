@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 class BlogNotFoundException extends RuntimeException {
 
   BlogNotFoundException(String name) {
-    super("Nie znaleziono blogu = " + name);
+    super("Nie znaleziono bloga = " + name);
   }
 
-  BlogNotFoundException(Long id) {
-    super("Nie znaleziono bloga o id = " + id);
-  }
 }

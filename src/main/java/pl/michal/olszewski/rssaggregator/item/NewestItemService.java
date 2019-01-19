@@ -1,7 +1,12 @@
 package pl.michal.olszewski.rssaggregator.item;
 
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -19,7 +24,9 @@ class NewestItemService {
 
   Flux<ItemDTO> getNewestItems(int size) {
     log.debug("Pobieram wpisy z limitem {}", size);
-    return Flux.fromIterable(itemRepository.findAllByOrderByDateDesc(size))
+    List<Item> all = itemRepository.findAll();
+    Page<Item> items = itemRepository.findAll(PageRequest.of(0, size, new Sort(Direction.DESC, "date")));
+    return Flux.fromIterable(items.getContent())
         .map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()));
   }
 

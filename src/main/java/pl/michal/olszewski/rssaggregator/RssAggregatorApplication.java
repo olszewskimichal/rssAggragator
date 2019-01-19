@@ -10,7 +10,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -20,7 +19,7 @@ import pl.michal.olszewski.rssaggregator.config.Profiles;
 @EnableCaching
 @EnableAsync
 @EntityScan(
-    basePackageClasses = {RssAggregatorApplication.class, Jsr310JpaConverters.class}
+    basePackageClasses = {RssAggregatorApplication.class}
 )
 @EnableScheduling
 public class RssAggregatorApplication {

@@ -33,20 +33,20 @@ class UpdateBlogServiceTest {
   @Test
   void shouldNotUpdateBlogFromId() {
     //given
-    given(blogRepository.findById(1L)).willReturn(Optional.empty());
+    given(blogRepository.findById("1")).willReturn(Optional.empty());
     //when
     //then
-    assertThatThrownBy(() -> updateBlogService.refreshBlogFromId(1L)).hasMessageContaining("Nie znaleziono bloga");
+    assertThatThrownBy(() -> updateBlogService.refreshBlogFromId("1")).hasMessageContaining("Nie znaleziono bloga");
   }
 
   @Test
   void shouldUpdateBlogFromId() {
     //given
-    given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog()));
+    given(blogRepository.findById("1")).willReturn(Optional.of(new Blog()));
     //when
-    updateBlogService.refreshBlogFromId(1L);
+    updateBlogService.refreshBlogFromId("1");
 
-    verify(blogRepository, times(1)).findById(1L);
+    verify(blogRepository, times(1)).findById("1");
     verify(asyncService, times(1)).updateBlog(new Blog());
     verifyNoMoreInteractions(blogRepository);
   }

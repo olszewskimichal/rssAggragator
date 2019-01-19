@@ -3,31 +3,32 @@ package pl.michal.olszewski.rssaggregator.blog;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.mongodb.MongoWriteException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import javax.persistence.PersistenceException;
-import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.exception.DataException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
-import pl.michal.olszewski.rssaggregator.item.Item;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
-@DataJpaTest
+@DataMongoTest
 @ActiveProfiles(Profiles.TEST)
 public class BlogRepositoryTest {
 
   @Autowired
-  protected TestEntityManager entityManager;
+  protected MongoTemplate entityManager;
 
   @Autowired
   private BlogRepository blogRepository;
+
+  @BeforeEach
+  void setUp() {
+    blogRepository.deleteAll();
+  }
 
   @Test
   void shouldFindBlogByBlogURL() {
@@ -67,7 +68,7 @@ public class BlogRepositoryTest {
   @Test
   void shouldNotFindBlogByIdWhenNotExists() {
     //when
-    Optional<Blog> blogById = blogRepository.findById(1L);
+    Optional<Blog> blogById = blogRepository.findById("1");
 
     //then
     assertThat(blogById).isNotPresent();
@@ -79,22 +80,10 @@ public class BlogRepositoryTest {
     givenBlog()
         .withURL("url");
     //then
-    assertThatThrownBy(() -> entityManager.persistAndFlush(new Blog("url", "", "", "", null, null))).hasCauseInstanceOf(ConstraintViolationException.class).isInstanceOf(PersistenceException.class)
-        .hasMessageContaining("ConstraintViolationException");
-  }
-
-  @Test
-  void shouldThrowExceptionWhenItemDescriptionIsTooLong() {
-    Blog blog = givenBlog()
-        .withURL("url");
-    String desc = IntStream.range(0, 10001).parallel().mapToObj(index -> "a").collect(Collectors.joining());
-    blog.addItem(new Item(ItemDTO.builder().description(desc).build()));
-
-    assertThatThrownBy(() -> entityManager.persistAndFlush(blog))
-        .hasCauseInstanceOf(DataException.class)
-        .isInstanceOf(PersistenceException.class)
-        .hasMessageContaining("DataException");
-
+    assertThatThrownBy(() -> entityManager.save(new Blog("url", "", "", "", null, null)))
+        .hasCauseInstanceOf(MongoWriteException.class)
+        .isInstanceOf(DuplicateKeyException.class)
+        .hasMessageContaining("duplicate key error collection");
   }
 
   @Test

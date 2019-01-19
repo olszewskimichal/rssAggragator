@@ -34,7 +34,7 @@ class UpdateBlogService {
     }
   }
 
-  public void refreshBlogFromId(Long id) {
+  public void refreshBlogFromId(String id) {
     log.debug("Odswiezam bloga o id {}", id);
     Blog blog = repository.findById(id)
         .orElseThrow(() -> new BlogNotFoundException(id));

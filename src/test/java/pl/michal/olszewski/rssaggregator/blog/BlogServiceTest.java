@@ -18,11 +18,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.persistence.PersistenceException;
+import java.util.zip.DataFormatException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.dao.DuplicateKeyException;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
@@ -105,7 +106,8 @@ class BlogServiceTest {
   void shouldNotCreateBlogWhenThrowException() {
     //given
     BlogDTO blogDTO = BlogDTO.builder().build();
-    given(blogRepository.save(any(Blog.class))).willThrow(new PersistenceException("Blog o podanym url juz istnieje"));
+    given(blogRepository.save(any(Blog.class)))
+        .willThrow(new DuplicateKeyException("Blog o podanym url juz istnieje"));
     //when
     //then
     assertThatThrownBy(() -> blogService.createBlog(blogDTO)).isNotNull().hasMessage("Blog o podanym url juz istnieje");
@@ -142,7 +144,6 @@ class BlogServiceTest {
           assertThat(v.getItems()).isNotEmpty().hasSize(2);
           for (Item item : v.getItems()) {
             assertThat(item.getAuthor()).isEqualTo("autor");
-            assertThat(item.getBlog()).isEqualTo(v);
             assertThat(item.getDate()).isBeforeOrEqualTo(now).isAfterOrEqualTo(now);
             assertThat(item.getTitle()).isNotNull().isNotEmpty();
             assertThat(item.getLink()).isEqualTo("link" + item.getTitle());
@@ -246,9 +247,9 @@ class BlogServiceTest {
 
   @Test
   void shouldDeleteBlogById() {
-    given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
+    given(blogRepository.findById("1")).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
 
-    StepVerifier.create(blogService.deleteBlog(1L))
+    StepVerifier.create(blogService.deleteBlog("1"))
         .assertNext(v -> assertThat(v).isTrue())
         .expectComplete()
         .verify();
@@ -256,17 +257,17 @@ class BlogServiceTest {
 
   @Test
   void shouldThrowExceptionOnDeleteWhenBlogNotExist() {
-    given(blogRepository.findById(1L)).willReturn(Optional.empty());
+    given(blogRepository.findById("1")).willReturn(Optional.empty());
 
-    assertThatThrownBy(() -> blogService.deleteBlog(1L)).isNotNull().hasMessage("Nie znaleziono bloga o id = 1");
+    assertThatThrownBy(() -> blogService.deleteBlog("1")).isNotNull().hasMessage("Nie znaleziono bloga = 1");
   }
 
   @Test
   void shouldGetBlogDTOById() {
     //given
-    given(blogRepository.findById(1L)).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
+    given(blogRepository.findById("1")).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
     //when
-    Mono<BlogDTO> blogById = blogService.getBlogDTOById(1L);
+    Mono<BlogDTO> blogById = blogService.getBlogDTOById("1");
     //then
     assertThat(blogById).isNotNull();
   }
@@ -274,9 +275,9 @@ class BlogServiceTest {
   @Test
   void shouldThrownExceptionWhenBlogDTOByIdNotExist() {
     //given
-    given(blogRepository.findById(1L)).willReturn(Optional.empty());
+    given(blogRepository.findById("1")).willReturn(Optional.empty());
     //when
-    assertThatThrownBy(() -> blogService.getBlogDTOById(1L)).isNotNull().hasMessage("Nie znaleziono bloga o id = 1");
+    assertThatThrownBy(() -> blogService.getBlogDTOById("1")).isNotNull().hasMessage("Nie znaleziono bloga = 1");
   }
 
   @Test
@@ -346,7 +347,7 @@ class BlogServiceTest {
     //given
     given(blogRepository.findByName("name")).willReturn(Optional.empty());
     //when
-    assertThatThrownBy(() -> blogService.getBlogDTOByName("name")).isNotNull().hasMessage("Nie znaleziono blogu = name");
+    assertThatThrownBy(() -> blogService.getBlogDTOByName("name")).isNotNull().hasMessage("Nie znaleziono bloga = name");
   }
 
   @Test
@@ -355,9 +356,9 @@ class BlogServiceTest {
     Blog blog = new Blog("", "", "", "", null, null);
     blog.addItem(item);
 
-    given(blogRepository.findById(1L)).willReturn(Optional.of(blog));
+    given(blogRepository.findById("1")).willReturn(Optional.of(blog));
     //when
-    blogService.deleteBlog(1L);
+    blogService.deleteBlog("1");
     //then
     assertThat(blog.isActive()).isFalse();
   }

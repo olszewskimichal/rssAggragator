@@ -13,11 +13,15 @@ class NewestItemsApiTest extends IntegrationTestBase {
   private BlogRepository repository;
 
   @Autowired
+  private ItemRepository itemRepository;
+
+  @Autowired
   private NewestItemService blogService;
 
   @BeforeEach
   void setUp() {
     repository.deleteAll();
+    itemRepository.deleteAll();
     blogService.evictItemsCache();
   }
 

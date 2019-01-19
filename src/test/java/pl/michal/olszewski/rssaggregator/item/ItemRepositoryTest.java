@@ -7,11 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.hibernate.exception.ConstraintViolationException;
+import javax.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.context.ActiveProfiles;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
@@ -37,7 +40,7 @@ public class ItemRepositoryTest {
     entityManager.persistAndFlush(blog);
 
     //when
-    List<Item> items = itemRepository.findAllByOrderByDateDesc(2);
+    List<Item> items = itemRepository.findAll(PageRequest.of(0, 2, new Sort(Direction.DESC, "date"))).getContent();
 
     //then
     assertAll(
@@ -56,7 +59,7 @@ public class ItemRepositoryTest {
     entityManager.persistAndFlush(blog);
 
     //when
-    List<Item> items = itemRepository.findAllByOrderByDateDesc(2);
+    List<Item> items = itemRepository.findAll(PageRequest.of(0, 2, new Sort(Direction.DESC, "date"))).getContent();
 
     //then
     assertThat(items.size()).isEqualTo(2);
@@ -68,7 +71,9 @@ public class ItemRepositoryTest {
     blog.addItem(new Item(ItemDTO.builder().link("title1").build()));
     entityManager.persistAndFlush(blog);
     blog.addItem(new Item(ItemDTO.builder().link("title1").description("desc").build()));
-    assertThatThrownBy(() -> entityManager.persistAndFlush(blog)).hasMessageContaining("could not execute").hasCauseInstanceOf(ConstraintViolationException.class);
+    assertThatThrownBy(() -> entityManager.persistAndFlush(blog))
+        .hasMessageContaining("could not execute")
+        .hasCauseInstanceOf(ConstraintViolationException.class);
   }
 
 

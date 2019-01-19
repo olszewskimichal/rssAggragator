@@ -157,7 +157,7 @@ class BlogApiTest extends IntegrationTestBase {
         .expectBodyList(BlogDTO.class);
   }
 
-  private BodySpec<BlogDTO, ?> thenGetOneBlogFromApiById(Long id) {
+  private BodySpec<BlogDTO, ?> thenGetOneBlogFromApiById(String id) {
     return webTestClient.get()
         .uri("http://localhost:{port}/api/v1/blogs/{id}", port, id)
         .exchange()
@@ -180,7 +180,7 @@ class BlogApiTest extends IntegrationTestBase {
     template.put(String.format("http://localhost:%s/api/v1/blogs/", port), blogDTO);
   }
 
-  private void thenDeleteOneBlogFromApi(Long blogId) {
+  private void thenDeleteOneBlogFromApi(String blogId) {
     template.delete(String.format("http://localhost:%s/api/v1/blogs/%s", port, blogId));
   }
 

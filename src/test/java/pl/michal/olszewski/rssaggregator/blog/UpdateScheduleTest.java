@@ -48,11 +48,11 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   @Test
   void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() throws ExecutionException, InterruptedException {
     blogRepository.deleteAll();
-    Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now());
-    blogRepository.save(blog);
+    Blog blog = blogRepository.save(new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now()));
     Future<Void> voidFuture = asyncService.updateBlog(blog);
     voidFuture.get();
     Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
+
     assertAll(
         () -> assertThat(updatedBlog).isPresent(),
         () -> assertThat(updatedBlog.get().getItems()).isEmpty(),
@@ -64,6 +64,8 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   void shouldNotUpdateBlog() {
     Blog blog = new Blog("https://devstyle.xxx", "DEVSTYLE", "devstyle", "https://devstyle.xxx/feed", null, null);
     blogRepository.save(blog);
-    assertThatThrownBy(() -> asyncService.updateBlog(blog).get()).isInstanceOf(ExecutionException.class).hasCauseInstanceOf(RssException.class);
+    assertThatThrownBy(() -> asyncService.updateBlog(blog).get())
+        .isInstanceOf(ExecutionException.class)
+        .hasCauseInstanceOf(RssException.class);
   }
 }

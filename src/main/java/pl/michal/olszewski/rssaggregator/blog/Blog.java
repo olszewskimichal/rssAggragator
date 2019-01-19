@@ -4,31 +4,30 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Immutable;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import pl.michal.olszewski.rssaggregator.config.CascadeSave;
 import pl.michal.olszewski.rssaggregator.item.Item;
 
-@Entity
+@Document
 @Getter
-@EqualsAndHashCode
 @NoArgsConstructor
 @Slf4j
+@ToString
 public class Blog {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  private Long id;
-  @Column(unique = true)
+  private String id;
+  @Indexed(unique = true)
   private String blogURL;
   private String description;
   private String name;
@@ -36,8 +35,8 @@ public class Blog {
   private Instant publishedDate;
   private Instant lastUpdateDate;
   private boolean active = true;
-
-  @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
+  @DBRef
+  @CascadeSave
   private Set<Item> items = new HashSet<>();
 
   public Blog(String blogURL, String description, String name, String feedURL, Instant publishedDate, Instant lastUpdateDate) {
@@ -57,7 +56,6 @@ public class Blog {
   public void addItem(Item item) {
     if (items.add(item)) {
       log.trace("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
-      item.setBlog(this);
     }
   }
 
@@ -74,5 +72,29 @@ public class Blog {
 
   void deactive() {
     active = false;
+  }
+
+  @Override
+  public final boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof Blog)) {
+      return false;
+    }
+    Blog blog = (Blog) o;
+    return active == blog.active &&
+        Objects.equals(blogURL, blog.blogURL) &&
+        Objects.equals(description, blog.description) &&
+        Objects.equals(name, blog.name) &&
+        Objects.equals(feedURL, blog.feedURL) &&
+        Objects.equals(publishedDate, blog.publishedDate) &&
+        Objects.equals(lastUpdateDate, blog.lastUpdateDate) &&
+        Objects.equals(items, blog.items);
+  }
+
+  @Override
+  public final int hashCode() {
+    return Objects.hash(blogURL, description, name, feedURL, publishedDate, lastUpdateDate, active, items);
   }
 }

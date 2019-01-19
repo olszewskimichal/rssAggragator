@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-@Transactional
 class BlogCacheTest extends IntegrationTestBase {
 
   @Autowired
@@ -59,18 +59,18 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldFindByNameFromCache() {
     service.createBlog(BlogDTO.builder().name("nazwa").build());
-    Optional<Blog> byName = blogRepository.findByName("nazwa");
-    Optional<Blog> cachedDTO = blogRepository.findByName("nazwa");
-    assertSame(byName.get(), cachedDTO.get());
+    Mono<BlogDTO> byName = service.getBlogDTOByName("nazwa");
+    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa");
+    assertSame(byName, cachedDTO);
   }
 
   @Test
   void shouldNotEvictFindByNameWhenCreate() {
     service.createBlog(BlogDTO.builder().name("nazwa").build());
-    Optional<Blog> byName = blogRepository.findByName("nazwa");
+    Mono<BlogDTO> byName = service.getBlogDTOByName("nazwa");
     service.createBlog(BlogDTO.builder().name("nazwa2").build());
-    Optional<Blog> cachedDTO = blogRepository.findByName("nazwa");
-    assertSame(byName.get(), cachedDTO.get());
+    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa");
+    assertSame(byName, cachedDTO);
   }
 
 }
