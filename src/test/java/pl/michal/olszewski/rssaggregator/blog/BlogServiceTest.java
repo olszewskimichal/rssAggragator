@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.zip.DataFormatException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +26,7 @@ import org.springframework.dao.DuplicateKeyException;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
+import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -40,10 +40,13 @@ class BlogServiceTest {
   @Mock
   private BlogRepository blogRepository;
 
+  @Mock
+  private ItemRepository itemRepository;
+
   @BeforeEach
   void setUp() {
     when(blogRepository.save(any())).then(i -> i.getArgument(0));
-    blogService = new BlogService(blogRepository, Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault()));
+    blogService = new BlogService(blogRepository, Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault()), itemRepository);
   }
 
   @Test
@@ -178,7 +181,7 @@ class BlogServiceTest {
   void shouldAddItemForBlogWhichHaveOneItem() {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
-    blog.addItem(new Item(ItemDTO.builder().title("title").build()));
+    blog.addItem(new Item(ItemDTO.builder().title("title").build()), itemRepository);
     List<ItemDTO> itemsList = IntStream.rangeClosed(2, 2).mapToObj(v -> ItemDTO.builder().author("autor").description("desc").date(Instant.now()).title(v + "").link("link" + v).build())
         .collect(Collectors.toList());
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(itemsList).build();
@@ -200,7 +203,7 @@ class BlogServiceTest {
     //given
     ItemDTO itemDTO = ItemDTO.builder().title("title").date(Instant.now()).build();
     Blog blog = new Blog("url", "", "url", "", null, null);
-    blog.addItem(new Item(itemDTO));
+    blog.addItem(new Item(itemDTO), itemRepository);
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(Arrays.asList(itemDTO, itemDTO)).build();
     given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
     //when
@@ -354,7 +357,7 @@ class BlogServiceTest {
   void shouldChangeActivityBlogWhenWeTryDeleteBlogWithItems() {
     Item item = new Item(ItemDTO.builder().link("test").build());
     Blog blog = new Blog("", "", "", "", null, null);
-    blog.addItem(item);
+    blog.addItem(item, itemRepository);
 
     given(blogRepository.findById("1")).willReturn(Optional.of(blog));
     //when

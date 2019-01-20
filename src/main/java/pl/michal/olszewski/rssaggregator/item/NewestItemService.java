@@ -24,7 +24,6 @@ class NewestItemService {
 
   Flux<ItemDTO> getNewestItems(int size) {
     log.debug("Pobieram wpisy z limitem {}", size);
-    List<Item> all = itemRepository.findAll();
     Page<Item> items = itemRepository.findAll(PageRequest.of(0, size, new Sort(Direction.DESC, "date")));
     return Flux.fromIterable(items.getContent())
         .map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()));

@@ -10,7 +10,7 @@ public class HomeController {
 
   @GetMapping("/")
   String mainPage() {
-    log.trace("GET main page");
+    log.debug("GET main page");
     return "index";
   }
 

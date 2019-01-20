@@ -11,12 +11,11 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Immutable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import pl.michal.olszewski.rssaggregator.config.CascadeSave;
 import pl.michal.olszewski.rssaggregator.item.Item;
+import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 
 @Document
 @Getter
@@ -36,7 +35,6 @@ public class Blog {
   private Instant lastUpdateDate;
   private boolean active = true;
   @DBRef
-  @CascadeSave
   private Set<Item> items = new HashSet<>();
 
   public Blog(String blogURL, String description, String name, String feedURL, Instant publishedDate, Instant lastUpdateDate) {
@@ -53,8 +51,9 @@ public class Blog {
     return Collections.unmodifiableSet(items);
   }
 
-  public void addItem(Item item) {
+  public void addItem(Item item, ItemRepository repository) {
     if (items.add(item)) {
+      repository.save(item);
       log.trace("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
     }
   }

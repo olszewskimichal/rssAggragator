@@ -14,6 +14,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
+import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 
 @DataMongoTest
 @ActiveProfiles(Profiles.TEST)
@@ -24,6 +25,9 @@ public class BlogRepositoryTest {
 
   @Autowired
   private BlogRepository blogRepository;
+
+  @Autowired
+  private ItemRepository itemRepository;
 
   @BeforeEach
   void setUp() {
@@ -127,7 +131,7 @@ public class BlogRepositoryTest {
   }
 
   private BlogListFactory givenBlog() {
-    return new BlogListFactory(blogRepository);
+    return new BlogListFactory(blogRepository, itemRepository);
   }
 
 }

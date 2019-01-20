@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 import reactor.core.publisher.Flux;
 
 class BlogApiTest extends IntegrationTestBase {
@@ -21,11 +22,15 @@ class BlogApiTest extends IntegrationTestBase {
   private BlogRepository blogRepository;
 
   @Autowired
+  private ItemRepository itemRepository;
+
+  @Autowired
   private BlogService blogService;
 
   @BeforeEach
   void setUp() {
     blogRepository.deleteAll();
+    itemRepository.deleteAll();
     blogService.evictBlogCache();
   }
 
@@ -147,7 +152,7 @@ class BlogApiTest extends IntegrationTestBase {
   }
 
   private BlogListFactory givenBlog() {
-    return new BlogListFactory(blogRepository);
+    return new BlogListFactory(blogRepository, itemRepository);
   }
 
   private ListBodySpec<BlogDTO> thenGetBlogsFromApi() {

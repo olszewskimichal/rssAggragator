@@ -7,14 +7,17 @@ import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
+import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 
 @Slf4j
 class BlogListFactory {
 
   private final BlogRepository repository;
+  private final ItemRepository itemRepository;
 
-  BlogListFactory(BlogRepository repository) {
+  BlogListFactory(BlogRepository repository, ItemRepository itemRepository) {
     this.repository = repository;
+    this.itemRepository = itemRepository;
   }
 
   List<BlogDTO> buildNumberOfBlogsDTOAndSave(int numberOfBlogs) {
@@ -26,7 +29,7 @@ class BlogListFactory {
 
   Blog buildBlogWithItemsAndSave(int numberOfItems) {
     Blog blog = new Blog("blog997", "", "", "", null, null);
-    IntStream.rangeClosed(1, numberOfItems).parallel().forEachOrdered(v -> blog.addItem(new Item(ItemDTO.builder().title("title" + v).build())));
+    IntStream.rangeClosed(1, numberOfItems).parallel().forEachOrdered(v -> blog.addItem(new Item(ItemDTO.builder().link("link" + v).title("title" + v).build()), itemRepository));
     log.debug("Zapisuje do bazy blog {}", blog);
     return repository.save(blog);
   }

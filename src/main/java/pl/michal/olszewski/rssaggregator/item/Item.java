@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
@@ -20,6 +21,7 @@ public final class Item {
   private String id;
   private String title;
   private String description;
+  @Indexed(unique = true)
   private String link;
   private Instant date;
   private String author;

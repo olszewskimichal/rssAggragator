@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
+import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -22,15 +23,18 @@ import reactor.core.publisher.Mono;
 class BlogService {
 
   private final BlogRepository blogRepository;
+  private final ItemRepository itemRepository;
   private final Clock clock;
 
-  public BlogService(BlogRepository blogRepository, Clock clock) {
+  public BlogService(BlogRepository blogRepository, Clock clock, ItemRepository itemRepository) {
     this.blogRepository = blogRepository;
     this.clock = clock;
+    this.itemRepository = itemRepository;
   }
 
   @CacheEvict(value = {"blogs", "blogsDTO"}, allEntries = true)
   public Mono<Blog> createBlog(BlogDTO blogDTO) {
+    log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
     Optional<Blog> byFeedURL = blogRepository.findByFeedURL(blogDTO.getFeedURL());
     if (!byFeedURL.isPresent()) {
       log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
@@ -38,7 +42,7 @@ class BlogService {
       Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate(), null);
       blogDTO.getItemsList().stream()
           .map(Item::new)
-          .forEach(blog::addItem);
+          .forEach(v -> blog.addItem(v, itemRepository));
       blogRepository.save(blog);
       return Mono.just(blog);
     }
@@ -46,12 +50,12 @@ class BlogService {
   }
 
   private Mono<Blog> getBlogByName(String name) {
-    log.debug("getBlogByName {}",name);
+    log.debug("getBlogByName {}", name);
     return Mono.just(blogRepository.findByName(name).orElseThrow(() -> new BlogNotFoundException(name)));
   }
 
   private Mono<Blog> getBlogByFeedUrl(String feedUrl) {
-    log.debug("getBlogByFeedUrl {}",feedUrl);
+    log.debug("getBlogByFeedUrl {}", feedUrl);
     return Mono.just(blogRepository.findByFeedURL(feedUrl).orElseThrow(() -> new BlogNotFoundException(feedUrl)));
   }
 
@@ -65,7 +69,7 @@ class BlogService {
               blogDTO.getItemsList().stream()
                   .map(Item::new)
                   .filter(v -> !linkSet.contains(v.getLink()))
-                  .forEach(blog::addItem);
+                  .forEach(v -> blog.addItem(v, itemRepository));
               blog.updateFromDto(blogDTO);
               return Mono.just(blogRepository.save(blog));
             }

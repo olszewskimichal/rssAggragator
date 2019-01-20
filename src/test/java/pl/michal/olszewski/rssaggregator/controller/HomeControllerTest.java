@@ -5,14 +5,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
-public class HomeControllerTest {
+class HomeControllerTest {
 
   private static final String VIEW_BASE_PATH = "/WEB-INF/templates";
   private static final String VIEW_FILENAME_SUFFIX = ".html";
@@ -26,27 +26,27 @@ public class HomeControllerTest {
     return viewResolver;
   }
 
-  @Before
-  public void configureSystemUnderTest() {
+  @BeforeEach
+  void configureSystemUnderTest() {
     mockMvc = MockMvcBuilders.standaloneSetup(new HomeController())
         .setViewResolvers(viewResolver())
         .build();
   }
 
   @Test
-  public void shouldReturnHttpStatusCodeOk() throws Exception {
+  void shouldReturnHttpStatusCodeOk() throws Exception {
     mockMvc.perform(get("/"))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void shouldRenderHomePageView() throws Exception {
+  void shouldRenderHomePageView() throws Exception {
     mockMvc.perform(get("/"))
         .andExpect(view().name("index"));
   }
 
   @Test
-  public void shouldShowIndexTemplate() {
+  void shouldShowIndexTemplate() {
     HomeController homeController = new HomeController();
     assertThat(homeController.mainPage()).isEqualTo("index");
   }
