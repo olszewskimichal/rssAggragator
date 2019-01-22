@@ -15,6 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 class BlogApiTest extends IntegrationTestBase {
 
@@ -29,7 +30,7 @@ class BlogApiTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    blogRepository.deleteAll();
+    blogRepository.deleteAll().block();
     itemRepository.deleteAll().block();
     blogService.evictBlogCache();
   }
@@ -78,15 +79,15 @@ class BlogApiTest extends IntegrationTestBase {
   @Test
   void should_create_a_blog() {
     //given
-    blogRepository.deleteAll();
+    blogRepository.deleteAll().block();
     //when
     thenCreateBlogByApi("test");
 
     //then
-    assertAll(
-        () -> assertThat(blogRepository.findAll().size()).isEqualTo(1),
-        () -> assertThat(blogRepository.findAll().get(0)).isNotNull()
-    );
+    StepVerifier.create(blogRepository.findAll())
+        .expectNextCount(1)
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -101,7 +102,7 @@ class BlogApiTest extends IntegrationTestBase {
     thenUpdateBlogByApi(blogDTO);
 
     //then
-    assertThat(blogRepository.findById(blog.getId()).get())
+    assertThat(blogRepository.findById(blog.getId()).block())
         .isNotNull()
         .hasFieldOrPropertyWithValue("description", "desc")
         .hasFieldOrPropertyWithValue("publishedDate", instant);
@@ -116,7 +117,10 @@ class BlogApiTest extends IntegrationTestBase {
     thenDeleteOneBlogFromApi(blog.getId());
 
     //then
-    assertThat(blogRepository.findById(blog.getId())).isEmpty();
+    StepVerifier.create(blogRepository.findById(blog.getId()))
+        .expectNextCount(0)
+        .expectComplete()
+        .verify();
   }
 
   @Test

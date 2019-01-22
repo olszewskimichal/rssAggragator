@@ -43,7 +43,7 @@ class BlogServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(blogRepository.save(any())).then(i -> i.getArgument(0));
+        when(blogRepository.save(any())).then(i -> Mono.just(i.getArgument(0)));
         when(itemRepository.save(any())).then(i -> Mono.just(i.getArgument(0)));
         blogService = new BlogService(blogRepository, Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault()), itemRepository);
     }
@@ -249,7 +249,7 @@ class BlogServiceTest {
 
     @Test
     void shouldDeleteBlogById() {
-        given(blogRepository.findById("1")).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
+        given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
 
         StepVerifier.create(blogService.deleteBlog("1"))
             .assertNext(v -> assertThat(v).isTrue())
@@ -259,7 +259,7 @@ class BlogServiceTest {
 
     @Test
     void shouldThrowExceptionOnDeleteWhenBlogNotExist() {
-        given(blogRepository.findById("1")).willReturn(Optional.empty());
+        given(blogRepository.findById("1")).willReturn(Mono.empty());
 
         assertThatThrownBy(() -> blogService.deleteBlog("1")).isNotNull().hasMessage("Nie znaleziono bloga = 1");
     }
@@ -267,7 +267,7 @@ class BlogServiceTest {
     @Test
     void shouldGetBlogDTOById() {
         //given
-        given(blogRepository.findById("1")).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
+        given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
         //when
         Mono<BlogDTO> blogById = blogService.getBlogDTOById("1");
         //then
@@ -277,7 +277,7 @@ class BlogServiceTest {
     @Test
     void shouldThrownExceptionWhenBlogDTOByIdNotExist() {
         //given
-        given(blogRepository.findById("1")).willReturn(Optional.empty());
+        given(blogRepository.findById("1")).willReturn(Mono.empty());
         //when
         assertThatThrownBy(() -> blogService.getBlogDTOById("1")).isNotNull().hasMessage("Nie znaleziono bloga = 1");
     }
@@ -285,7 +285,7 @@ class BlogServiceTest {
     @Test
     void shouldGetEmptyBlogs() {
         //given
-        given(blogRepository.findAll()).willReturn(Collections.emptyList());
+        given(blogRepository.findAll()).willReturn(Flux.empty());
         //when
         Flux<Blog> blogs = blogService.getAllBlogs();
         //then
@@ -298,7 +298,7 @@ class BlogServiceTest {
     @Test
     void shouldGetAllBlogs() {
         //given
-        given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
+        given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
         //when
         Flux<Blog> blogs = blogService.getAllBlogs();
         //then
@@ -311,7 +311,7 @@ class BlogServiceTest {
     @Test
     void shouldGetEmptyBlogsDTOs() {
         //given
-        given(blogRepository.findAll()).willReturn(Collections.emptyList());
+        given(blogRepository.findAll()).willReturn(Flux.empty());
         //when
         Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
         //then
@@ -324,7 +324,7 @@ class BlogServiceTest {
     @Test
     void shouldGetAllBlogDTOs() {
         //given
-        given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
+        given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
         //when
         Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
         //then
@@ -358,7 +358,7 @@ class BlogServiceTest {
         Blog blog = new Blog("", "", "", "", null, null);
         blog.addItem(item, itemRepository);
 
-        given(blogRepository.findById("1")).willReturn(Optional.of(blog));
+        given(blogRepository.findById("1")).willReturn(Mono.just(blog));
         //when
         blogService.deleteBlog("1");
         //then

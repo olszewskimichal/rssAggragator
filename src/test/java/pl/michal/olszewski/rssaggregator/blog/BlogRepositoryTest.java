@@ -15,6 +15,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
 import pl.michal.olszewski.rssaggregator.item.ItemRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @DataMongoTest
 @ActiveProfiles(Profiles.TEST)
@@ -31,7 +34,7 @@ public class BlogRepositoryTest {
 
   @BeforeEach
   void setUp() {
-    blogRepository.deleteAll();
+    blogRepository.deleteAll().block();
   }
 
   @Test
@@ -54,10 +57,13 @@ public class BlogRepositoryTest {
         .withURL("url");
 
     //when
-    Optional<Blog> blogByID = blogRepository.findById(blog.getId());
+    Mono<Blog> blogByID = blogRepository.findById(blog.getId());
 
     //then
-    assertThat(blogByID).isPresent();
+    StepVerifier.create(blogByID)
+        .expectNext(blog)
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -72,10 +78,13 @@ public class BlogRepositoryTest {
   @Test
   void shouldNotFindBlogByIdWhenNotExists() {
     //when
-    Optional<Blog> blogById = blogRepository.findById("1");
+    Mono<Blog> blogById = blogRepository.findById("1");
 
     //then
-    assertThat(blogById).isNotPresent();
+    StepVerifier.create(blogById)
+        .expectNextCount(0)
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -116,18 +125,24 @@ public class BlogRepositoryTest {
   void shouldGetAllBlogsIfAllAreActive() {
     givenBlog().buildNumberOfBlogsAndSave(5);
     //when
-    List<Blog> streamAll = blogRepository.findAll();
+    Flux<Blog> streamAll = blogRepository.findAll();
     //then
-    assertThat(streamAll).hasSize(5);
+    StepVerifier.create(streamAll)
+        .expectNextCount(5)
+        .expectComplete()
+        .verify();
   }
 
   @Test
   void shouldNotReturnNotActiveBlog() {
     givenBlog().notActive();
     //when
-    List<Blog> streamAll = blogRepository.findAll();
+    Flux<Blog> streamAll = blogRepository.findAll();
     //then
-    assertThat(streamAll).hasSize(0);
+    StepVerifier.create(streamAll)
+        .expectNextCount(0)
+        .expectComplete()
+        .verify();
   }
 
   private BlogListFactory givenBlog() {
