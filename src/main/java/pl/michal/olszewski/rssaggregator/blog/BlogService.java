@@ -121,7 +121,7 @@ class BlogService {
   public Flux<BlogDTO> getAllBlogDTOs(Integer limit) {
     log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
     Flux<BlogDTO> dtoFlux = getAllBlogs()
-        .take(getLimit(limit))
+        .take(getLimit(limit))  //TODO refactor do Pageable
         .map(blog -> new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog)));
     return dtoFlux.doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }

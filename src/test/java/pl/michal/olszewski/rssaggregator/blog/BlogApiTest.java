@@ -30,7 +30,7 @@ class BlogApiTest extends IntegrationTestBase {
   @BeforeEach
   void setUp() {
     blogRepository.deleteAll();
-    itemRepository.deleteAll();
+    itemRepository.deleteAll().block();
     blogService.evictBlogCache();
   }
 

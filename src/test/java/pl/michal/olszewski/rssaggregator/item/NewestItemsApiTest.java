@@ -21,7 +21,7 @@ class NewestItemsApiTest extends IntegrationTestBase {
   @BeforeEach
   void setUp() {
     repository.deleteAll();
-    itemRepository.deleteAll();
+    itemRepository.deleteAll().block();
     blogService.evictItemsCache();
   }
 
