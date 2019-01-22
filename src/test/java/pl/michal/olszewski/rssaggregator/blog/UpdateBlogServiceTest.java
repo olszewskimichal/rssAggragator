@@ -14,8 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateBlogServiceTest {
@@ -35,7 +33,7 @@ class UpdateBlogServiceTest {
   @Test
   void shouldNotUpdateBlogFromId() {
     //given
-    given(blogRepository.findById("1")).willReturn(Mono.empty());
+    given(blogRepository.findById("1")).willReturn(Optional.empty());
     //when
     //then
     assertThatThrownBy(() -> updateBlogService.refreshBlogFromId("1")).hasMessageContaining("Nie znaleziono bloga");
@@ -44,7 +42,7 @@ class UpdateBlogServiceTest {
   @Test
   void shouldUpdateBlogFromId() {
     //given
-    given(blogRepository.findById("1")).willReturn(Mono.just((new Blog())));
+    given(blogRepository.findById("1")).willReturn(Optional.of(new Blog()));
     //when
     updateBlogService.refreshBlogFromId("1");
 
@@ -57,7 +55,7 @@ class UpdateBlogServiceTest {
   void shouldRunUpdatesForAllBlogs() {
     //given
     ReflectionTestUtils.setField(updateBlogService, "enableJob", true);
-    given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
+    given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
     //when
     updateBlogService.updatesBlogs();
 

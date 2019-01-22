@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -29,39 +28,42 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
     @BeforeEach
     void setUp() {
-        blogRepository.deleteAll().block();
         blogService.evictBlogCache();
     }
 
     @Test
     void shouldUpdateBlog() throws ExecutionException, InterruptedException {
+        blogRepository.deleteAll();
         Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, null);
-        blogRepository.save(blog).block();
+        blogRepository.save(blog);
         CompletableFuture<Blog> voidFuture = asyncService.updateBlog(blog);
         voidFuture.get();
-        Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
+        Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
         assertAll(
-            () -> assertThat(updatedBlog.block().getItems()).isNotEmpty().hasSize(15),
-            () -> assertThat(updatedBlog.block().getLastUpdateDate()).isNotNull().isBefore(Instant.now())
+            () -> assertThat(updatedBlog).isPresent(),
+            () -> assertThat(updatedBlog.get().getItems()).isNotEmpty().hasSize(15),
+            () -> assertThat(updatedBlog.get().getLastUpdateDate()).isNotNull().isBefore(Instant.now())
         );
     }
 
     @Test
     void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() throws ExecutionException, InterruptedException {
-        Blog blog = blogRepository.save(new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now())).block();
+        blogRepository.deleteAll();
+        Blog blog = blogRepository.save(new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now()));
         CompletableFuture<Blog> voidFuture = asyncService.updateBlog(blog);
         voidFuture.get();
-        Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
+        Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
         assertAll(
-            () -> assertThat(updatedBlog.block().getItems()).isEmpty(),
-            () -> assertThat(updatedBlog.block().getLastUpdateDate()).isNotNull().isBefore(Instant.now())
+            () -> assertThat(updatedBlog).isPresent(),
+            () -> assertThat(updatedBlog.get().getItems()).isEmpty(),
+            () -> assertThat(updatedBlog.get().getLastUpdateDate()).isNotNull().isBefore(Instant.now())
         );
     }
 
     @Test
     void shouldNotUpdateBlog() {
         Blog blog = new Blog("https://devstyle.xxx", "DEVSTYLE", "devstyle", "https://devstyle.xxx/feed", null, null);
-        blogRepository.save(blog).block();
+        blogRepository.save(blog);
         assertThatThrownBy(() -> asyncService.updateBlog(blog).get())
             .isInstanceOf(ExecutionException.class)
             .hasCauseInstanceOf(RssException.class);

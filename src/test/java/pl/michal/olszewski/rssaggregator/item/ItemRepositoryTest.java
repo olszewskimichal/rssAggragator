@@ -37,7 +37,7 @@ public class ItemRepositoryTest {
     @BeforeEach
     void setUp() {
         itemRepository.deleteAll().block();
-        blogRepository.deleteAll().block();
+        blogRepository.deleteAll();
     }
 
     @Test
