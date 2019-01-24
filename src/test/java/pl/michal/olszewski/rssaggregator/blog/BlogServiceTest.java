@@ -13,15 +13,14 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
@@ -38,14 +37,14 @@ class BlogServiceTest {
   private BlogService blogService;
 
   @Mock
-  private BlogRepository blogRepository;
+  private BlogReactiveRepository blogRepository;
 
   @Mock
   private MongoTemplate itemRepository;
 
   @BeforeEach
   void setUp() {
-    when(blogRepository.save(any())).then(i -> i.getArgument(0));
+    when(blogRepository.save(any())).then(i -> Mono.just(i.getArgument(0)));
     when(itemRepository.save(any())).then(i -> Mono.just(i.getArgument(0)));
     blogService = new BlogService(blogRepository, Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault()), itemRepository);
   }
@@ -53,7 +52,8 @@ class BlogServiceTest {
   @Test
   void shouldCreateBlogFromDTO() {
     //given
-    BlogDTO blogDTO = BlogDTO.builder().name("test").build();
+    given(blogRepository.findByFeedURL("feedUrl1")).willReturn(Mono.empty());
+    BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl1").name("test").build();
     //when
     Mono<Blog> blog = blogService.createBlog(blogDTO);
     //then
@@ -63,7 +63,7 @@ class BlogServiceTest {
   @Test
   void shouldNotTryCreatingBlogWhenExist() {
     //given
-    given(blogRepository.findByFeedURL("nazwa")).willReturn(Optional.of(new Blog()));
+    given(blogRepository.findByFeedURL("nazwa")).willReturn(Mono.just(new Blog()));
 
     BlogDTO blogDTO = BlogDTO.builder().feedURL("nazwa").build();
     //when
@@ -77,7 +77,8 @@ class BlogServiceTest {
   void shouldCreateBlogWithCorrectProperties() {
     //given
     Instant now = Instant.now();
-    BlogDTO blogDTO = BlogDTO.builder().name("nazwa1").description("desc").feedURL("url").link("blogUrl1").publishedDate(now).build();
+    BlogDTO blogDTO = BlogDTO.builder().name("nazwa1").description("desc").feedURL("feedUrl3").link("blogUrl1").publishedDate(now).build();
+    given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Mono.empty());
     //when
     Mono<Blog> blog = blogService.createBlog(blogDTO);
     //then
@@ -86,7 +87,7 @@ class BlogServiceTest {
             () -> assertThat(v).isNotNull(),
             () -> assertThat(v.getDescription()).isEqualTo("desc"),
             () -> assertThat(v.getName()).isEqualTo("nazwa1"),
-            () -> assertThat(v.getFeedURL()).isEqualTo("url"),
+            () -> assertThat(v.getFeedURL()).isEqualTo("feedUrl3"),
             () -> assertThat(v.getBlogURL()).isEqualTo("blogUrl1"),
             () -> assertThat(v.getPublishedDate()).isAfterOrEqualTo(now).isBeforeOrEqualTo(now)
         ))
@@ -98,7 +99,8 @@ class BlogServiceTest {
   @Test
   void shouldPersistBlogOnCreate() {
     //given
-    BlogDTO blogDTO = BlogDTO.builder().build();
+    given(blogRepository.findByFeedURL("feedUrl5")).willReturn(Mono.empty());
+    BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl5").build();
     //when
     Mono<Blog> blog = blogService.createBlog(blogDTO);
     //then
@@ -110,8 +112,8 @@ class BlogServiceTest {
   void shouldNotCreateBlogWhenThrowException() {
     //given
     BlogDTO blogDTO = BlogDTO.builder().build();
-    given(blogRepository.save(any(Blog.class)))
-        .willThrow(new DuplicateKeyException("Blog o podanym url juz istnieje"));
+    Mockito.doThrow(new DuplicateKeyException("Blog o podanym url juz istnieje"))
+        .when(blogRepository).save(any());
     //when
     //then
     assertThatThrownBy(() -> blogService.createBlog(blogDTO)).isNotNull().hasMessage("Blog o podanym url juz istnieje");
@@ -120,8 +122,9 @@ class BlogServiceTest {
   @Test
   void shouldCreateBlogWith2Items() {
     //given
+    given(blogRepository.findByFeedURL("feedUrl2")).willReturn(Mono.empty());
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 2).mapToObj(v -> ItemDTO.builder().title("title" + v).build()).collect(Collectors.toList());
-    BlogDTO blogDTO = BlogDTO.builder().itemsList(itemsList).build();
+    BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl2").itemsList(itemsList).build();
     //when
     Mono<Blog> blog = blogService.createBlog(blogDTO);
     //then
@@ -139,7 +142,9 @@ class BlogServiceTest {
     Instant now = Instant.now();
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 2).mapToObj(v -> ItemDTO.builder().author("autor").date(now).description("desc").title(v + "").link("link" + v).build())
         .collect(Collectors.toList());
-    BlogDTO blogDTO = BlogDTO.builder().itemsList(itemsList).build();
+    BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl4").itemsList(itemsList).build();
+    given(blogRepository.findByFeedURL("feedUrl4")).willReturn(Mono.empty());
+
     //when
     Mono<Blog> blog = blogService.createBlog(blogDTO);
     //then
@@ -164,7 +169,7 @@ class BlogServiceTest {
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1).mapToObj(v -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(v + "").link("link" + v).build())
         .collect(Collectors.toList());
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(itemsList).build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
+    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
     //when
     Mono<Blog> updateBlog = blogService.updateBlog(blogDTO);
     //then
@@ -186,7 +191,8 @@ class BlogServiceTest {
     List<ItemDTO> itemsList = IntStream.rangeClosed(2, 2).mapToObj(v -> ItemDTO.builder().author("autor").description("desc").date(Instant.now()).title(v + "").link("link" + v).build())
         .collect(Collectors.toList());
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(itemsList).build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
+    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
+
     //when
     Mono<Blog> updateBlog = blogService.updateBlog(blogDTO);
     //then
@@ -206,7 +212,7 @@ class BlogServiceTest {
     Blog blog = new Blog("url", "", "url", "", null, null);
     blog.addItem(new Item(itemDTO), itemRepository);
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(Arrays.asList(itemDTO, itemDTO)).build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
+    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
     //when
     Mono<Blog> updateBlog = blogService.updateBlog(blogDTO);
     //then
@@ -221,7 +227,7 @@ class BlogServiceTest {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
+    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
     //when
     Mono<Blog> updateBlog = blogService.updateBlog(blogDTO);
     //then
@@ -236,7 +242,7 @@ class BlogServiceTest {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
     BlogDTO blogDTO = BlogDTO.builder().feedURL("url").description("desc").name("url").build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
+    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
     //when
     Mono<Blog> updateBlog = blogService.updateBlog(blogDTO);
     //then
@@ -251,7 +257,8 @@ class BlogServiceTest {
 
   @Test
   void shouldDeleteBlogById() {
-    given(blogRepository.findById("1")).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
+    given(blogRepository.delete(any())).willReturn(Mono.empty());
+    given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
 
     StepVerifier.create(blogService.deleteBlog("1"))
         .assertNext(v -> assertThat(v).isTrue())
@@ -261,7 +268,7 @@ class BlogServiceTest {
 
   @Test
   void shouldThrowExceptionOnDeleteWhenBlogNotExist() {
-    given(blogRepository.findById("1")).willReturn(Optional.empty());
+    given(blogRepository.findById("1")).willReturn(Mono.empty());
 
     assertThatThrownBy(() -> blogService.deleteBlog("1")).isNotNull().hasMessage("Nie znaleziono bloga = 1");
   }
@@ -269,7 +276,7 @@ class BlogServiceTest {
   @Test
   void shouldGetBlogDTOById() {
     //given
-    given(blogRepository.findById("1")).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
+    given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
     //when
     Mono<BlogDTO> blogById = blogService.getBlogDTOById("1");
     //then
@@ -279,15 +286,17 @@ class BlogServiceTest {
   @Test
   void shouldThrownExceptionWhenBlogDTOByIdNotExist() {
     //given
-    given(blogRepository.findById("1")).willReturn(Optional.empty());
+    given(blogRepository.findById("1")).willReturn(Mono.empty());
     //when
-    assertThatThrownBy(() -> blogService.getBlogDTOById("1")).isNotNull().hasMessage("Nie znaleziono bloga = 1");
+    StepVerifier.create(blogService.getBlogDTOById("1"))
+        .expectErrorMessage("Nie znaleziono bloga = 1")
+        .verify();
   }
 
   @Test
   void shouldGetEmptyBlogs() {
     //given
-    given(blogRepository.findAll()).willReturn(Collections.emptyList());
+    given(blogRepository.findAll()).willReturn(Flux.empty());
     //when
     Flux<Blog> blogs = blogService.getAllBlogs();
     //then
@@ -300,7 +309,7 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogs() {
     //given
-    given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
+    given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
     //when
     Flux<Blog> blogs = blogService.getAllBlogs();
     //then
@@ -313,7 +322,7 @@ class BlogServiceTest {
   @Test
   void shouldGetEmptyBlogsDTOs() {
     //given
-    given(blogRepository.findAll()).willReturn(Collections.emptyList());
+    given(blogRepository.findAll()).willReturn(Flux.empty());
     //when
     Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
     //then
@@ -326,7 +335,7 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogDTOs() {
     //given
-    given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
+    given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
     //when
     Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
     //then
@@ -339,7 +348,7 @@ class BlogServiceTest {
   @Test
   void shouldGetBlogDTOByName() {
     //given
-    given(blogRepository.findByName("name")).willReturn(Optional.of(new Blog("", "", "", "", null, null)));
+    given(blogRepository.findByName("name")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
     //when
     Mono<BlogDTO> blogById = blogService.getBlogDTOByName("name");
     //then
@@ -349,9 +358,11 @@ class BlogServiceTest {
   @Test
   void shouldThrownExceptionWhenBlogDTOByNameNotExist() {
     //given
-    given(blogRepository.findByName("name")).willReturn(Optional.empty());
+    given(blogRepository.findByName("name")).willReturn(Mono.empty());
     //when
-    assertThatThrownBy(() -> blogService.getBlogDTOByName("name")).isNotNull().hasMessage("Nie znaleziono bloga = name");
+    StepVerifier.create(blogService.getBlogDTOByName("name"))
+        .expectErrorMessage("Nie znaleziono bloga = name")
+        .verify();
   }
 
   @Test
@@ -360,7 +371,7 @@ class BlogServiceTest {
     Blog blog = new Blog("", "", "", "", null, null);
     blog.addItem(item, itemRepository);
 
-    given(blogRepository.findById("1")).willReturn(Optional.of(blog));
+    given(blogRepository.findById("1")).willReturn(Mono.just(blog));
     //when
     blogService.deleteBlog("1");
     //then

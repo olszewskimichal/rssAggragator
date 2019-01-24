@@ -3,7 +3,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 import java.time.Clock;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +21,11 @@ import reactor.core.publisher.Mono;
 @Slf4j
 class BlogService {
 
-  private final BlogRepository blogRepository;
+  private final BlogReactiveRepository blogRepository;
   private final MongoTemplate itemRepository;
   private final Clock clock;
 
-  public BlogService(BlogRepository blogRepository, Clock clock, MongoTemplate itemRepository) {
+  public BlogService(BlogReactiveRepository blogRepository, Clock clock, MongoTemplate itemRepository) {
     this.blogRepository = blogRepository;
     this.clock = clock;
     this.itemRepository = itemRepository;
@@ -35,28 +34,30 @@ class BlogService {
   @CacheEvict(value = {"blogs", "blogsDTO"}, allEntries = true)
   public Mono<Blog> createBlog(BlogDTO blogDTO) {
     log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
-    Optional<Blog> byFeedURL = blogRepository.findByFeedURL(blogDTO.getFeedURL());
-    if (!byFeedURL.isPresent()) {
-      log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
+    return blogRepository.findByFeedURL(blogDTO.getFeedURL())
+        .switchIfEmpty(createBlogg(blogDTO));
+  }
 
-      Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate(), null);
-      blogDTO.getItemsList().stream()
-          .map(Item::new)
-          .forEach(v -> blog.addItem(v, itemRepository));
-      blogRepository.save(blog);
-      return Mono.just(blog);
-    }
-    return Mono.just(byFeedURL.get());
+  private Mono<Blog> createBlogg(BlogDTO blogDTO) {
+    log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
+
+    Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate(), null);
+    blogDTO.getItemsList().stream()
+        .map(Item::new)
+        .forEach(v -> blog.addItem(v, itemRepository));
+    return blogRepository.save(blog);
   }
 
   private Mono<Blog> getBlogByName(String name) {
     log.debug("getBlogByName {}", name);
-    return Mono.just(blogRepository.findByName(name).orElseThrow(() -> new BlogNotFoundException(name)));
+    return blogRepository.findByName(name)
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(name)));
   }
 
   private Mono<Blog> getBlogByFeedUrl(String feedUrl) {
     log.debug("getBlogByFeedUrl {}", feedUrl);
-    return Mono.just(blogRepository.findByFeedURL(feedUrl).orElseThrow(() -> new BlogNotFoundException(feedUrl)));
+    return blogRepository.findByFeedURL(feedUrl)
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(feedUrl)));
   }
 
   @Transactional
@@ -71,7 +72,7 @@ class BlogService {
                   .filter(v -> !linkSet.contains(v.getLink()))
                   .forEach(v -> blog.addItem(v, itemRepository));
               blog.updateFromDto(blogDTO);
-              return Mono.just(blogRepository.save(blog));
+              return blogRepository.save(blog);
             }
         );
   }
@@ -79,18 +80,17 @@ class BlogService {
   @Cacheable("blogs")
   public Flux<Blog> getAllBlogs() {
     log.debug("Pobieram wszystkie blogi");
-    List<Blog> all = blogRepository.findAll();
-    log.debug("Znalazlem w bazie {} blogow", all.size());
-    log.trace("Wszystkie blogi to {}", all);
-    return Flux.fromIterable(all);
+    return blogRepository.findAll();
   }
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
   public Mono<Boolean> deleteBlog(String id) {
     log.debug("Usuwam bloga o id {}", id);
-    Blog blog = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
+    Blog blog = blogRepository.findById(id)
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
+        .block();
     if (blog.getItems().isEmpty()) {
-      blogRepository.delete(blog);
+      blogRepository.delete(blog).block();
       log.debug("usunalem blog {}", id);
       return Mono.just(true);
     } else {
@@ -103,9 +103,10 @@ class BlogService {
   @Transactional(readOnly = true)
   public Mono<BlogDTO> getBlogDTOById(String id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
-    Blog blogById = blogRepository.findById(id).orElseThrow(() -> new BlogNotFoundException(id));
-    return Mono.just(new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById)))
-        .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", blogById));
+    return blogRepository.findById(id)
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
+        .map(blogById -> (new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById))))
+        .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id));
   }
 
   @Cacheable("blogsName")
