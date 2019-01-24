@@ -3,10 +3,8 @@ package pl.michal.olszewski.rssaggregator.blog;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,7 +15,7 @@ class BlogCacheTest extends IntegrationTestBase {
   private BlogService service;
 
   @Autowired
-  private BlogRepository blogRepository;
+  private BlogReactiveRepository blogRepository;
 
   @Test
   void shouldReturnTheSameCollectionFromCache() {

@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.blog.BlogRepository;
+import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -30,12 +30,12 @@ public class ItemRepositoryTest {
     private ItemRepository itemRepository;
 
     @Autowired
-    private BlogRepository blogRepository;
+    private BlogReactiveRepository blogRepository;
 
     @BeforeEach
     void setUp() {
         itemRepository.deleteAll().block();
-        blogRepository.deleteAll();
+        blogRepository.deleteAll().block();
     }
 
     @Test
