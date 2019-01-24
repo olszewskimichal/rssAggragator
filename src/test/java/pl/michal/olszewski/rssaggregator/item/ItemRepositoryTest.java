@@ -23,77 +23,77 @@ import reactor.test.StepVerifier;
 @ActiveProfiles(Profiles.TEST)
 public class ItemRepositoryTest {
 
-    @Autowired
-    protected MongoTemplate entityManager;
+  @Autowired
+  protected MongoTemplate entityManager;
 
-    @Autowired
-    private ItemRepository itemRepository;
+  @Autowired
+  private ItemRepository itemRepository;
 
-    @Autowired
-    private BlogReactiveRepository blogRepository;
+  @Autowired
+  private BlogReactiveRepository blogRepository;
 
-    @BeforeEach
-    void setUp() {
-        itemRepository.deleteAll().block();
-        blogRepository.deleteAll().block();
-    }
+  @BeforeEach
+  void setUp() {
+    itemRepository.deleteAll().block();
+    blogRepository.deleteAll().block();
+  }
 
-    @Test
-    void shouldFind2NewestItems() {
-        //given
-        Blog blog = new Blog("url", "", "", "", null, null);
-        Instant instant = Instant.now();
-        entityManager.save(blog);
-        Item title1 = new Item(ItemDTO.builder().link("title1").date(instant).build());
-        Item title3 = new Item(ItemDTO.builder().link("title3").date(instant.plusSeconds(10)).build());
-        blog.addItem(title1, entityManager);
-        blog.addItem(new Item(ItemDTO.builder().link("title2").date(instant.minusSeconds(10)).build()), entityManager);
-        blog.addItem(title3, entityManager);
-        entityManager.save(blog);
+  @Test
+  void shouldFind2NewestItems() {
+    //given
+    Blog blog = new Blog("url", "", "", "", null, null);
+    Instant instant = Instant.now();
+    entityManager.save(blog);
+    Item title1 = new Item(ItemDTO.builder().link("title1").date(instant).build());
+    Item title3 = new Item(ItemDTO.builder().link("title3").date(instant.plusSeconds(10)).build());
+    blog.addItem(title1, entityManager);
+    blog.addItem(new Item(ItemDTO.builder().link("title2").date(instant.minusSeconds(10)).build()), entityManager);
+    blog.addItem(title3, entityManager);
+    entityManager.save(blog);
 
-        //when
-        Flux<Item> items = itemRepository.findAllBy(PageRequest.of(0, 2, new Sort(Direction.DESC, "date")));
+    //when
+    Flux<Item> items = itemRepository.findAllBy(PageRequest.of(0, 2, new Sort(Direction.DESC, "date")));
 
-        //then
-        StepVerifier.create(items)
-            .expectNextCount(2)
-            .expectComplete()
-            .verify();
-        StepVerifier.create(items)
-            .expectNext(title3)
-            .expectNext(title1)
-            .expectComplete()
-            .verify();
-    }
+    //then
+    StepVerifier.create(items)
+        .expectNextCount(2)
+        .expectComplete()
+        .verify();
+    StepVerifier.create(items)
+        .expectNext(title3)
+        .expectNext(title1)
+        .expectComplete()
+        .verify();
+  }
 
-    @Test
-    void shouldFindItemsWhenDateIsNull() {
-        //given
-        Blog blog = new Blog("url", "", "", "", null, null);
-        blog.addItem(new Item(ItemDTO.builder().link("title1").date(Instant.now()).build()), entityManager);
-        blog.addItem(new Item(ItemDTO.builder().link("title2").date(Instant.now()).build()), entityManager);
-        blog.addItem(new Item(ItemDTO.builder().link("title3").date(Instant.now()).build()), entityManager);
-        entityManager.save(blog);
+  @Test
+  void shouldFindItemsWhenDateIsNull() {
+    //given
+    Blog blog = new Blog("url", "", "", "", null, null);
+    blog.addItem(new Item(ItemDTO.builder().link("title1").date(Instant.now()).build()), entityManager);
+    blog.addItem(new Item(ItemDTO.builder().link("title2").date(Instant.now()).build()), entityManager);
+    blog.addItem(new Item(ItemDTO.builder().link("title3").date(Instant.now()).build()), entityManager);
+    entityManager.save(blog);
 
-        //when
-        Flux<Item> items = itemRepository.findAllBy(PageRequest.of(0, 2, new Sort(Direction.DESC, "date")));
+    //when
+    Flux<Item> items = itemRepository.findAllBy(PageRequest.of(0, 2, new Sort(Direction.DESC, "date")));
 
-        //then
-        StepVerifier.create(items)
-            .expectNextCount(2)
-            .expectComplete()
-            .verify();
-    }
+    //then
+    StepVerifier.create(items)
+        .expectNextCount(2)
+        .expectComplete()
+        .verify();
+  }
 
-    @Test
-    void shouldNotCreateItemByUniqueConstraint() {
-        Blog blog = new Blog("url", "", "", "", null, null);
-        blog.addItem(new Item(ItemDTO.builder().link("title1").build()), entityManager);
-        entityManager.save(blog);
-        assertThatThrownBy(() -> blog.addItem(new Item(ItemDTO.builder().link("title1").description("desc").build()), entityManager))
-            .hasMessageContaining("duplicate key error collection")
-            .hasCauseInstanceOf(MongoWriteException.class);
-    }
+  @Test
+  void shouldNotCreateItemByUniqueConstraint() {
+    Blog blog = new Blog("url", "", "", "", null, null);
+    blog.addItem(new Item(ItemDTO.builder().link("title1").build()), entityManager);
+    entityManager.save(blog);
+    assertThatThrownBy(() -> blog.addItem(new Item(ItemDTO.builder().link("title1").description("desc").build()), entityManager))
+        .hasMessageContaining("duplicate key error collection")
+        .hasCauseInstanceOf(MongoWriteException.class);
+  }
 
 
 }

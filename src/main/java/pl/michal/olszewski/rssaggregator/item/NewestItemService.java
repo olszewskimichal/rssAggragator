@@ -14,20 +14,20 @@ import reactor.core.publisher.Flux;
 @Slf4j
 class NewestItemService {
 
-    private final ItemRepository itemRepository;
+  private final ItemRepository itemRepository;
 
-    public NewestItemService(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
+  public NewestItemService(ItemRepository itemRepository) {
+    this.itemRepository = itemRepository;
+  }
 
-    Flux<ItemDTO> getNewestItems(int size) {
-        log.debug("Pobieram wpisy z limitem {}", size);
-        Flux<Item> items = itemRepository.findAllBy(PageRequest.of(0, size, new Sort(Direction.DESC, "date")));
-        return items.map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()));
-    }
+  Flux<ItemDTO> getNewestItems(int size) {
+    log.debug("Pobieram wpisy z limitem {}", size);
+    Flux<Item> items = itemRepository.findAllBy(PageRequest.of(0, size, new Sort(Direction.DESC, "date")));
+    return items.map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()));
+  }
 
-    @CacheEvict(value = {"items"}, allEntries = true)
-    public void evictItemsCache() {
-        log.debug("Czyszcze cache dla itemów");
-    }
+  @CacheEvict(value = {"items"}, allEntries = true)
+  public void evictItemsCache() {
+    log.debug("Czyszcze cache dla itemów");
+  }
 }
