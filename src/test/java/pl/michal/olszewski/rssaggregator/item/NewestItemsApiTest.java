@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.blog.BlogRepository;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
@@ -14,6 +15,9 @@ class NewestItemsApiTest extends IntegrationTestBase {
 
   @Autowired
   private ItemRepository itemRepository;
+
+  @Autowired
+  private MongoTemplate entityManager;
 
   @Autowired
   private NewestItemService blogService;
@@ -56,7 +60,7 @@ class NewestItemsApiTest extends IntegrationTestBase {
   }
 
   private ItemListFactory givenItem() {
-    return new ItemListFactory(repository, itemRepository);
+    return new ItemListFactory(repository, entityManager);
   }
 
   private ListBodySpec<ItemDTO> thenGetItemsFromApi() {

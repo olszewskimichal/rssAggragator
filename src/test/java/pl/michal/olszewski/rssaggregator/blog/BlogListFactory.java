@@ -5,17 +5,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
-import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 
 @Slf4j
 class BlogListFactory {
 
   private final BlogRepository repository;
-  private final ItemRepository itemRepository;
+  private final MongoTemplate itemRepository;
 
-  BlogListFactory(BlogRepository repository, ItemRepository itemRepository) {
+  BlogListFactory(BlogRepository repository, MongoTemplate itemRepository) {
     this.repository = repository;
     this.itemRepository = itemRepository;
   }

@@ -92,6 +92,7 @@ public class RssExtractorService {
       log.trace("getBlog STOP {} {} {}", feedURL, blogURL, lastUpdatedDate);
       return blogInfo;
     } catch (IOException | FeedException e) {
+      log.error("wystapił bład przy pobieraniu bloga o url {}", blogURL, e);
       throw new RssException(feedURL, e);
     }
   }

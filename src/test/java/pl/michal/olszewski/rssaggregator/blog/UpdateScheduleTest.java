@@ -1,19 +1,17 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.net.UnknownHostException;
+import java.time.Instant;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-
-import java.time.Instant;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 
 class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLogger {
@@ -32,12 +30,11 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     }
 
     @Test
-    void shouldUpdateBlog() throws ExecutionException, InterruptedException {
+    void shouldUpdateBlog() {
         blogRepository.deleteAll();
         Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, null);
         blogRepository.save(blog);
-        CompletableFuture<Blog> voidFuture = asyncService.updateBlog(blog);
-        voidFuture.get();
+        Boolean voidFuture = asyncService.updateBlog(blog);
         Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
         assertAll(
             () -> assertThat(updatedBlog).isPresent(),
@@ -47,11 +44,10 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     }
 
     @Test
-    void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() throws ExecutionException, InterruptedException {
+    void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() {
         blogRepository.deleteAll();
         Blog blog = blogRepository.save(new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now()));
-        CompletableFuture<Blog> voidFuture = asyncService.updateBlog(blog);
-        voidFuture.get();
+        Boolean voidFuture = asyncService.updateBlog(blog);
         Optional<Blog> updatedBlog = blogRepository.findById(blog.getId());
         assertAll(
             () -> assertThat(updatedBlog).isPresent(),
@@ -64,8 +60,8 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     void shouldNotUpdateBlog() {
         Blog blog = new Blog("https://devstyle.xxx", "DEVSTYLE", "devstyle", "https://devstyle.xxx/feed", null, null);
         blogRepository.save(blog);
-        assertThatThrownBy(() -> asyncService.updateBlog(blog).get())
-            .isInstanceOf(ExecutionException.class)
-            .hasCauseInstanceOf(RssException.class);
+        assertThatThrownBy(() -> asyncService.updateBlog(blog))
+            .isInstanceOf(RssException.class)
+            .hasCauseInstanceOf(UnknownHostException.class);
     }
 }

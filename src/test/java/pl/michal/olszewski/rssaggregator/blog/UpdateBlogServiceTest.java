@@ -6,14 +6,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.util.Collections;
-import java.util.Optional;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.test.util.ReflectionTestUtils;
 import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class UpdateBlogServiceTest {
@@ -21,19 +22,19 @@ class UpdateBlogServiceTest {
   private UpdateBlogService updateBlogService;
 
   @Mock
-  private BlogRepository blogRepository;
+  private BlogReactiveRepository blogRepository;
   @Mock
   private AsyncService asyncService;
 
   @BeforeEach
   void setUp() {
-    updateBlogService = new UpdateBlogService(blogRepository, asyncService);
+    updateBlogService = new UpdateBlogService(blogRepository, asyncService, Executors.newSingleThreadExecutor());
   }
 
   @Test
   void shouldNotUpdateBlogFromId() {
     //given
-    given(blogRepository.findById("1")).willReturn(Optional.empty());
+    given(blogRepository.findById("1")).willReturn(Mono.empty());
     //when
     //then
     assertThatThrownBy(() -> updateBlogService.refreshBlogFromId("1")).hasMessageContaining("Nie znaleziono bloga");
@@ -42,7 +43,7 @@ class UpdateBlogServiceTest {
   @Test
   void shouldUpdateBlogFromId() {
     //given
-    given(blogRepository.findById("1")).willReturn(Optional.of(new Blog()));
+    given(blogRepository.findById("1")).willReturn(Mono.just(new Blog()));
     //when
     updateBlogService.refreshBlogFromId("1");
 
@@ -55,7 +56,7 @@ class UpdateBlogServiceTest {
   void shouldRunUpdatesForAllBlogs() {
     //given
     ReflectionTestUtils.setField(updateBlogService, "enableJob", true);
-    given(blogRepository.findAll()).willReturn(Collections.singletonList(new Blog()));
+    given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
     //when
     updateBlogService.updatesBlogs();
 

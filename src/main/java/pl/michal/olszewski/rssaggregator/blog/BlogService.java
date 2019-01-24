@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
-import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -23,10 +23,10 @@ import reactor.core.publisher.Mono;
 class BlogService {
 
   private final BlogRepository blogRepository;
-  private final ItemRepository itemRepository;
+  private final MongoTemplate itemRepository;
   private final Clock clock;
 
-  public BlogService(BlogRepository blogRepository, Clock clock, ItemRepository itemRepository) {
+  public BlogService(BlogRepository blogRepository, Clock clock, MongoTemplate itemRepository) {
     this.blogRepository = blogRepository;
     this.clock = clock;
     this.itemRepository = itemRepository;

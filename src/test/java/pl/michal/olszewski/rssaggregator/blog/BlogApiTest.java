@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
@@ -23,6 +24,9 @@ class BlogApiTest extends IntegrationTestBase {
 
   @Autowired
   private ItemRepository itemRepository;
+
+  @Autowired
+  private MongoTemplate mongoTemplate;
 
   @Autowired
   private BlogService blogService;
@@ -152,7 +156,7 @@ class BlogApiTest extends IntegrationTestBase {
   }
 
   private BlogListFactory givenBlog() {
-    return new BlogListFactory(blogRepository, itemRepository);
+    return new BlogListFactory(blogRepository, mongoTemplate);
   }
 
   private ListBodySpec<BlogDTO> thenGetBlogsFromApi() {

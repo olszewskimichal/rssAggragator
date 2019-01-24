@@ -1,15 +1,16 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import java.util.stream.IntStream;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogRepository;
 
 class ItemListFactory {
 
   private final BlogRepository repository;
-  private final ItemRepository itemRepository;
+  private final MongoTemplate itemRepository;
 
-  ItemListFactory(BlogRepository repository, ItemRepository itemRepository) {
+  ItemListFactory(BlogRepository repository, MongoTemplate itemRepository) {
     this.repository = repository;
     this.itemRepository = itemRepository;
   }
