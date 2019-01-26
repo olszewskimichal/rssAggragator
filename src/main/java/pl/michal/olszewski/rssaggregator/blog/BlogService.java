@@ -110,7 +110,8 @@ class BlogService {
   @Transactional(readOnly = true)
   public Mono<BlogDTO> getBlogDTOByName(String name) {
     log.debug("pobieram bloga w postaci DTO o nazwie {} {}", name, clock.instant());
-    return getBlogByName(name).map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v))) //TODO skrocic linie
+    return getBlogByName(name)
+        .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v))) //TODO skrocic linie
         .doOnEach(blogDTO -> log.trace("getBlogDTOByName {}", blogDTO));
   }
 
@@ -125,7 +126,10 @@ class BlogService {
   }
 
   private List<ItemDTO> extractItems(Blog v) {
-    return v.getItems().stream().parallel().map(item -> new ItemDTO(item.getTitle(), item.getDescription(), item.getLink(), item.getDate(), item.getAuthor())).collect(Collectors.toList()); //TODO skrocic linie
+    return v.getItems().stream()
+        .parallel()
+        .map(ItemDTO::new)
+        .collect(Collectors.toList());
   }
 
   private int getLimit(final Integer size) {

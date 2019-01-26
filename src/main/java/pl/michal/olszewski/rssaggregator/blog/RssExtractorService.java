@@ -27,7 +27,7 @@ public class RssExtractorService {
   private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
     return syndFeed.getEntries().parallelStream()
-        .filter(v -> v.getPublishedDate().toInstant().isAfter(lastUpdatedDate))
+        .filter(entry -> entry.getPublishedDate().toInstant().isAfter(lastUpdatedDate))
         .map(entry -> new ItemDTO(
             entry.getTitle(),
             entry.getDescription() != null ? entry.getDescription().getValue() : "",

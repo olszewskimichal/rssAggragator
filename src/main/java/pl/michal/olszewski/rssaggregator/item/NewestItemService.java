@@ -20,7 +20,8 @@ class NewestItemService {
     Flux<ItemDTO> getNewestItems(int size) {
         log.debug("Pobieram wpisy z limitem {}", size);
         Flux<Item> items = itemRepository.findAllNew(size);
-        return items.map(v -> new ItemDTO(v.getTitle(), v.getDescription(), v.getLink(), v.getDate(), v.getAuthor()));
+        return items
+            .map(ItemDTO::new);
     }
 
     @CacheEvict(value = {"items"}, allEntries = true)
