@@ -63,7 +63,7 @@ class BlogEndPoint {
 
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public Mono<Boolean> deleteBlog(@PathVariable("id") String blogId) {
+  public Mono<Void> deleteBlog(@PathVariable("id") String blogId) {
     log.debug("DELETE - deleteBlog {}", blogId);
     return blogService.deleteBlog(blogId);
   }

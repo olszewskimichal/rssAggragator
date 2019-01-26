@@ -84,20 +84,17 @@ class BlogService {
   }
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
-  public Mono<Boolean> deleteBlog(String id) {
+  public Mono<Void> deleteBlog(String id) {
     log.debug("Usuwam bloga o id {}", id);
-    Blog blog = blogRepository.findById(id)
+    return blogRepository.findById(id)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .block(); //TODO Pozbvc sie blocka
-    if (blog.getItems().isEmpty()) {
-      blogRepository.delete(blog).block(); //TODO pozbyc sie bloka
-      log.debug("usunalem blog {}", id);
-      return Mono.just(true); //TODO nie wiem czy jest sens zwracac cos takiego
-    } else {
-      log.debug("Nie moglem usunac bloga wiec zmieniam jego aktywnosc {}", id);
-      blog.deactive();
-      return Mono.just(false);
-    }
+        .flatMap(v -> {
+          if (v.getItems().isEmpty()) {
+            return blogRepository.delete(v);
+          }
+          v.deactive();
+          return Mono.empty();
+        });
   }
 
   @Transactional(readOnly = true)

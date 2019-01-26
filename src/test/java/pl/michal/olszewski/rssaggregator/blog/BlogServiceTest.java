@@ -261,7 +261,6 @@ class BlogServiceTest {
     given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
 
     StepVerifier.create(blogService.deleteBlog("1"))
-        .assertNext(v -> assertThat(v).isTrue())
         .expectComplete()
         .verify();
   }
@@ -270,7 +269,7 @@ class BlogServiceTest {
   void shouldThrowExceptionOnDeleteWhenBlogNotExist() {
     given(blogRepository.findById("1")).willReturn(Mono.empty());
 
-    assertThatThrownBy(() -> blogService.deleteBlog("1")).isNotNull().hasMessage("Nie znaleziono bloga = 1");
+    assertThatThrownBy(() -> blogService.deleteBlog("1").block()).isNotNull().hasMessage("Nie znaleziono bloga = 1");
   }
 
   @Test
@@ -373,7 +372,7 @@ class BlogServiceTest {
 
     given(blogRepository.findById("1")).willReturn(Mono.just(blog));
     //when
-    blogService.deleteBlog("1");
+    blogService.deleteBlog("1").block();
     //then
     assertThat(blog.isActive()).isFalse();
   }
