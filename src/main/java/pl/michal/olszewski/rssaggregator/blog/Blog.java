@@ -47,6 +47,14 @@ public class Blog {
     this.lastUpdateDate = lastUpdateDate;
   }
 
+  public Blog(BlogDTO blogDTO) {
+    this.blogURL = blogDTO.getLink();
+    this.description = blogDTO.getDescription();
+    this.name = blogDTO.getName();
+    this.feedURL = blogDTO.getFeedURL();
+    this.publishedDate = blogDTO.getPublishedDate();
+  }
+
   public Set<Item> getItems() {
     return Collections.unmodifiableSet(items);
   }
