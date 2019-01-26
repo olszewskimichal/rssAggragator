@@ -45,9 +45,10 @@ class UpdateBlogService {
 
   public void refreshBlogFromId(String id) {
     log.debug("Odswiezam bloga o id {}", id);
-    Mono<Blog> blog = repository.findById(id)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)));
-    asyncService.updateBlog(blog.block()); //TODO usunac blocka
+    repository.findById(id)
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
+        .map(asyncService::updateBlog)
+        .subscribe();
   }
 
 }
