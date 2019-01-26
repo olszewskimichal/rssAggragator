@@ -36,7 +36,7 @@ class NewestItemServiceTest {
     //given
     List<Item> itemList = IntStream.rangeClosed(1, 10).parallel().mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())).collect(Collectors.toList());
 
-    given(itemRepository.findAllBy(PageRequest.of(0, 10, new Sort(Direction.DESC, "date")))).willReturn(Flux.fromIterable(itemList));
+    given(itemRepository.findAllNew( 10)).willReturn(Flux.fromIterable(itemList));
     //when
     Flux<ItemDTO> newestItems = itemService.getNewestItems(10);
     //then

@@ -53,7 +53,7 @@ public class ItemRepositoryTest {
     entityManager.save(blog);
 
     //when
-    Flux<Item> items = itemRepository.findAllBy(PageRequest.of(0, 2, new Sort(Direction.DESC, "date")));
+    Flux<Item> items = itemRepository.findAllNew(2);
 
     //then
     StepVerifier.create(items)
@@ -78,8 +78,7 @@ public class ItemRepositoryTest {
     entityManager.save(blog);
 
     //when
-    Flux<Item> items = itemRepository.findAllBy(PageRequest.of(0, 2, new Sort(Direction.DESC, "date")));
-
+    Flux<Item> items = itemRepository.findAllNew(2);
     //then
     StepVerifier.create(items)
         .expectNextCount(2)
