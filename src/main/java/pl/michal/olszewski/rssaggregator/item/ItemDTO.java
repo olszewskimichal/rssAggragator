@@ -25,7 +25,7 @@ public class ItemDTO {
 
   @JsonCreator
   public ItemDTO(@JsonProperty("title") String title, @JsonProperty("description") String description, @JsonProperty("link") String link, @JsonProperty("date") Instant date,
-      @JsonProperty("author") String author) {
+      @JsonProperty("author") String author) { //TODO skrocic linie
     this.title = title;
     this.description = description;
     this.link = link;

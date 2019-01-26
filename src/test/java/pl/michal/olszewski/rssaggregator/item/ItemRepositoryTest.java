@@ -35,9 +35,10 @@ public class ItemRepositoryTest {
   @BeforeEach
   void setUp() {
     itemRepository.deleteAll().block();
-    blogRepository.deleteAll().block();
+    blogRepository.deleteAll().block(); //TODO pomyslec co zrobic z blockami
   }
 
+  //TODO za dlugie given
   @Test
   void shouldFind2NewestItems() {
     //given
@@ -66,6 +67,7 @@ public class ItemRepositoryTest {
         .verify();
   }
 
+  //TODO za dlugie given
   @Test
   void shouldFindItemsWhenDateIsNull() {
     //given
@@ -85,6 +87,7 @@ public class ItemRepositoryTest {
         .verify();
   }
 
+  //TODO rozbic na 3 sekcje
   @Test
   void shouldNotCreateItemByUniqueConstraint() {
     Blog blog = new Blog("url", "", "", "", null, null);

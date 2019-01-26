@@ -41,7 +41,7 @@ class BlogService {
   private Mono<Blog> createBlogg(BlogDTO blogDTO) {
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
 
-    Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate(), null);
+    Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate(), null); //TODO za dluga linia
     blogDTO.getItemsList().stream()
         .map(Item::new)
         .forEach(v -> blog.addItem(v, itemRepository));
@@ -88,11 +88,11 @@ class BlogService {
     log.debug("Usuwam bloga o id {}", id);
     Blog blog = blogRepository.findById(id)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .block();
+        .block(); //TODO Pozbvc sie blocka
     if (blog.getItems().isEmpty()) {
-      blogRepository.delete(blog).block();
+      blogRepository.delete(blog).block(); //TODO pozbyc sie bloka
       log.debug("usunalem blog {}", id);
-      return Mono.just(true);
+      return Mono.just(true); //TODO nie wiem czy jest sens zwracac cos takiego
     } else {
       log.debug("Nie moglem usunac bloga wiec zmieniam jego aktywnosc {}", id);
       blog.deactive();
@@ -105,7 +105,7 @@ class BlogService {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
     return blogRepository.findById(id)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .map(blogById -> (new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById))))
+        .map(blogById -> (new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById)))) //TODO skrocic linie
         .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id));
   }
 
@@ -113,7 +113,7 @@ class BlogService {
   @Transactional(readOnly = true)
   public Mono<BlogDTO> getBlogDTOByName(String name) {
     log.debug("pobieram bloga w postaci DTO o nazwie {} {}", name, clock.instant());
-    return getBlogByName(name).map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v)))
+    return getBlogByName(name).map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v))) //TODO skrocic linie
         .doOnEach(blogDTO -> log.trace("getBlogDTOByName {}", blogDTO));
   }
 
@@ -123,12 +123,12 @@ class BlogService {
     log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
     Flux<BlogDTO> dtoFlux = getAllBlogs()
         .take(getLimit(limit))  //TODO refactor do Pageable
-        .map(blog -> new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog)));
+        .map(blog -> new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog))); //TODO skrocic linie
     return dtoFlux.doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }
 
   private List<ItemDTO> extractItems(Blog v) {
-    return v.getItems().stream().parallel().map(item -> new ItemDTO(item.getTitle(), item.getDescription(), item.getLink(), item.getDate(), item.getAuthor())).collect(Collectors.toList());
+    return v.getItems().stream().parallel().map(item -> new ItemDTO(item.getTitle(), item.getDescription(), item.getLink(), item.getDate(), item.getAuthor())).collect(Collectors.toList()); //TODO skrocic linie
   }
 
   private int getLimit(final Integer size) {

@@ -69,7 +69,7 @@ class BlogServiceTest {
     //when
     Mono<Blog> blog = blogService.createBlog(blogDTO);
     //then
-    verify(blogRepository, times(1)).findByFeedURL("nazwa");
+    verify(blogRepository, times(1)).findByFeedURL("nazwa"); //TODO moze jest cos lepszego do mockowania FLuxow i mono
     assertThat(blog).isNotNull();
   }
 
@@ -77,7 +77,7 @@ class BlogServiceTest {
   void shouldCreateBlogWithCorrectProperties() {
     //given
     Instant now = Instant.now();
-    BlogDTO blogDTO = BlogDTO.builder().name("nazwa1").description("desc").feedURL("feedUrl3").link("blogUrl1").publishedDate(now).build();
+    BlogDTO blogDTO = BlogDTO.builder().name("nazwa1").description("desc").feedURL("feedUrl3").link("blogUrl1").publishedDate(now).build(); //TODO skrocic link
     given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Mono.empty());
     //when
     Mono<Blog> blog = blogService.createBlog(blogDTO);
@@ -123,7 +123,7 @@ class BlogServiceTest {
   void shouldCreateBlogWith2Items() {
     //given
     given(blogRepository.findByFeedURL("feedUrl2")).willReturn(Mono.empty());
-    List<ItemDTO> itemsList = IntStream.rangeClosed(1, 2).mapToObj(v -> ItemDTO.builder().title("title" + v).build()).collect(Collectors.toList());
+    List<ItemDTO> itemsList = IntStream.rangeClosed(1, 2).mapToObj(v -> ItemDTO.builder().title("title" + v).build()).collect(Collectors.toList()); //TODO przerobic linie
     BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl2").itemsList(itemsList).build();
     //when
     Mono<Blog> blog = blogService.createBlog(blogDTO);
@@ -140,7 +140,7 @@ class BlogServiceTest {
   @Test
   void shouldCreateItemsWithCorrectProperties() {
     Instant now = Instant.now();
-    List<ItemDTO> itemsList = IntStream.rangeClosed(1, 2).mapToObj(v -> ItemDTO.builder().author("autor").date(now).description("desc").title(v + "").link("link" + v).build())
+    List<ItemDTO> itemsList = IntStream.rangeClosed(1, 2).mapToObj(v -> ItemDTO.builder().author("autor").date(now).description("desc").title(v + "").link("link" + v).build()) //TODO przerobic linie
         .collect(Collectors.toList());
     BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl4").itemsList(itemsList).build();
     given(blogRepository.findByFeedURL("feedUrl4")).willReturn(Mono.empty());
@@ -166,7 +166,7 @@ class BlogServiceTest {
   void shouldUpdateBlogWhenNewItemAdd() {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
-    List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1).mapToObj(v -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(v + "").link("link" + v).build())
+    List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1).mapToObj(v -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(v + "").link("link" + v).build()) //przerobic linie
         .collect(Collectors.toList());
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(itemsList).build();
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
@@ -188,7 +188,7 @@ class BlogServiceTest {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
     blog.addItem(new Item(ItemDTO.builder().title("title").build()), itemRepository);
-    List<ItemDTO> itemsList = IntStream.rangeClosed(2, 2).mapToObj(v -> ItemDTO.builder().author("autor").description("desc").date(Instant.now()).title(v + "").link("link" + v).build())
+    List<ItemDTO> itemsList = IntStream.rangeClosed(2, 2).mapToObj(v -> ItemDTO.builder().author("autor").description("desc").date(Instant.now()).title(v + "").link("link" + v).build()) //TODO przerobic linie
         .collect(Collectors.toList());
     BlogDTO blogDTO = BlogDTO.builder().name("url").feedURL("url").itemsList(itemsList).build();
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
@@ -205,7 +205,7 @@ class BlogServiceTest {
         .verify();
   }
 
-  @Test
+  @Test //TODO zmniejszyc liczbe linii w sekcji given
   void shouldNotAddItemWhenIsTheSame() {
     //given
     ItemDTO itemDTO = ItemDTO.builder().title("title").date(Instant.now()).build();

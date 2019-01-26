@@ -25,8 +25,8 @@ class AsyncService {
   public Boolean updateBlog(Blog v) {
     log.debug("START updateBlog dla blog {}", v.getName());
     try {
-      BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(v.getFeedURL())), v.getFeedURL(), v.getBlogURL(), v.getLastUpdateDate() == null ? Instant.MIN : v.getLastUpdateDate());
-      blogService.updateBlog(blogDTO).subscribeOn(Schedulers.parallel()).block();
+      BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(v.getFeedURL())), v.getFeedURL(), v.getBlogURL(), v.getLastUpdateDate() == null ? Instant.MIN : v.getLastUpdateDate()); //TODO skrocic linie
+      blogService.updateBlog(blogDTO).subscribeOn(Schedulers.parallel()).block(); //TODO pozbyc sie blocka
       log.debug("STOP updateBlog dla blog {}", v.getName());
       return true;
     } catch (IOException e) {

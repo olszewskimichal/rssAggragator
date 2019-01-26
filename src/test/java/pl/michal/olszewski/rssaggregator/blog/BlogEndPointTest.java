@@ -32,7 +32,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusNotFoundWhenBlogNotExist() {
-    given(blogService.getBlogDTOById("1")).willThrow(new BlogNotFoundException("aaa"));
+    given(blogService.getBlogDTOById("1")).willThrow(new BlogNotFoundException("aaa"));  //TODO TO chyba powinno zwrocic mono.error
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()

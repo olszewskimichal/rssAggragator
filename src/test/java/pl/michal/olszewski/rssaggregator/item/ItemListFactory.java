@@ -15,6 +15,7 @@ class ItemListFactory {
     this.itemRepository = itemRepository;
   }
 
+  //TODO zrefaktorowac
   void buildNumberOfItemsAndSave(int numberOfItems) {
     Blog blog = new Blog("blog997", "", "", "", null, null);
     IntStream.rangeClosed(1, numberOfItems).parallel().forEachOrdered(v -> blog.addItem(new Item(ItemDTO.builder().link("link" + v).title("title" + v).build()), itemRepository));

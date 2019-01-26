@@ -15,7 +15,7 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 @Builder
 @ToString
 @NoArgsConstructor
-class BlogDTO {
+class BlogDTO { //TODO czy idzie zrobic to niemutowalne?
 
   private String link;
   private String description;

@@ -72,7 +72,7 @@ class BlogApiTest extends IntegrationTestBase {
   void should_get_one_blog() {
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
-    BlogDTO expected = new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), new ArrayList<>());
+    BlogDTO expected = new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), new ArrayList<>()); //TODO skrocic linie
 
     BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
 
@@ -99,7 +99,7 @@ class BlogApiTest extends IntegrationTestBase {
     Instant instant = Instant.now();
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
-    BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "desc", blog.getName(), "", instant, new ArrayList<>());
+    BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "desc", blog.getName(), "", instant, new ArrayList<>()); //TODO skrocic linie
 
     //when
     thenUpdateBlogByApi(blogDTO);
@@ -120,30 +120,34 @@ class BlogApiTest extends IntegrationTestBase {
     thenDeleteOneBlogFromApi(blog.getId());
 
     //then
-    assertThat(blogRepository.findById(blog.getId()).block()).isNull();
+    assertThat(blogRepository.findById(blog.getId()).block()).isNull(); //TODO pozbyc sie blocka - zamienic na StepVerifier
   }
 
   @Test
   void should_get_one_blogWith2Items() {
+    //given
     Blog blog = givenBlog()
         .buildBlogWithItemsAndSave(2);
-
+    //when
     BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
+    //then
     blogDTO.value(v -> assertThat(v).isNotNull());
   }
 
   @Test
   void should_get_all_blogs_with_items() {
+    //given
     givenBlog()
         .buildBlogWithItemsAndSave(2);
-
+    //when
     ListBodySpec<BlogDTO> dtos = thenGetBlogsFromApi();
+    //then
     dtos.hasSize(1);
     dtos.value(v -> assertThat(v.get(0).getItemsList()).isNotNull().hasSize(2));
   }
 
   @Test
-  void should_evictCache() {
+  void should_evictCache() { //TODO chyba podobny test jest w BlogCacheTescie - trzeba sprawdzic czy nie lepiej tam to przeniesc
     Flux<Blog> blogs = blogService.getAllBlogs();
     Flux<Blog> blogsNotCached = blogService.getAllBlogs();
     assertSame(blogs, blogsNotCached);
@@ -151,8 +155,8 @@ class BlogApiTest extends IntegrationTestBase {
 
     blogs = blogService.getAllBlogs();
     thenEvictCache();
-    blogsNotCached = blogService.getAllBlogs();
-    assertNotSame(blogs, blogsNotCached);
+    blogsNotCached = blogService.getAllBlogs(); //TODO
+    assertNotSame(blogs, blogsNotCached);  //TODO sprawdzic czy to aby na pewno dziala
   }
 
   private BlogListFactory givenBlog() {
@@ -180,7 +184,7 @@ class BlogApiTest extends IntegrationTestBase {
         .expectStatus().isOk()
         .expectBodyList(BlogDTO.class);
   }
-
+//TODO pozbyc sie template a uzyc webTestClienta
   private void thenCreateBlogByApi(String link) {
     template.postForEntity(String.format("http://localhost:%s/api/v1/blogs", port), BlogDTO.builder().link(link).build(), BlogDTO.class);
   }

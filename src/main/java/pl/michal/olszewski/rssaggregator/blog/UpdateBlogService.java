@@ -34,11 +34,11 @@ class UpdateBlogService {
     if (enableJob) {
       log.debug("zaczynam aktualizacje blogów");
       Mono<List<Boolean>> collect = repository.findAll()
-          .flatMap(v -> Mono.fromCallable(() -> asyncService.updateBlog(v)).subscribeOn(Schedulers.fromExecutor(executor)).onErrorReturn(false))
+          .flatMap(v -> Mono.fromCallable(() -> asyncService.updateBlog(v)).subscribeOn(Schedulers.fromExecutor(executor)).onErrorReturn(false)) //TODO skrocic linie
           .collectList();
       Flux.merge(collect)
           .subscribeOn(Schedulers.parallel())
-          .collectList().block();
+          .collectList().block(); //TODO usunac blocka
       log.debug("Aktualizacja zakończona");
     }
   }
@@ -47,7 +47,7 @@ class UpdateBlogService {
     log.debug("Odswiezam bloga o id {}", id);
     Mono<Blog> blog = repository.findById(id)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)));
-    asyncService.updateBlog(blog.block());
+    asyncService.updateBlog(blog.block()); //TODO usunac blocka
   }
 
 }

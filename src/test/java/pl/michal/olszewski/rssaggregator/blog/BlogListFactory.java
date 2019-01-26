@@ -9,6 +9,7 @@ import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import reactor.core.publisher.Mono;
 
+//TODO przerobic calosc
 @Slf4j
 class BlogListFactory {
 

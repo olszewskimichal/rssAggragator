@@ -14,14 +14,11 @@ class BlogCacheTest extends IntegrationTestBase {
   @Autowired
   private BlogService service;
 
-  @Autowired
-  private BlogReactiveRepository blogRepository;
-
   @Test
   void shouldReturnTheSameCollectionFromCache() {
     Flux<Blog> allBlogs = service.getAllBlogs();
     Flux<Blog> cacheBlogs = service.getAllBlogs();
-    assertSame(allBlogs, cacheBlogs);
+    assertSame(allBlogs, cacheBlogs);  //TODO sprawdzic czy Same na FLuxie dziala
   }
 
   @Test
@@ -35,7 +32,7 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldAfterCreateNewBlogAndReturnNotTheSameCollection() {
     Flux<Blog> allBlogs = service.getAllBlogs();
-    service.createBlog(BlogDTO.builder().name("nazwa2").build());
+    service.createBlog(BlogDTO.builder().name("nazwa2").build()); //TODO block albo jakaas alternatywa bo to wcale nic nie sprawdza
     Flux<Blog> cacheBlogs = service.getAllBlogs();
     assertNotSame(allBlogs, cacheBlogs);
   }
@@ -47,7 +44,7 @@ class BlogCacheTest extends IntegrationTestBase {
     Flux<Blog> allBlogs = service.getAllBlogs();
     Flux<Blog> cacheBlogs = service.getAllBlogs();
     assertSame(allBlogs, cacheBlogs);
-    service.deleteBlog(blog.getId());
+    service.deleteBlog(blog.getId());  //TODO block lub cos podobnego bo nie mam pewnosci czy usunieto
 
     cacheBlogs = service.getAllBlogs();
     assertNotSame(allBlogs, cacheBlogs);
@@ -58,7 +55,7 @@ class BlogCacheTest extends IntegrationTestBase {
   void shouldFindByNameFromCache() {
     service.createBlog(BlogDTO.builder().name("nazwa").build());
     Mono<BlogDTO> byName = service.getBlogDTOByName("nazwa");
-    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa");
+    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa"); 
     assertSame(byName, cachedDTO);
   }
 

@@ -32,7 +32,7 @@ class AtomReadRomeTest {
   @Test
   void shouldCorrectTransformXmlToRome() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL", Instant.MIN);
+      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL", Instant.MIN); //TODO skrocic linie
       assertAll(
           () -> assertThat(blog).isNotNull(),
           () -> assertThat(blog.getFeedURL()).isEqualTo("feedURL")
@@ -45,7 +45,7 @@ class AtomReadRomeTest {
   @Test
   void shouldTransformWithCorrectTitle() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL", Instant.MIN);
+      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL", Instant.MIN); //TODO skrocic linie
       assertThat(blog.getName()).isNotNull().isEqualTo("Test RSS");
     } catch (IOException e) {
       Assert.fail();
@@ -55,8 +55,8 @@ class AtomReadRomeTest {
   @Test
   void shouldTransformWithCorrectDescriptionAndPublicationDate() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL", Instant.MIN);
-      assertThat(blog.getPublishedDate()).isNotNull().isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant());
+      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL", Instant.MIN); //TODO skrocic linie
+      assertThat(blog.getPublishedDate()).isNotNull().isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant()); //TODO skrocic linie
     } catch (IOException e) {
       Assert.fail();
     }
@@ -65,7 +65,7 @@ class AtomReadRomeTest {
   @Test
   void shouldTransformWithCorrectBlogItems() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL", Instant.MIN);
+      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), "feedURL", "blogURL", Instant.MIN);//TODO skrocic linie
       List<ItemDTO> itemsForBlog = blog.getItemsList();
       assertThat(itemsForBlog).isEmpty();
     } catch (IOException e) {
@@ -75,7 +75,7 @@ class AtomReadRomeTest {
 
   @Test
   void shouldThrowException() {
-    assertThatThrownBy(() -> rssExtractorService.getBlog(null, "test", "blogURL", Instant.MIN)).isNotNull().hasMessage("Wystąpił błąd przy pobieraniu informacji z bloga test");
+    assertThatThrownBy(() -> rssExtractorService.getBlog(null, "test", "blogURL", Instant.MIN)).isNotNull().hasMessage("Wystąpił błąd przy pobieraniu informacji z bloga test"); //TODO skrocic linie
   }
 
 }

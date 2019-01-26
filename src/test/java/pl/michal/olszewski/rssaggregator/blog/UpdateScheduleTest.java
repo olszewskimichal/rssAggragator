@@ -29,10 +29,11 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     blogService.evictBlogCache();
   }
 
+  //TODO wyprostowac metode
   @Test
   void shouldUpdateBlog() {
     blogRepository.deleteAll().block();
-    Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, null);
+    Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, null); //TODO krotsza linia
     blogRepository.save(blog).block();
     Boolean voidFuture = asyncService.updateBlog(blog);
     Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
@@ -44,10 +45,11 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .verify();
   }
 
+  //TODO wyprostowac metode
   @Test
   void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() {
     blogRepository.deleteAll().block();
-    Blog blog = blogRepository.save(new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now())).block();
+    Blog blog = blogRepository.save(new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now())).block(); //TODO krotsza linia bez blocka
     Boolean voidFuture = asyncService.updateBlog(blog);
     Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
 
@@ -60,7 +62,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @Test
   void shouldNotUpdateBlog() {
-    Blog blog = new Blog("https://devstyle.xxx", "DEVSTYLE", "devstyle", "https://devstyle.xxx/feed", null, null);
+    Blog blog = new Blog("https://devstyle.xxx", "DEVSTYLE", "devstyle", "https://devstyle.xxx/feed", null, null); //TODO krotsza linia
     blogRepository.save(blog).block();
     assertThatThrownBy(() -> asyncService.updateBlog(blog))
         .isInstanceOf(RssException.class)

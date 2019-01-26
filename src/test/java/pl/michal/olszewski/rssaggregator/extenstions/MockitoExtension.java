@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+//TODO sprawdzic czy jest mi to potrzebne
 public class MockitoExtension implements TestInstancePostProcessor, ParameterResolver {
 
   @Override
