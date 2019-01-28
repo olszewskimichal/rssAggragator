@@ -23,7 +23,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusOK() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogDTO()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().build()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -42,7 +42,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnBlogAsJson() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogDTO()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().build()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -95,7 +95,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByNameReturnBlogAsJson() {
-    given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(new BlogDTO()));
+    given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(BlogDTO.builder().build()));
 
     webClient.get().uri("/api/v1/blogs/by-name/name")
         .exchange()
