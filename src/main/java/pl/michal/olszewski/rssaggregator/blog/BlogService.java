@@ -124,7 +124,7 @@ class BlogService {
     public Mono<BlogDTO> getBlogDTOByName(String name) {
         log.debug("pobieram bloga w postaci DTO o nazwie {} {}", name, clock.instant());
         return getBlogByName(name)
-            .map(v -> new BlogDTO(v.getBlogURL(), v.getDescription(), v.getName(), v.getFeedURL(), v.getPublishedDate(), extractItems(v))) //TODO skrocic linie
+            .map(blog -> new BlogDTO(blog, extractItems(blog)))
             .doOnEach(blogDTO -> log.trace("getBlogDTOByName {}", blogDTO));
     }
 
