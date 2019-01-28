@@ -115,7 +115,7 @@ class BlogService {
         log.debug("pobieram bloga w postaci DTO o id {}", id);
         return blogRepository.findById(id)
             .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-            .map(blogById -> (new BlogDTO(blogById.getBlogURL(), blogById.getDescription(), blogById.getName(), blogById.getFeedURL(), blogById.getPublishedDate(), extractItems(blogById)))) //TODO skrocic linie
+            .map(blogById -> (new BlogDTO(blogById, extractItems(blogById))))
             .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id));
     }
 
