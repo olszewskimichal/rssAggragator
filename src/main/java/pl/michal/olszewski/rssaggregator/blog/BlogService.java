@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.blog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.Clock;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,7 +42,7 @@ class BlogService {
     private Mono<Blog> createBlogg(BlogDTO blogDTO) {
         log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
 
-        Blog blog = new Blog(blogDTO.getLink(), blogDTO.getDescription(), blogDTO.getName(), blogDTO.getFeedURL(), blogDTO.getPublishedDate(), null); //TODO za dluga linia
+        Blog blog = new Blog(blogDTO);
         blogDTO.getItemsList().stream()
             .map(Item::new)
             .forEach(v -> blog.addItem(v, itemRepository));
@@ -78,10 +78,22 @@ class BlogService {
             );
     }
 
+    private Flux<Blog> getBlogs(Integer limit) { //TODO moze dodac test
+        if (limit != null) {
+            return getBlogsWithLimit(limit);
+        }
+        return getAllBlogs();
+    }
+
     @Cacheable("blogs")
     public Flux<Blog> getAllBlogs() {
         log.debug("Pobieram wszystkie blogi");
         return blogRepository.findAll();
+    }
+
+    private Flux<Blog> getBlogsWithLimit(int limit) {
+        log.debug("Pobieram {} blogow", limit);
+        return blogRepository.findAll(PageRequest.of(0, limit));
     }
 
     @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
@@ -120,10 +132,10 @@ class BlogService {
     @Transactional(readOnly = true)
     public Flux<BlogDTO> getAllBlogDTOs(Integer limit) {
         log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
-        Flux<BlogDTO> dtoFlux = getAllBlogs()
-            .take(getLimit(limit))  //TODO refactor do Pageable
-            .map(blog -> new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog))); //TODO skrocic linie
-        return dtoFlux.doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
+        Flux<BlogDTO> dtoFlux = getBlogs(limit)
+            .map(blog -> new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog)));
+        return dtoFlux
+            .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
     }
 
     private List<ItemDTO> extractItems(Blog v) {
@@ -131,10 +143,6 @@ class BlogService {
             .parallel()
             .map(ItemDTO::new)
             .collect(Collectors.toList());
-    }
-
-    private int getLimit(final Integer size) {
-        return (Objects.isNull(size) ? 20 : size);
     }
 
     @CacheEvict(value = {"blogs", "blogsDTO", "blogsName"}, allEntries = true)

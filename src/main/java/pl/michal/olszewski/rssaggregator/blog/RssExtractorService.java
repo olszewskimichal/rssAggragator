@@ -78,7 +78,13 @@ public class RssExtractorService {
 
   private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
     log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
-    return new BlogDTO(syndFeed.getLink() != null ? syndFeed.getLink() : blogURL, syndFeed.getDescription(), syndFeed.getTitle(), feedURL, syndFeed.getPublishedDate().toInstant(), new ArrayList<>());
+    return new BlogDTO(
+        syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
+        syndFeed.getDescription(),
+        syndFeed.getTitle(),
+        feedURL,
+        syndFeed.getPublishedDate().toInstant(),
+        new ArrayList<>());
   }
 
   BlogDTO getBlog(XmlReader xmlReader, String feedURL, String blogURL, Instant lastUpdatedDate) {
@@ -86,9 +92,13 @@ public class RssExtractorService {
     try (XmlReader reader = xmlReader) {
       SyndFeed feed = new SyndFeedInput().build(reader);
       feed.setEncoding("UTF-8");
-      feed.getEntries().parallelStream().filter(v -> v.getPublishedDate() == null && v.getUpdatedDate() != null).forEach(v -> v.setPublishedDate(v.getUpdatedDate()));
+      feed.getEntries()
+          .parallelStream()
+          .filter(v -> v.getPublishedDate() == null && v.getUpdatedDate() != null)
+          .forEach(v -> v.setPublishedDate(v.getUpdatedDate()));
       BlogDTO blogInfo = getBlogInfo(feed, feedURL, blogURL);
-      getItemsForBlog(feed, lastUpdatedDate).forEach(blogInfo::addNewItem);
+      getItemsForBlog(feed, lastUpdatedDate)
+          .forEach(blogInfo::addNewItem);
       log.trace("getBlog STOP {} {} {}", feedURL, blogURL, lastUpdatedDate);
       return blogInfo;
     } catch (IOException | FeedException e) {

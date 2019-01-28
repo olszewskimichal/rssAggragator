@@ -35,23 +35,27 @@ class UpdateBlogService {
 
     @Scheduled(fixedDelayString = "${refresh.blog.milis}")
     Disposable runScheduledUpdate() {
-        return updateAllActiveBlogs().subscribe();
+        return updateAllActiveBlogs()
+            .subscribe();
     }
 
     Mono<List<List<Boolean>>> updateAllActiveBlogs() {
         if (enableJob) {
             Instant now = Instant.now();
             log.debug("zaczynam aktualizacje blogów");
-            Mono<List<Boolean>> collect = repository.findAll()
-                .flatMap(this::updateBlog)
-                .collectList();
-            return Flux.merge(collect)
+            return Flux.merge(getUpdateBlogList())
                 .subscribeOn(Schedulers.parallel())
                 .collectList()
                 .doOnSuccess(v -> log.debug("Aktualizacja zakonczona w {} sekund", Duration.between(now, Instant.now()).getSeconds()))
                 .doOnError(ex -> log.error("Aktualizacja zakonczona bledem {}", ex));
         }
         return Mono.empty();
+    }
+
+    private Mono<List<Boolean>> getUpdateBlogList() {
+        return repository.findAll()
+            .flatMap(this::updateBlog)
+            .collectList();
     }
 
     private Mono<Boolean> updateBlog(Blog blog) {
