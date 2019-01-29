@@ -99,7 +99,7 @@ class BlogApiTest extends IntegrationTestBase {
     Instant instant = Instant.now();
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
-    BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "desc", blog.getName(), "", instant, new ArrayList<>()); //TODO skrocic linie
+    BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "desc", blog.getName(), blog.getFeedURL(), instant, new ArrayList<>()); //TODO skrocic linie
 
     //when
     thenUpdateBlogByApi(blogDTO);

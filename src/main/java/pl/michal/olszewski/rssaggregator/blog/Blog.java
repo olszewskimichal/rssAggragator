@@ -1,9 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,6 +36,7 @@ public class Blog {
     @DBRef
     private Set<Item> items = new HashSet<>();
 
+    @Builder
     public Blog(String blogURL, String description, String name, String feedURL, Instant publishedDate, Instant lastUpdateDate) {
         this.blogURL = blogURL;
         this.description = description;
