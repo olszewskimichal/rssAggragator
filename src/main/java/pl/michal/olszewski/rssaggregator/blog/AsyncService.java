@@ -26,11 +26,7 @@ class AsyncService {
     Boolean updateBlog(Blog blog) {
         log.debug("START updateBlog dla blog {}", blog.getName());
         try {
-            BlogDTO blogDTO = rssExtractorService.getBlog(
-                new XmlReader(new URL(blog.getFeedURL())),
-                blog.getFeedURL(),
-                blog.getBlogURL(),    //TODO te 3 linie wyniesc do jakiejs klasy malej i dzieki temu skrócic linie
-                blog.getLastUpdateDate() == null ? Instant.MIN : blog.getLastUpdateDate());
+            BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(blog.getFeedURL())), blog.getRssInfo());
             blogService.updateBlog(blog, blogDTO)
                 .subscribeOn(Schedulers.parallel())
                 .doOnSuccess(v-> log.debug("STOP updateBlog dla blog {}", v.getName()))
