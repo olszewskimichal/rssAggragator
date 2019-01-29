@@ -19,14 +19,10 @@ class NewestItemsApiTest extends IntegrationTestBase {
   @Autowired
   private MongoTemplate entityManager;
 
-  @Autowired
-  private NewestItemService blogService;
-
   @BeforeEach
   void setUp() {
     repository.deleteAll().block();
     itemRepository.deleteAll().block();
-    blogService.evictItemsCache();
   }
 
   @Test

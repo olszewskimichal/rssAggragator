@@ -1,16 +1,14 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.IntStream;
-
-//TODO pozbyc sie duplikacji kodu
 @Slf4j
 class BlogListFactory {
 
@@ -25,8 +23,8 @@ class BlogListFactory {
     List<BlogDTO> buildNumberOfBlogsDTOAndSave(int numberOfBlogs) {
         IntStream.range(0, numberOfBlogs)
             .parallel()
-            .mapToObj(number -> Blog.builder().blogURL("blog" + number).build()).
-            map(repository::save)
+            .mapToObj(number -> Blog.builder().blogURL("blog" + number).build())
+            .map(repository::save)
             .forEach(Mono::block);
         return repository.findAll()
             .map(blog -> new BlogDTO(blog, Collections.emptyList()))

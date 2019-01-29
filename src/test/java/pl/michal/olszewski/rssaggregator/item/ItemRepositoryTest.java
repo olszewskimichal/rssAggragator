@@ -8,13 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -24,18 +21,15 @@ import reactor.test.StepVerifier;
 public class ItemRepositoryTest {
 
   @Autowired
-  protected MongoTemplate entityManager;
+  protected MongoTemplate mongoTemplate;
 
   @Autowired
   private ItemRepository itemRepository;
 
-  @Autowired
-  private BlogReactiveRepository blogRepository;
-
   @BeforeEach
   void setUp() {
-    itemRepository.deleteAll().block();
-    blogRepository.deleteAll().block(); //TODO pomyslec co zrobic z blockami
+    mongoTemplate.remove(new Query(), "item");
+    mongoTemplate.remove(new Query(), "blog");
   }
 
   //TODO za dlugie given
@@ -44,13 +38,13 @@ public class ItemRepositoryTest {
     //given
     Blog blog = new Blog("url", "", "", "", null, null);
     Instant instant = Instant.now();
-    entityManager.save(blog);
+    mongoTemplate.save(blog);
     Item title1 = new Item(ItemDTO.builder().link("title1").date(instant).build());
     Item title3 = new Item(ItemDTO.builder().link("title3").date(instant.plusSeconds(10)).build());
-    blog.addItem(title1, entityManager);
-    blog.addItem(new Item(ItemDTO.builder().link("title2").date(instant.minusSeconds(10)).build()), entityManager);
-    blog.addItem(title3, entityManager);
-    entityManager.save(blog);
+    blog.addItem(title1, mongoTemplate);
+    blog.addItem(new Item(ItemDTO.builder().link("title2").date(instant.minusSeconds(10)).build()), mongoTemplate);
+    blog.addItem(title3, mongoTemplate);
+    mongoTemplate.save(blog);
 
     //when
     Flux<Item> items = itemRepository.findAllNew(2);
@@ -72,10 +66,10 @@ public class ItemRepositoryTest {
   void shouldFindItemsWhenDateIsNull() {
     //given
     Blog blog = new Blog("url", "", "", "", null, null);
-    blog.addItem(new Item(ItemDTO.builder().link("title1").date(Instant.now()).build()), entityManager);
-    blog.addItem(new Item(ItemDTO.builder().link("title2").date(Instant.now()).build()), entityManager);
-    blog.addItem(new Item(ItemDTO.builder().link("title3").date(Instant.now()).build()), entityManager);
-    entityManager.save(blog);
+    blog.addItem(new Item(ItemDTO.builder().link("title1").date(Instant.now()).build()), mongoTemplate);
+    blog.addItem(new Item(ItemDTO.builder().link("title2").date(Instant.now()).build()), mongoTemplate);
+    blog.addItem(new Item(ItemDTO.builder().link("title3").date(Instant.now()).build()), mongoTemplate);
+    mongoTemplate.save(blog);
 
     //when
     Flux<Item> items = itemRepository.findAllNew(2);
@@ -86,13 +80,15 @@ public class ItemRepositoryTest {
         .verify();
   }
 
-  //TODO rozbic na 3 sekcje
   @Test
-  void shouldNotCreateItemByUniqueConstraint() {
+  void shouldNotCreateItemByUniqueConstraint() { //TODO zapiac sie jakas fabryka
+    //given
     Blog blog = new Blog("url", "", "", "", null, null);
-    blog.addItem(new Item(ItemDTO.builder().link("title1").build()), entityManager);
-    entityManager.save(blog);
-    assertThatThrownBy(() -> blog.addItem(new Item(ItemDTO.builder().link("title1").description("desc").build()), entityManager))
+    blog.addItem(new Item(ItemDTO.builder().link("title1").build()), mongoTemplate);
+    mongoTemplate.save(blog);
+
+    //expect
+    assertThatThrownBy(() -> blog.addItem(new Item(ItemDTO.builder().link("title1").description("desc").build()), mongoTemplate))
         .hasMessageContaining("duplicate key error collection")
         .hasCauseInstanceOf(MongoWriteException.class);
   }
