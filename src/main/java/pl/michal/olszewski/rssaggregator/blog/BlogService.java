@@ -1,5 +1,9 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import java.time.Clock;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -11,11 +15,6 @@ import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Clock;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -51,7 +50,7 @@ class BlogService {
 
     private Mono<Blog> getBlogByName(String name) {
         log.debug("getBlogByName {}", name);
-        return blogRepository.findByName(name)
+      return blogRepository.findByName(name).cache()
             .switchIfEmpty(Mono.error(new BlogNotFoundException(name)));
     }
 
@@ -88,7 +87,7 @@ class BlogService {
     @Cacheable("blogs")
     public Flux<Blog> getAllBlogs() {
         log.debug("Pobieram wszystkie blogi");
-        return blogRepository.findAll();
+      return blogRepository.findAll().cache();
     }
 
     private Flux<Blog> getBlogsWithLimit(int limit) {
