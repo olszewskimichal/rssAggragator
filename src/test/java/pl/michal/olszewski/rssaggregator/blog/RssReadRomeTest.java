@@ -7,7 +7,7 @@ import com.rometools.rome.io.XmlReader;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import pl.michal.olszewski.rssaggregator.extenstions.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 import java.io.File;
