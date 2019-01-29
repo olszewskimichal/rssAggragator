@@ -72,7 +72,7 @@ class BlogApiTest extends IntegrationTestBase {
   void should_get_one_blog() {
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
-    BlogDTO expected = new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), new ArrayList<>()); //TODO skrocic linie
+    BlogDTO expected = new BlogDTO(blog, new ArrayList<>());
 
     BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
 

@@ -55,7 +55,7 @@ class BlogCacheTest extends IntegrationTestBase {
   void shouldFindByNameFromCache() {
     service.createBlog(BlogDTO.builder().name("nazwa").build());
     Mono<BlogDTO> byName = service.getBlogDTOByName("nazwa");
-    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa"); 
+    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa");
     assertSame(byName, cachedDTO);
   }
 
