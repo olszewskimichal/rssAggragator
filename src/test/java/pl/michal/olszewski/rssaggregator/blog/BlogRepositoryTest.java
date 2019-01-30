@@ -3,31 +3,34 @@ package pl.michal.olszewski.rssaggregator.blog;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import javax.persistence.PersistenceException;
-import org.hibernate.exception.ConstraintViolationException;
-import org.hibernate.exception.DataException;
+import com.mongodb.MongoWriteException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
-import pl.michal.olszewski.rssaggregator.item.Item;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-@DataJpaTest
+@DataMongoTest
 @ActiveProfiles(Profiles.TEST)
 public class BlogRepositoryTest {
 
   @Autowired
-  protected TestEntityManager entityManager;
+  protected MongoTemplate entityManager;
 
   @Autowired
-  private BlogRepository blogRepository;
+  private BlogReactiveRepository blogRepository;
+
+  @BeforeEach
+  void setUp() {
+    blogRepository.deleteAll().block();
+  }
 
   @Test
   void shouldFindBlogByBlogURL() {
@@ -36,10 +39,14 @@ public class BlogRepositoryTest {
         .withURL("url");
 
     //when
-    Optional<Blog> byBlogURL = blogRepository.findByFeedURL("url");
+    Mono<Blog> byBlogURL = blogRepository.findByFeedURL("url");
 
     //then
-    assertThat(byBlogURL).isPresent();
+    StepVerifier
+        .create(byBlogURL)
+        .assertNext(v -> assertThat(v.getBlogURL()).isEqualTo("url"))
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -49,28 +56,40 @@ public class BlogRepositoryTest {
         .withURL("url");
 
     //when
-    Optional<Blog> blogByID = blogRepository.findById(blog.getId());
+    Mono<Blog> blogByID = blogRepository.findById(blog.getId());
 
     //then
-    assertThat(blogByID).isPresent();
+    StepVerifier
+        .create(blogByID)
+        .assertNext(v -> assertThat(v.getBlogURL()).isEqualTo("url"))
+        .expectComplete()
+        .verify();
   }
 
   @Test
   void shouldNotFindBlogByBlogURLWhenNotExists() {
     //when
-    Optional<Blog> byBlogURL = blogRepository.findByFeedURL("url");
+    Mono<Blog> byBlogURL = blogRepository.findByFeedURL("url");
 
     //then
-    assertThat(byBlogURL).isNotPresent();
+    StepVerifier
+        .create(byBlogURL)
+        .expectNextCount(0)
+        .expectComplete()
+        .verify();
   }
 
   @Test
   void shouldNotFindBlogByIdWhenNotExists() {
     //when
-    Optional<Blog> blogById = blogRepository.findById(1L);
+    Mono<Blog> blogById = blogRepository.findById("1");
 
     //then
-    assertThat(blogById).isNotPresent();
+    StepVerifier
+        .create(blogById)
+        .expectNextCount(0)
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -79,22 +98,10 @@ public class BlogRepositoryTest {
     givenBlog()
         .withURL("url");
     //then
-    assertThatThrownBy(() -> entityManager.persistAndFlush(new Blog("url", "", "", "", null, null))).hasCauseInstanceOf(ConstraintViolationException.class).isInstanceOf(PersistenceException.class)
-        .hasMessageContaining("ConstraintViolationException");
-  }
-
-  @Test
-  void shouldThrowExceptionWhenItemDescriptionIsTooLong() {
-    Blog blog = givenBlog()
-        .withURL("url");
-    String desc = IntStream.range(0, 10001).parallel().mapToObj(index -> "a").collect(Collectors.joining());
-    blog.addItem(new Item(ItemDTO.builder().description(desc).build()));
-
-    assertThatThrownBy(() -> entityManager.persistAndFlush(blog))
-        .hasCauseInstanceOf(DataException.class)
-        .isInstanceOf(PersistenceException.class)
-        .hasMessageContaining("DataException");
-
+    assertThatThrownBy(() -> entityManager.save(new Blog("url", "", "", "", null, null))) //TODO skrocic linie
+        .hasCauseInstanceOf(MongoWriteException.class)
+        .isInstanceOf(DuplicateKeyException.class)
+        .hasMessageContaining("duplicate key error collection");
   }
 
   @Test
@@ -104,41 +111,84 @@ public class BlogRepositoryTest {
         .withName("url");
 
     //when
-    Optional<Blog> byName = blogRepository.findByName("url");
+    Mono<Blog> byName = blogRepository.findByName("url");
 
     //then
-    assertThat(byName).isPresent();
+    StepVerifier
+        .create(byName)
+        .assertNext(v -> assertThat(v.getName()).isEqualTo("url"))
+        .expectComplete()
+        .verify();
   }
 
   @Test
   void shouldNotFindBlogByNameWhenNotExists() {
     //when
-    Optional<Blog> byName = blogRepository.findByName("name");
+    Mono<Blog> byName = blogRepository.findByName("name");
 
     //then
-    assertThat(byName).isNotPresent();
+    StepVerifier
+        .create(byName)
+        .expectNextCount(0)
+        .expectComplete()
+        .verify();
   }
 
   @Test
   void shouldGetAllBlogsIfAllAreActive() {
     givenBlog().buildNumberOfBlogsAndSave(5);
     //when
-    List<Blog> streamAll = blogRepository.findAll();
+    Flux<Blog> streamAll = blogRepository.findAll();
     //then
-    assertThat(streamAll).hasSize(5);
+    StepVerifier
+        .create(streamAll)
+        .expectNextCount(5)
+        .expectComplete()
+        .verify();
+  }
+
+  @Test
+  void shouldGetPageableBlogs() {
+    givenBlog().buildNumberOfBlogsAndSave(5);
+    //when
+    Flux<Blog> streamAll = blogRepository.findAll(PageRequest.of(0,3));
+    //then
+    StepVerifier
+        .create(streamAll)
+        .expectNextCount(3)
+        .expectComplete()
+        .verify();
+  }
+
+
+  @Test
+  void shouldGetPageableBlogsFromNextPage() {
+    givenBlog().buildNumberOfBlogsAndSave(5);
+    //when
+    Flux<Blog> streamAll = blogRepository.findAll(PageRequest.of(1,3));
+    //then
+    StepVerifier
+        .create(streamAll)
+        .expectNextCount(2)
+        .expectComplete()
+        .verify();
   }
 
   @Test
   void shouldNotReturnNotActiveBlog() {
     givenBlog().notActive();
     //when
-    List<Blog> streamAll = blogRepository.findAll();
+    Flux<Blog> streamAll = blogRepository.findAll();
     //then
-    assertThat(streamAll).hasSize(0);
+    StepVerifier
+        .create(streamAll)
+        .expectNextCount(0)
+        .expectComplete()
+        .verify();
   }
 
   private BlogListFactory givenBlog() {
-    return new BlogListFactory(blogRepository);
+    return new BlogListFactory(blogRepository, entityManager);
   }
 
 }

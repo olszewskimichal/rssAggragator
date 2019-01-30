@@ -23,7 +23,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusOK() {
-    given(blogService.getBlogDTOById(1L)).willReturn(Mono.just(new BlogDTO()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().build()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -32,7 +32,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusNotFoundWhenBlogNotExist() {
-    given(blogService.getBlogDTOById(1L)).willThrow(new BlogNotFoundException("aaa"));
+    given(blogService.getBlogDTOById("1")).willThrow(new BlogNotFoundException("aaa"));  //TODO TO chyba powinno zwrocic mono.error
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -42,7 +42,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnBlogAsJson() {
-    given(blogService.getBlogDTOById(1L)).willReturn(Mono.just(new BlogDTO()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().build()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -51,7 +51,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldReturnCorrectBlogById() {
-    given(blogService.getBlogDTOById(1L)).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -77,7 +77,6 @@ class BlogEndPointTest {
 
   @Test
   void shouldCreateBlogReturnStatusNoContent() {
-
     webClient.post().uri("/api/v1/blogs")
         .body(BodyInserters.fromObject(BlogDTO.builder().build()))
         .exchange()
@@ -95,7 +94,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByNameReturnBlogAsJson() {
-    given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(new BlogDTO()));
+    given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(BlogDTO.builder().build()));
 
     webClient.get().uri("/api/v1/blogs/by-name/name")
         .exchange()

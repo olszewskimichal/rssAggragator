@@ -4,13 +4,14 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -20,7 +21,7 @@ import pl.michal.olszewski.rssaggregator.config.Profiles;
 @EnableCaching
 @EnableAsync
 @EntityScan(
-    basePackageClasses = {RssAggregatorApplication.class, Jsr310JpaConverters.class}
+    basePackageClasses = {RssAggregatorApplication.class}
 )
 @EnableScheduling
 public class RssAggregatorApplication {
@@ -29,12 +30,21 @@ public class RssAggregatorApplication {
     SpringApplication.run(RssAggregatorApplication.class, args);
   }
 
-  @Bean(name = "threadPoolTaskExecutor")
+  @Profile({Profiles.PRODUCTION, Profiles.DEVELOPMENT})
+  @Bean
+  @Primary
   public Executor threadPoolTaskExecutor() {
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
     threadPoolTaskExecutor.setCorePoolSize(8);
     threadPoolTaskExecutor.setMaxPoolSize(16);
     return threadPoolTaskExecutor;
+  }
+
+  @Profile({Profiles.TEST})
+  @Bean
+  @Primary
+  public Executor testThreadPoolTaskExecutor() {
+    return Executors.newSingleThreadExecutor();
   }
 
   @Profile({Profiles.PRODUCTION, Profiles.DEVELOPMENT})

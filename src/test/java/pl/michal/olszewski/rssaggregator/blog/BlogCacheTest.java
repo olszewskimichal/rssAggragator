@@ -1,76 +1,122 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import java.util.Optional;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-@Transactional
 class BlogCacheTest extends IntegrationTestBase {
 
   @Autowired
   private BlogService service;
 
   @Autowired
-  private BlogRepository blogRepository;
+  private MongoTemplate mongoTemplate;
+
+  Blog blog;
+
+  @BeforeEach
+  void setUp() {
+    mongoTemplate.dropCollection(Blog.class);
+    blog = mongoTemplate.save(Blog.builder().blogURL("nazwa").feedURL("nazwa").name("nazwa").build());
+  }
 
   @Test
   void shouldReturnTheSameCollectionFromCache() {
+    //given
     Flux<Blog> allBlogs = service.getAllBlogs();
+    List<Blog> blogList = allBlogs.collectList().block();
+
+    //when
     Flux<Blog> cacheBlogs = service.getAllBlogs();
+
+    //then
     assertSame(allBlogs, cacheBlogs);
+    assertThat(blogList).containsExactlyElementsOf(cacheBlogs.toIterable());
   }
 
   @Test
   void shouldAfterEvictCacheAndReturnNotTheSameCollection() {
+    //given
     Flux<Blog> allBlogs = service.getAllBlogs();
+    List<Blog> blogList = allBlogs.collectList().block();
+
+    //when
     service.evictBlogCache();
-    Flux<Blog> cacheBlogs = service.getAllBlogs();
-    assertNotSame(allBlogs, cacheBlogs);
+    Flux<Blog> blogs = service.getAllBlogs();
+
+    //then
+    assertNotSame(allBlogs, blogs);
+    assertThat(blogList).containsExactlyElementsOf(blogs.toIterable());
   }
 
   @Test
   void shouldAfterCreateNewBlogAndReturnNotTheSameCollection() {
+    //given
     Flux<Blog> allBlogs = service.getAllBlogs();
-    service.createBlog(BlogDTO.builder().name("nazwa2").build());
-    Flux<Blog> cacheBlogs = service.getAllBlogs();
-    assertNotSame(allBlogs, cacheBlogs);
+    List<Blog> blogList = allBlogs.collectList().block();
+
+    //when
+    service.createBlog(BlogDTO.builder().name("nazwa2").build()).block();
+    Flux<Blog> blogs = service.getAllBlogs();
+
+    //then
+    assertNotSame(allBlogs, blogs);
+    assertThat(blogList).isNotEqualTo(blogs.toIterable());
   }
 
   @Test
   void shouldAfterDeleteNewBlogAndReturnNotTheSameCollection() {
-    Blog blog = service.createBlog(BlogDTO.builder().name("nazwa2").build()).block();
-
+    //given
     Flux<Blog> allBlogs = service.getAllBlogs();
-    Flux<Blog> cacheBlogs = service.getAllBlogs();
-    assertSame(allBlogs, cacheBlogs);
-    service.deleteBlog(blog.getId());
+    List<Blog> blogList = allBlogs.collectList().block();
 
-    cacheBlogs = service.getAllBlogs();
-    assertNotSame(allBlogs, cacheBlogs);
+    //when
+    service.deleteBlog(blog.getId()).block();
+    Flux<Blog> blogs = service.getAllBlogs();
+
+    //then
+    assertNotSame(allBlogs, blogs);
+    assertThat(blogList).isNotEqualTo(blogs.toIterable());
   }
 
 
   @Test
   void shouldFindByNameFromCache() {
-    service.createBlog(BlogDTO.builder().name("nazwa").build());
-    Optional<Blog> byName = blogRepository.findByName("nazwa");
-    Optional<Blog> cachedDTO = blogRepository.findByName("nazwa");
-    assertSame(byName.get(), cachedDTO.get());
+    //given
+    Mono<BlogDTO> byName = service.getBlogDTOByName("nazwa");
+    BlogDTO blogDTO = byName.block();
+
+    //when
+    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa");
+
+    //then
+    assertSame(byName, cachedDTO);
+    assertEquals(blogDTO, cachedDTO.block());
   }
 
   @Test
   void shouldNotEvictFindByNameWhenCreate() {
-    service.createBlog(BlogDTO.builder().name("nazwa").build());
-    Optional<Blog> byName = blogRepository.findByName("nazwa");
-    service.createBlog(BlogDTO.builder().name("nazwa2").build());
-    Optional<Blog> cachedDTO = blogRepository.findByName("nazwa");
-    assertSame(byName.get(), cachedDTO.get());
+    //given
+    Mono<BlogDTO> byName = service.getBlogDTOByName("nazwa");
+    BlogDTO blogDTO = byName.block();
+
+    //when
+    service.createBlog(BlogDTO.builder().name("nazwa2").build()).block();
+    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa");
+
+    //then
+    assertSame(byName, cachedDTO);
+    assertEquals(blogDTO, cachedDTO.block());
   }
 
 }

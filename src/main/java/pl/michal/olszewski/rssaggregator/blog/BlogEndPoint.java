@@ -28,7 +28,7 @@ class BlogEndPoint {
   }
 
   @GetMapping(value = "/{id}")
-  public Mono<BlogDTO> getBlog(@PathVariable("id") Long blogId) {
+  public Mono<BlogDTO> getBlog(@PathVariable("id") String blogId) {
     log.debug("GET blog by id {}", blogId);
     return blogService.getBlogDTOById(blogId);
   }
@@ -63,7 +63,7 @@ class BlogEndPoint {
 
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public Mono<Boolean> deleteBlog(@PathVariable("id") Long blogId) {
+  public Mono<Void> deleteBlog(@PathVariable("id") String blogId) {
     log.debug("DELETE - deleteBlog {}", blogId);
     return blogService.deleteBlog(blogId);
   }

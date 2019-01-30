@@ -1,14 +1,21 @@
 package pl.michal.olszewski.rssaggregator.item;
 
-import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 @Repository
-interface ItemRepository extends JpaRepository<Item, Long> {
+public interface ItemRepository extends ReactiveMongoRepository<Item, String> {
+    String DATE = "date";
+    Flux<Item> findAllBy(Pageable pageable);
 
-  @Query(value = "SELECT TOP(?1) * FROM Item v order by v.date desc", nativeQuery = true)
-  List<Item> findAllByOrderByDateDesc(int limit);
+    default Flux<Item> findAllNew(Integer limit){
+        return findAllBy(PageRequest.of(0, limit, new Sort(Sort.Direction.DESC, DATE)));
+    }
+
+
 
 }
