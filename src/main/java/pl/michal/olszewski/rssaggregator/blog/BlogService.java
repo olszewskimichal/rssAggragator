@@ -80,7 +80,7 @@ class BlogService {
             );
     }
 
-    private Flux<Blog> getBlogs(Integer limit) { //TODO moze dodac test
+    private Flux<Blog> getBlogs(Integer limit) {
         if (limit != null) {
             return getBlogsWithLimit(limit);
         }

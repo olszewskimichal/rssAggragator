@@ -24,5 +24,5 @@ public interface BlogReactiveRepository extends ReactiveMongoRepository<Blog, St
   Flux<Blog> findAll();
 
   @Query("{ 'active' : true}")
-  Flux<Blog> findAll(Pageable pageable); //TODO dodac test
+  Flux<Blog> findAll(Pageable pageable);
 }
