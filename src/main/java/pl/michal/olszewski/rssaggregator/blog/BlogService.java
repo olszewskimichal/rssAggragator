@@ -66,7 +66,10 @@ class BlogService {
             flatMap(
                 blog -> {
                     log.debug("aktualizuje bloga {}", blog.getName());
-                    Set<String> linkSet = blog.getItems().stream().parallel().map(Item::getLink).collect(Collectors.toSet());
+                    Set<String> linkSet = blog.getItems().stream()
+                        .parallel()
+                        .map(Item::getLink)
+                        .collect(Collectors.toSet());
                     blogInfoFromRSS.getItemsList().stream()
                         .map(Item::new)
                         .filter(v -> !linkSet.contains(v.getLink()))
@@ -112,7 +115,7 @@ class BlogService {
     @Transactional(readOnly = true)
     public Mono<BlogDTO> getBlogDTOById(String id) {
         log.debug("pobieram bloga w postaci DTO o id {}", id);
-        return blogRepository.findById(id)
+        return blogRepository.findById(id).cache()
             .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
             .map(blogById -> (new BlogDTO(blogById, extractItems(blogById))))
             .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id));

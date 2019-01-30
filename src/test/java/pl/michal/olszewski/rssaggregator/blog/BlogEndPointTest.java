@@ -77,7 +77,6 @@ class BlogEndPointTest {
 
   @Test
   void shouldCreateBlogReturnStatusNoContent() {
-
     webClient.post().uri("/api/v1/blogs")
         .body(BodyInserters.fromObject(BlogDTO.builder().build()))
         .exchange()
