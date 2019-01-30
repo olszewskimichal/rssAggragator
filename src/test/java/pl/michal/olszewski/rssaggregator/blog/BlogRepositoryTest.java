@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
@@ -142,6 +143,33 @@ public class BlogRepositoryTest {
     StepVerifier
         .create(streamAll)
         .expectNextCount(5)
+        .expectComplete()
+        .verify();
+  }
+
+  @Test
+  void shouldGetPageableBlogs() {
+    givenBlog().buildNumberOfBlogsAndSave(5);
+    //when
+    Flux<Blog> streamAll = blogRepository.findAll(PageRequest.of(0,3));
+    //then
+    StepVerifier
+        .create(streamAll)
+        .expectNextCount(3)
+        .expectComplete()
+        .verify();
+  }
+
+
+  @Test
+  void shouldGetPageableBlogsFromNextPage() {
+    givenBlog().buildNumberOfBlogsAndSave(5);
+    //when
+    Flux<Blog> streamAll = blogRepository.findAll(PageRequest.of(1,3));
+    //then
+    StepVerifier
+        .create(streamAll)
+        .expectNextCount(2)
         .expectComplete()
         .verify();
   }
