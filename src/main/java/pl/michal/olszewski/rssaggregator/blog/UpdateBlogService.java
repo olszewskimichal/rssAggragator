@@ -1,5 +1,10 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -9,11 +14,6 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
-import java.util.concurrent.Executor;
 
 @Service
 @Slf4j
@@ -44,10 +44,10 @@ class UpdateBlogService {
             Instant now = Instant.now();
             log.debug("zaczynam aktualizacje blogów");
             return Flux.merge(getUpdateBlogList())
-                .subscribeOn(Schedulers.parallel())
+                .subscribeOn(Schedulers.fromExecutor(Executors.newFixedThreadPool(8)))
                 .collectList()
                 .doOnSuccess(v -> log.debug("Aktualizacja zakonczona w {} sekund", Duration.between(now, Instant.now()).getSeconds()))
-                .doOnError(ex -> log.error("Aktualizacja zakonczona bledem {}", ex));
+                .doOnError(ex -> log.error("Aktualizacja zakonczona bledem ", ex));
         }
         return Mono.empty();
     }

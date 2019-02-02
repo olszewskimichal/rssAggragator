@@ -1,14 +1,11 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import com.rometools.rome.io.XmlReader;
+import java.io.IOException;
+import java.net.URL;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import reactor.core.scheduler.Schedulers;
-
-import java.io.IOException;
-import java.net.URL;
-import java.time.Instant;
 
 @Service
 @Transactional
@@ -28,7 +25,6 @@ class AsyncService {
         try {
             BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(blog.getFeedURL())), blog.getRssInfo());
             blogService.updateBlog(blog, blogDTO)
-                .subscribeOn(Schedulers.parallel())
                 .doOnSuccess(v-> log.debug("STOP updateBlog dla blog {}", v.getName()))
                 .block();
             return true;
