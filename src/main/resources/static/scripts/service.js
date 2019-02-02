@@ -5,7 +5,7 @@ App.factory('Service', ['$http', '$q', function ($http, $q) {
   return {
 
     fetchItems: function () {
-      return $http.get('https://rss-aggregator-mo.herokuapp.com/api/v1/items?limit=25')
+      return $http.get('/api/v1/items?limit=25')
       .then(
           function (response) {
             return response.data;
@@ -18,7 +18,7 @@ App.factory('Service', ['$http', '$q', function ($http, $q) {
     },
 
     createBlog: function (blog) {
-      return $http.post('https://rss-aggregator-mo.herokuapp.com/api/v1/blogs', blog)
+      return $http.post('/api/v1/blogs', blog)
       .then(
           function (response) {
             return response.data;
