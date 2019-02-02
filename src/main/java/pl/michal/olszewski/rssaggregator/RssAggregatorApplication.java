@@ -30,10 +30,20 @@ public class RssAggregatorApplication {
     SpringApplication.run(RssAggregatorApplication.class, args);
   }
 
-  @Profile({Profiles.PRODUCTION, Profiles.DEVELOPMENT})
+  @Profile({Profiles.PRODUCTION})
   @Bean
   @Primary
   public Executor threadPoolTaskExecutor() {
+    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+    threadPoolTaskExecutor.setCorePoolSize(4);
+    threadPoolTaskExecutor.setMaxPoolSize(8);
+    return threadPoolTaskExecutor;
+  }
+
+  @Profile({Profiles.DEVELOPMENT})
+  @Bean
+  @Primary
+  public Executor threadPoolTaskExecutorDevelop() {
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
     threadPoolTaskExecutor.setCorePoolSize(8);
     threadPoolTaskExecutor.setMaxPoolSize(16);
