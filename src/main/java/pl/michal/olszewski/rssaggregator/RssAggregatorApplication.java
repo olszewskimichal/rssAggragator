@@ -35,8 +35,8 @@ public class RssAggregatorApplication {
   @Primary
   public Executor threadPoolTaskExecutor() {
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
-    threadPoolTaskExecutor.setCorePoolSize(7);
-    threadPoolTaskExecutor.setMaxPoolSize(14);
+    threadPoolTaskExecutor.setCorePoolSize(8);
+    threadPoolTaskExecutor.setMaxPoolSize(16);
     return threadPoolTaskExecutor;
   }
 
