@@ -18,31 +18,31 @@ import reactor.test.StepVerifier;
 @ExtendWith(MockitoExtension.class)
 class NewestItemServiceTest {
 
-    private NewestItemService itemService;
+  private NewestItemService itemService;
 
-    @Mock
-    private ItemRepository itemRepository;
+  @Mock
+  private ItemRepository itemRepository;
 
-    @BeforeEach
-    void setUp() {
-        itemService = new NewestItemService(itemRepository);
-    }
+  @BeforeEach
+  void setUp() {
+    itemService = new NewestItemService(itemRepository);
+  }
 
-    @Test
-    void shouldGet10NewestItems() {
-        //given
-      List<Item> itemList = IntStream.rangeClosed(1, 10).parallel()
-          .mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())) //TODO do fabryki
-          .collect(Collectors.toList());
-        given(itemRepository.findAllNew(10)).willReturn(Flux.fromIterable(itemList));
-        //when
-        Flux<ItemDTO> newestItems = itemService.getNewestItems(10);
-        //then
-        StepVerifier.create(newestItems)
-            .recordWith(ArrayList::new)
-            .expectNextCount(10)
-            .expectComplete()
-            .verify();
-    }
+  @Test
+  void shouldGet10NewestItems() {
+    //given
+    List<Item> itemList = IntStream.rangeClosed(1, 10).parallel()
+        .mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())) //TODO do fabryki
+        .collect(Collectors.toList());
+    given(itemRepository.findAllNew(10)).willReturn(Flux.fromIterable(itemList));
+    //when
+    Flux<ItemDTO> newestItems = itemService.getNewestItems(10);
+    //then
+    StepVerifier.create(newestItems)
+        .recordWith(ArrayList::new)
+        .expectNextCount(10)
+        .expectComplete()
+        .verify();
+  }
 
 }

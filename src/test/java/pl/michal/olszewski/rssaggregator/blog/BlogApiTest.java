@@ -184,7 +184,8 @@ class BlogApiTest extends IntegrationTestBase {
         .expectStatus().isOk()
         .expectBodyList(BlogDTO.class);
   }
-//TODO pozbyc sie template a uzyc webTestClienta
+
+  //TODO pozbyc sie template a uzyc webTestClienta
   private void thenCreateBlogByApi(String link) {
     template.postForEntity(String.format("http://localhost:%s/api/v1/blogs", port), BlogDTO.builder().link(link).build(), BlogDTO.class);
   }

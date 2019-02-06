@@ -16,13 +16,11 @@ import reactor.core.publisher.Mono;
 
 class BlogCacheTest extends IntegrationTestBase {
 
+  Blog blog;
   @Autowired
   private BlogService service;
-
   @Autowired
   private MongoTemplate mongoTemplate;
-
-  Blog blog;
 
   @BeforeEach
   void setUp() {

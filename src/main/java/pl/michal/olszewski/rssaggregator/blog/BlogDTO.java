@@ -19,34 +19,35 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 @NoArgsConstructor
 @AllArgsConstructor
 class BlogDTO {
-    private String link;
-    private String description;
-    private String name;
-    private String feedURL;
-    private Instant publishedDate;
-    @Builder.Default
-    @JsonProperty("itemsList")
-    private List<ItemDTO> itemsList = new ArrayList<>();
 
-    List<ItemDTO> getItemsList() {
-        if (itemsList == null) {
-            itemsList = new ArrayList<>();
-        }
-        return Collections.unmodifiableList(itemsList);
-    }
+  private String link;
+  private String description;
+  private String name;
+  private String feedURL;
+  private Instant publishedDate;
+  @Builder.Default
+  @JsonProperty("itemsList")
+  private List<ItemDTO> itemsList = new ArrayList<>();
 
-    public BlogDTO(Blog blog, List<ItemDTO> items) {
-        this.link = blog.getBlogURL();
-        this.description = blog.getDescription();
-        this.name = blog.getName();
-        this.feedURL = blog.getFeedURL();
-        this.publishedDate = blog.getPublishedDate();
-        this.itemsList=items;
-    }
+  public BlogDTO(Blog blog, List<ItemDTO> items) {
+    this.link = blog.getBlogURL();
+    this.description = blog.getDescription();
+    this.name = blog.getName();
+    this.feedURL = blog.getFeedURL();
+    this.publishedDate = blog.getPublishedDate();
+    this.itemsList = items;
+  }
 
-    void addNewItem(ItemDTO itemDTO) {
-        this.itemsList.add(itemDTO);
+  List<ItemDTO> getItemsList() {
+    if (itemsList == null) {
+      itemsList = new ArrayList<>();
     }
+    return Collections.unmodifiableList(itemsList);
+  }
+
+  void addNewItem(ItemDTO itemDTO) {
+    this.itemsList.add(itemDTO);
+  }
 
   @Override
   public boolean equals(Object o) {

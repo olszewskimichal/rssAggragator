@@ -10,16 +10,16 @@ import reactor.core.publisher.Flux;
 @Slf4j
 class NewestItemService {
 
-    private final ItemRepository itemRepository;
+  private final ItemRepository itemRepository;
 
-    public NewestItemService(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
+  public NewestItemService(ItemRepository itemRepository) {
+    this.itemRepository = itemRepository;
+  }
 
-    Flux<ItemDTO> getNewestItems(int size) {
-        log.debug("Pobieram wpisy z limitem {}", size);
-        Flux<Item> items = itemRepository.findAllNew(size);
-        return items
-            .map(ItemDTO::new);
-    }
+  Flux<ItemDTO> getNewestItems(int size) {
+    log.debug("Pobieram wpisy z limitem {}", size);
+    Flux<Item> items = itemRepository.findAllNew(size);
+    return items
+        .map(ItemDTO::new);
+  }
 }
