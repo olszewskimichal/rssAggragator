@@ -20,13 +20,13 @@ class BlogListFactory {
     this.itemRepository = itemRepository;
   }
 
-  List<BlogDTO> buildNumberOfBlogsDTOAndSave(int numberOfBlogs) {
+  void buildNumberOfBlogsDTOAndSave(int numberOfBlogs) {
     IntStream.range(0, numberOfBlogs)
         .parallel()
         .mapToObj(number -> Blog.builder().blogURL("blog" + number).build())
         .map(repository::save)
         .forEach(Mono::block);
-    return repository.findAll()
+    repository.findAll()
         .map(blog -> new BlogDTO(blog, Collections.emptyList()))
         .collectList()
         .block();
@@ -58,13 +58,13 @@ class BlogListFactory {
     return repository.save(Blog.builder().blogURL(url).feedURL(url).build()).block();
   }
 
-  Blog notActive() {
+  void notActive() {
     Blog blog = Blog.builder().blogURL("test").feedURL("test").build();
     blog.deactive();
-    return repository.save(blog).block();
+    repository.save(blog).block();
   }
 
-  Blog withName(String name) {
-    return repository.save(Blog.builder().blogURL(name).name(name).build()).block();
+  void withName(String name) {
+    repository.save(Blog.builder().blogURL(name).name(name).build()).block();
   }
 }

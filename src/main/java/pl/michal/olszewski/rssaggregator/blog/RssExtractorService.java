@@ -46,7 +46,7 @@ public class RssExtractorService {
         return asciiString;
       }
     } catch (MalformedURLException | URISyntaxException e) {
-      log.error("Wystapił problem przy zamianie linku na ASCII {}", e);
+      log.error("Wystapił problem przy zamianie linku {} na ASCII", linkUrl, e);
     }
     return linkUrl;
   }

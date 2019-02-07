@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 class BlogCacheTest extends IntegrationTestBase {
 
-  Blog blog;
+  private Blog blog;
   @Autowired
   private BlogService service;
   @Autowired
