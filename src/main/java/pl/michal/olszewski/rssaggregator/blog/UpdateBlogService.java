@@ -39,7 +39,7 @@ class UpdateBlogService {
 
   Mono<List<List<Boolean>>> updateAllActiveBlogs() {
     if (enableJob) {
-      Instant now = Instant.now();
+      var now = Instant.now();
       log.debug("zaczynam aktualizacje blogów");
       return Flux.merge(getUpdateBlogList())
           .collectList()

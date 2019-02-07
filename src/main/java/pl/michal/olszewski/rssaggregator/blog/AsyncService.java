@@ -27,7 +27,7 @@ class AsyncService {
   Boolean updateBlog(Blog blog) {
     log.debug("START updateBlog dla blog {}", blog.getName());
     try {
-      BlogDTO blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(blog.getFeedURL())), blog.getRssInfo());
+      var blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(blog.getFeedURL())), blog.getRssInfo());
       blogService.updateBlog(blog, blogDTO)
           .subscribeOn(SCHEDULER)
           .doOnSuccess(v -> log.debug("STOP updateBlog dla blog {}", v.getName()))

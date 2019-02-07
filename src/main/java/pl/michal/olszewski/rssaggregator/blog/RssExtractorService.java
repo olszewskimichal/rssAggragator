@@ -39,7 +39,7 @@ public class RssExtractorService {
 
   static String convertURLToAscii(String linkUrl) {
     try {
-      String url = new URL(linkUrl.replaceAll(">", "%3E")).toURI().toString();
+      var url = new URL(linkUrl.replaceAll(">", "%3E")).toURI().toString();
       if (containsUnicode(url)) {
         String asciiString = UriUtils.encodeQuery(url, "UTF-8");
         log.trace("Zamieniłem {} na {}", linkUrl, asciiString);

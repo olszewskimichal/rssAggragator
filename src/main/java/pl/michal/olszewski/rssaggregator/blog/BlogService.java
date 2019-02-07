@@ -41,7 +41,7 @@ class BlogService {
   private Mono<Blog> createBlogg(BlogDTO blogDTO) {
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
 
-    Blog blog = new Blog(blogDTO);
+    var blog = new Blog(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)
         .forEach(v -> blog.addItem(v, itemRepository));
@@ -134,7 +134,7 @@ class BlogService {
   @Transactional(readOnly = true)
   public Flux<BlogDTO> getAllBlogDTOs(Integer limit) {
     log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
-    Flux<BlogDTO> dtoFlux = getBlogs(limit)
+    var dtoFlux = getBlogs(limit)
         .map(blog -> new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog)));
     return dtoFlux
         .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
