@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 @Service
@@ -21,7 +19,6 @@ import reactor.core.scheduler.Schedulers;
 @Transactional
 class UpdateBlogService {
 
-  private static final Scheduler SCHEDULER = Schedulers.fromExecutor(Executors.newFixedThreadPool(8));
   private final BlogReactiveRepository repository;
   private final AsyncService asyncService;
   private final Executor executor;
@@ -46,7 +43,6 @@ class UpdateBlogService {
       Instant now = Instant.now();
       log.debug("zaczynam aktualizacje blogów");
       return Flux.merge(getUpdateBlogList())
-          .subscribeOn(SCHEDULER)
           .collectList()
           .doOnSuccess(v -> log.debug("Aktualizacja zakonczona w {} sekund", Duration.between(now, Instant.now()).getSeconds()))
           .doOnError(ex -> log.error("Aktualizacja zakonczona bledem ", ex));
