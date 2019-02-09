@@ -15,7 +15,7 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 class AsyncService {
 
-  private static final Scheduler SCHEDULER = Schedulers.fromExecutor(Executors.newFixedThreadPool(8));
+  private static final Scheduler SCHEDULER = Schedulers.fromExecutor(Executors.newFixedThreadPool(100));
   private final BlogService blogService;
   private final RssExtractorService rssExtractorService;
 
