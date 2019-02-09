@@ -1,0 +1,1 @@
+web java -javaagent:heroku-javaagent-2.0.jar=stdout=true,lxmem=true -Dserver.port=$PORT $JAVA_OPTS -jar target/*.jar
