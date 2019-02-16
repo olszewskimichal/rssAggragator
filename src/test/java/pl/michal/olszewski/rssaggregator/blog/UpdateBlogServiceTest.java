@@ -30,7 +30,7 @@ class UpdateBlogServiceTest {
 
   @BeforeEach
   void setUp() {
-    updateBlogService = new UpdateBlogService(blogRepository, asyncService, Executors.newSingleThreadExecutor());
+    updateBlogService = new UpdateBlogService(blogRepository, asyncService, Executors.newSingleThreadExecutor(), null);
   }
 
   @Test

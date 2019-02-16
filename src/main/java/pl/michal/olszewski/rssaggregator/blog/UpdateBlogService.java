@@ -1,7 +1,9 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import java.time.Duration;
-import java.time.Instant;
+import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
+
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.michal.olszewski.rssaggregator.config.RegistryTimed;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -25,25 +28,29 @@ class UpdateBlogService {
   @Value("${refresh.blog.enable-job}")
   private boolean enableJob;
 
-  public UpdateBlogService(BlogReactiveRepository repository, AsyncService asyncService, Executor executor) {
+  public UpdateBlogService(BlogReactiveRepository repository, AsyncService asyncService, Executor executor, MeterRegistry registry) {
     this.repository = repository;
     this.asyncService = asyncService;
-    this.executor = executor;
+    if (registry != null) {
+      this.executor = monitor(registry, executor, "prod_pool");
+    } else {
+      this.executor = executor;
+    }
   }
 
   @Scheduled(fixedDelayString = "${refresh.blog.milis}")
+  @Timed(longTask = true, value = "scheduledUpdate")
+  @RegistryTimed
   void runScheduledUpdate() {
     updateAllActiveBlogs()
-        .subscribe();
+        .block();
   }
 
   Mono<List<List<Boolean>>> updateAllActiveBlogs() {
     if (enableJob) {
-      var now = Instant.now();
       log.debug("zaczynam aktualizacje blogów");
       return Flux.merge(getUpdateBlogList())
           .collectList()
-          .doOnSuccess(v -> log.debug("Aktualizacja zakonczona w {} sekund", Duration.between(now, Instant.now()).getSeconds()))
           .doOnError(ex -> log.error("Aktualizacja zakonczona bledem ", ex));
     }
     return Mono.empty();
