@@ -151,7 +151,7 @@ public class BlogRepositoryTest {
   void shouldGetPageableBlogs() {
     givenBlog().buildNumberOfBlogsAndSave(5);
     //when
-    Flux<Blog> streamAll = blogRepository.findAll(PageRequest.of(0,3));
+    Flux<Blog> streamAll = blogRepository.findAll(PageRequest.of(0, 3));
     //then
     StepVerifier
         .create(streamAll)
@@ -165,7 +165,7 @@ public class BlogRepositoryTest {
   void shouldGetPageableBlogsFromNextPage() {
     givenBlog().buildNumberOfBlogsAndSave(5);
     //when
-    Flux<Blog> streamAll = blogRepository.findAll(PageRequest.of(1,3));
+    Flux<Blog> streamAll = blogRepository.findAll(PageRequest.of(1, 3));
     //then
     StepVerifier
         .create(streamAll)

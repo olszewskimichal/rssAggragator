@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.mongodb.MongoWriteException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class ItemRepositoryTest {
   void shouldFind2NewestItems() {
     //given
     Blog blog = new Blog("url", "", "", "", null, null);
-    Instant instant = Instant.now();
+    Instant instant = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     mongoTemplate.save(blog);
     Item title1 = new Item(ItemDTO.builder().link("title1").date(instant).build());
     Item title3 = new Item(ItemDTO.builder().link("title3").date(instant.plusSeconds(10)).build());

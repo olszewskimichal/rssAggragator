@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -24,17 +25,28 @@ import pl.michal.olszewski.rssaggregator.config.Profiles;
     basePackageClasses = {RssAggregatorApplication.class}
 )
 @EnableScheduling
+@EnableConfigurationProperties
 public class RssAggregatorApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(RssAggregatorApplication.class, args);
   }
 
-  @Profile({Profiles.PRODUCTION, Profiles.DEVELOPMENT})
+  @Profile({Profiles.PRODUCTION})
   @Bean
   @Primary
-  public Executor threadPoolTaskExecutor() {
-    ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+  public Executor threadPoolTaskExecutorProd() {
+    var threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
+    threadPoolTaskExecutor.setCorePoolSize(50);
+    threadPoolTaskExecutor.setMaxPoolSize(100);
+    return threadPoolTaskExecutor;
+  }
+
+  @Profile({Profiles.DEVELOPMENT})
+  @Bean
+  @Primary
+  public Executor threadPoolTaskExecutorDevelopment() {
+    var threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
     threadPoolTaskExecutor.setCorePoolSize(8);
     threadPoolTaskExecutor.setMaxPoolSize(16);
     return threadPoolTaskExecutor;

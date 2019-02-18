@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,7 +97,7 @@ class BlogApiTest extends IntegrationTestBase {
   @Test
   void should_update_existing_blog() {
     //given
-    Instant instant = Instant.now();
+    Instant instant = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
     BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "desc", blog.getName(), blog.getFeedURL(), instant, new ArrayList<>()); //TODO skrocic linie
@@ -184,7 +185,8 @@ class BlogApiTest extends IntegrationTestBase {
         .expectStatus().isOk()
         .expectBodyList(BlogDTO.class);
   }
-//TODO pozbyc sie template a uzyc webTestClienta
+
+  //TODO pozbyc sie template a uzyc webTestClienta
   private void thenCreateBlogByApi(String link) {
     template.postForEntity(String.format("http://localhost:%s/api/v1/blogs", port), BlogDTO.builder().link(link).build(), BlogDTO.class);
   }
