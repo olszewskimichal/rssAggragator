@@ -2,16 +2,12 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
 
-import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.michal.olszewski.rssaggregator.config.RegistryTimed;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -25,9 +21,6 @@ class UpdateBlogService {
   private final AsyncService asyncService;
   private final Executor executor;
 
-  @Value("${refresh.blog.enable-job}")
-  private boolean enableJob;
-
   public UpdateBlogService(BlogReactiveRepository repository, AsyncService asyncService, Executor executor, MeterRegistry registry) {
     this.repository = repository;
     this.asyncService = asyncService;
@@ -38,22 +31,11 @@ class UpdateBlogService {
     }
   }
 
-  @Scheduled(fixedDelayString = "${refresh.blog.milis}")
-  @Timed(longTask = true, value = "scheduledUpdate")
-  @RegistryTimed
-  void runScheduledUpdate() {
-    updateAllActiveBlogs()
-        .block();
-  }
-
   Mono<List<List<Boolean>>> updateAllActiveBlogs() {
-    if (enableJob) {
-      log.debug("zaczynam aktualizacje blogów");
-      return Flux.merge(getUpdateBlogList())
-          .collectList()
-          .doOnError(ex -> log.error("Aktualizacja zakonczona bledem ", ex));
-    }
-    return Mono.empty();
+    log.debug("zaczynam aktualizacje blogów");
+    return Flux.merge(getUpdateBlogList())
+        .collectList()
+        .doOnError(ex -> log.error("Aktualizacja zakonczona bledem ", ex));
   }
 
   private Mono<List<Boolean>> getUpdateBlogList() {

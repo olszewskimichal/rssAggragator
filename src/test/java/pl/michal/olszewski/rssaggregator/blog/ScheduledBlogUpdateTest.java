@@ -1,6 +1,5 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,13 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateBlogServiceTest {
+class ScheduledBlogUpdateTest {
 
-  private UpdateBlogService updateBlogService;
-
+  private ScheduledBlogUpdate scheduledBlogUpdate;
   @Mock
   private BlogReactiveRepository blogRepository;
   @Mock
@@ -26,27 +24,19 @@ class UpdateBlogServiceTest {
 
   @BeforeEach
   void setUp() {
-    updateBlogService = new UpdateBlogService(blogRepository, asyncService, Executors.newSingleThreadExecutor(), null);
+    scheduledBlogUpdate = new ScheduledBlogUpdate(new UpdateBlogService(blogRepository, asyncService, Executors.newSingleThreadExecutor(), null));
   }
 
   @Test
-  void shouldNotUpdateBlogFromId() {
+  void shouldRunUpdatesForAllBlogs() {
     //given
-    given(blogRepository.findById("1")).willReturn(Mono.empty());
+    given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
     //when
-    //then
-    assertThatThrownBy(() -> updateBlogService.refreshBlogFromId("1")).hasMessageContaining("Nie znaleziono bloga");
-  }
+    scheduledBlogUpdate.runScheduledUpdate();
 
-  @Test
-  void shouldUpdateBlogFromId() {
-    //given
-    given(blogRepository.findById("1")).willReturn(Mono.just(new Blog()));
-    //when
-    updateBlogService.refreshBlogFromId("1");
-
-    verify(blogRepository, times(1)).findById("1");
+    verify(blogRepository, times(1)).findAll();
     verify(asyncService, times(1)).updateBlog(new Blog());
     verifyNoMoreInteractions(blogRepository);
   }
+
 }
