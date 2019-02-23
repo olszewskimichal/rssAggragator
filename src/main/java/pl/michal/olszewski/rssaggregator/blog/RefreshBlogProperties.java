@@ -8,5 +8,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 class RefreshBlogProperties {
 
   private Integer milis = 5 * 1000 * 60;
-  private boolean enableJob = false;
 }
