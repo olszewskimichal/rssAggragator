@@ -89,13 +89,13 @@ class BlogService {
 
   @Cacheable("blogs")
   public Flux<Blog> getAllBlogs() {
-    log.debug("Pobieram wszystkie blogi");
-    return blogRepository.findAll().cache();
+    log.debug("Pobieram wszystkie blogi2");
+    return blogRepository.findAllWithoutItems();
   }
 
   private Flux<Blog> getBlogsWithLimit(int limit) {
     log.debug("Pobieram {} blogow", limit);
-    return blogRepository.findAll(PageRequest.of(0, limit));
+    return blogRepository.findAllWithoutItems(PageRequest.of(0, limit));
   }
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
@@ -113,29 +113,29 @@ class BlogService {
   }
 
   @Transactional(readOnly = true)
-  public Mono<BlogDTO> getBlogDTOById(String id) {
+  public Mono<BlogInfoDTO> getBlogDTOById(String id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
     return blogRepository.findById(id).cache()
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .map(blogById -> (new BlogDTO(blogById, extractItems(blogById))))
+        .map(BlogInfoDTO::new)
         .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id));
   }
 
   @Cacheable("blogsName")
   @Transactional(readOnly = true)
-  public Mono<BlogDTO> getBlogDTOByName(String name) {
+  public Mono<BlogInfoDTO> getBlogDTOByName(String name) {
     log.debug("pobieram bloga w postaci DTO o nazwie {} {}", name, clock.instant());
     return getBlogByName(name)
-        .map(blog -> new BlogDTO(blog, extractItems(blog)))
+        .map(BlogInfoDTO::new)
         .doOnEach(blogDTO -> log.trace("getBlogDTOByName {}", blogDTO));
   }
 
   @Cacheable("blogsDTO")
   @Transactional(readOnly = true)
-  public Flux<BlogDTO> getAllBlogDTOs(Integer limit) {
+  public Flux<BlogInfoDTO> getAllBlogDTOs(Integer limit) {
     log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
     var dtoFlux = getBlogs(limit)
-        .map(blog -> new BlogDTO(blog.getBlogURL(), blog.getDescription(), blog.getName(), blog.getFeedURL(), blog.getPublishedDate(), extractItems(blog)));
+        .map(BlogInfoDTO::new);
     return dtoFlux
         .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }

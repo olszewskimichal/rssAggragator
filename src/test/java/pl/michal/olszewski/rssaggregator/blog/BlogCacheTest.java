@@ -91,11 +91,11 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldFindByNameFromCache() {
     //given
-    Mono<BlogDTO> byName = service.getBlogDTOByName("nazwa");
-    BlogDTO blogDTO = byName.block();
+    Mono<BlogInfoDTO> byName = service.getBlogDTOByName("nazwa");
+    BlogInfoDTO blogDTO = byName.block();
 
     //when
-    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa");
+    Mono<BlogInfoDTO> cachedDTO = service.getBlogDTOByName("nazwa");
 
     //then
     assertSame(byName, cachedDTO);
@@ -105,12 +105,12 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldNotEvictFindByNameWhenCreate() {
     //given
-    Mono<BlogDTO> byName = service.getBlogDTOByName("nazwa");
-    BlogDTO blogDTO = byName.block();
+    Mono<BlogInfoDTO> byName = service.getBlogDTOByName("nazwa");
+    BlogInfoDTO blogDTO = byName.block();
 
     //when
     service.createBlog(BlogDTO.builder().name("nazwa2").build()).block();
-    Mono<BlogDTO> cachedDTO = service.getBlogDTOByName("nazwa");
+    Mono<BlogInfoDTO> cachedDTO = service.getBlogDTOByName("nazwa");
 
     //then
     assertSame(byName, cachedDTO);

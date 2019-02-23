@@ -339,7 +339,7 @@ class BlogServiceTest {
     given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
 
     //when
-    Mono<BlogDTO> blogById = blogService.getBlogDTOById("1");
+    Mono<BlogInfoDTO> blogById = blogService.getBlogDTOById("1");
 
     //then
     assertThat(blogById).isNotNull();
@@ -359,7 +359,7 @@ class BlogServiceTest {
   @Test
   void shouldGetEmptyBlogs() {
     //given
-    given(blogRepository.findAll()).willReturn(Flux.empty());
+    given(blogRepository.findAllWithoutItems()).willReturn(Flux.empty());
 
     //when
     Flux<Blog> blogs = blogService.getAllBlogs();
@@ -374,7 +374,7 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogs() {
     //given
-    given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
+    given(blogRepository.findAllWithoutItems()).willReturn(Flux.just(new Blog()));
 
     //when
     Flux<Blog> blogs = blogService.getAllBlogs();
@@ -389,10 +389,10 @@ class BlogServiceTest {
   @Test
   void shouldGetEmptyBlogsDTOs() {
     //given
-    given(blogRepository.findAll()).willReturn(Flux.empty());
+    given(blogRepository.findAllWithoutItems()).willReturn(Flux.empty());
 
     //when
-    Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
+    Flux<BlogInfoDTO> blogs = blogService.getAllBlogDTOs(null);
 
     //then
     StepVerifier.create(blogs)
@@ -404,10 +404,10 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogDTOs() {
     //given
-    given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
+    given(blogRepository.findAllWithoutItems()).willReturn(Flux.just(new Blog()));
 
     //when
-    Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
+    Flux<BlogInfoDTO> blogs = blogService.getAllBlogDTOs(null);
 
     //then
     StepVerifier.create(blogs)
@@ -419,10 +419,10 @@ class BlogServiceTest {
   @Test
   void shouldGetOnly3BlogsDTOs() {
     //given
-    given(blogRepository.findAll(PageRequest.of(0, 3))).willReturn(Flux.just(new Blog(), new Blog(), new Blog()));
+    given(blogRepository.findAllWithoutItems(PageRequest.of(0, 3))).willReturn(Flux.just(new Blog(), new Blog(), new Blog()));
 
     //when
-    Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(3);
+    Flux<BlogInfoDTO> blogs = blogService.getAllBlogDTOs(3);
 
     //then
     StepVerifier.create(blogs)
@@ -437,7 +437,7 @@ class BlogServiceTest {
     given(blogRepository.findByName("name")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
 
     //when
-    Mono<BlogDTO> blogById = blogService.getBlogDTOByName("name");
+    Mono<BlogInfoDTO> blogById = blogService.getBlogDTOByName("name");
 
     //then
     assertThat(blogById).isNotNull();

@@ -28,19 +28,19 @@ class BlogEndPoint {
   }
 
   @GetMapping(value = "/{id}")
-  public Mono<BlogDTO> getBlog(@PathVariable("id") String blogId) {
+  public Mono<BlogInfoDTO> getBlog(@PathVariable("id") String blogId) {
     log.debug("GET blog by id {}", blogId);
     return blogService.getBlogDTOById(blogId);
   }
 
   @GetMapping(value = "/by-name/{name}")
-  public Mono<BlogDTO> getBlogByName(@PathVariable("name") String name) {
+  public Mono<BlogInfoDTO> getBlogByName(@PathVariable("name") String name) {
     log.debug("GET blog by name {}", name);
     return blogService.getBlogDTOByName(name);
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public Flux<BlogDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit) {
+  public Flux<BlogInfoDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit) {
     log.debug("GET blogs with limit {}", limit);
     return blogService.getAllBlogDTOs(limit);
   }

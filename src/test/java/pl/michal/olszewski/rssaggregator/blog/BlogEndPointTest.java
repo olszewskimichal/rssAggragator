@@ -23,7 +23,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusOK() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().build()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogInfoDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -42,7 +42,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnBlogAsJson() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().build()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogInfoDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -51,7 +51,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldReturnCorrectBlogById() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogInfoDTO(Blog.builder().name("nazwa").build())));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -94,7 +94,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByNameReturnBlogAsJson() {
-    given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(BlogDTO.builder().build()));
+    given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(new BlogInfoDTO()));
 
     webClient.get().uri("/api/v1/blogs/by-name/name")
         .exchange()
@@ -103,7 +103,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldReturnCorrectBlogByName() {
-    given(blogService.getBlogDTOByName("nazwa")).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
+    given(blogService.getBlogDTOByName("nazwa")).willReturn(Mono.just(new BlogInfoDTO(Blog.builder().name("nazwa").build())));
 
     webClient.get().uri("/api/v1/blogs/by-name/nazwa")
         .exchange()

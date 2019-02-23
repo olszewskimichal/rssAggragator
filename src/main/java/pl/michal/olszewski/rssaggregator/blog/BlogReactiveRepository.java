@@ -23,6 +23,12 @@ public interface BlogReactiveRepository extends ReactiveMongoRepository<Blog, St
   @Query("{ 'active' : true}")
   Flux<Blog> findAll();
 
+  @Query(value = "{ 'active' : true}", fields = "{ 'items' : 0 }")
+  Flux<Blog> findAllWithoutItems(Pageable pageable);
+
+  @Query(value = "{ 'active' : true}", fields = "{ 'items' : 0 }")
+  Flux<Blog> findAllWithoutItems();
+
   @Query("{ 'active' : true}")
   Flux<Blog> findAll(Pageable pageable);
 }

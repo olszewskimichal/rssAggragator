@@ -136,18 +136,6 @@ class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  void should_get_all_blogs_with_items() {
-    //given
-    givenBlog()
-        .buildBlogWithItemsAndSave(2);
-    //when
-    ListBodySpec<BlogDTO> dtos = thenGetBlogsFromApi();
-    //then
-    dtos.hasSize(1);
-    dtos.value(v -> assertThat(v.get(0).getItemsList()).isNotNull().hasSize(2));
-  }
-
-  @Test
   void should_evictCache() { //TODO chyba podobny test jest w BlogCacheTescie - trzeba sprawdzic czy nie lepiej tam to przeniesc
     Flux<Blog> blogs = blogService.getAllBlogs();
     Flux<Blog> blogsNotCached = blogService.getAllBlogs();
