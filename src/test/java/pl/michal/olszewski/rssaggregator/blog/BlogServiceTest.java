@@ -49,7 +49,7 @@ class BlogServiceTest {
   void setUp() {
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
     given(itemRepository.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault()), itemRepository);
+    blogService = new BlogService(blogRepository, Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault()), itemRepository, null);
   }
 
   @Test
