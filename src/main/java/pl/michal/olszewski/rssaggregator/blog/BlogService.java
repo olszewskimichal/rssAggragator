@@ -156,4 +156,10 @@ class BlogService {
     return getBlogByFeedUrl(blogDTO.getFeedURL())
         .flatMap(blog -> updateBlog(blog, blogDTO));
   }
+
+  Flux<ItemDTO> getBlogItemsForBlog(String blogId) {
+    return blogRepository.findById(blogId)
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId)))
+        .flatMapIterable(this::extractItems);
+  }
 }

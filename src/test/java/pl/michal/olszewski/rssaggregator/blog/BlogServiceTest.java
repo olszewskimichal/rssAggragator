@@ -468,4 +468,28 @@ class BlogServiceTest {
     assertThat(blog.isActive()).isFalse();
   }
 
+  @Test
+  void shouldThrownExceptionWhenGetItemsForNotExistingBlog() {
+    //given
+    given(blogRepository.findById("id")).willReturn(Mono.empty());
+
+    //when
+    StepVerifier.create(blogService.getBlogItemsForBlog("id"))
+        .expectErrorMessage("Nie znaleziono bloga = id")
+        .verify();
+  }
+
+  @Test
+  void shouldReturnBlogItemsForBlog() {
+    //given
+    Blog blog = new Blog("url", "", "url", "", null, null);
+    blog.addItem(new Item(ItemDTO.builder().title("title").build()), itemRepository);
+    given(blogRepository.findById("id")).willReturn(Mono.just(blog));
+
+    //when
+    StepVerifier.create(blogService.getBlogItemsForBlog("id"))
+        .expectNextCount(1)
+        .verifyComplete();
+  }
+
 }
