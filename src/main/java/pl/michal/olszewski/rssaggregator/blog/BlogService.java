@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.item.Item;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -140,10 +139,10 @@ class BlogService {
         .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }
 
-  private List<ItemDTO> extractItems(Blog v) {
+  private List<BlogItemDTO> extractItems(Blog v) {
     return v.getItems().stream()
         .parallel()
-        .map(ItemDTO::new)
+        .map(BlogItemDTO::new)
         .collect(Collectors.toList());
   }
 
@@ -157,7 +156,7 @@ class BlogService {
         .flatMap(blog -> updateBlog(blog, blogDTO));
   }
 
-  Flux<ItemDTO> getBlogItemsForBlog(String blogId) {
+  Flux<BlogItemDTO> getBlogItemsForBlog(String blogId) {
     return blogRepository.findById(blogId)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId)))
         .flatMapIterable(this::extractItems);
