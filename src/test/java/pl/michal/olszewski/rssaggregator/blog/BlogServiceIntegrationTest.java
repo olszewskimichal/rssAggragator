@@ -41,6 +41,20 @@ class BlogServiceIntegrationTest extends IntegrationTestBase {
   }
 
   @Test
+  void shouldAggregateBlogPosts3() {
+    Blog blog = givenBlog().buildBlogWithItemsAndSave(20);
+
+    Flux<BlogAggregationDTO> blogsWithCount = blogService.getBlogsWithCount();
+
+    StepVerifier.create(blogsWithCount)
+        .assertNext(v -> {
+          System.err.println(v.toString());
+          assertThat(v.getBlogItemsCount()).isEqualTo(20);
+        })
+        .verifyComplete();
+  }
+
+  @Test
   void shouldAggregateBlogPosts2() {
     Blog blog = givenBlog().buildBlogWithItemsAndSave(0);
 
