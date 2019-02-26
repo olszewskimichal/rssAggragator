@@ -41,7 +41,7 @@ class BlogApiTest extends IntegrationTestBase {
     givenBlog()
         .buildNumberOfBlogsDTOAndSave(0);
 
-    ListBodySpec<BlogDTO> blogs = thenGetBlogsFromApi();
+    ListBodySpec<BlogAggregationDTO> blogs = thenGetBlogsFromApi();
 
     blogs.hasSize(0);
   }
@@ -51,7 +51,7 @@ class BlogApiTest extends IntegrationTestBase {
     givenBlog()
         .buildNumberOfBlogsDTOAndSave(3);
 
-    ListBodySpec<BlogDTO> blogs = thenGetBlogsFromApi();
+    ListBodySpec<BlogAggregationDTO> blogs = thenGetBlogsFromApi();
 
     blogs.hasSize(3);
   }
@@ -60,9 +60,9 @@ class BlogApiTest extends IntegrationTestBase {
   void should_get_one_blog() {
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
-    BlogDTO expected = new BlogDTO(blog, new ArrayList<>());
+    BlogAggregationDTO expected = new BlogAggregationDTO(blog);
 
-    BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
+    BodySpec<BlogAggregationDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
 
     blogDTO.value(v -> assertThat(v).isEqualToComparingFieldByField(expected));
   }
@@ -117,7 +117,7 @@ class BlogApiTest extends IntegrationTestBase {
     Blog blog = givenBlog()
         .buildBlogWithItemsAndSave(2);
     //when
-    BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
+    BodySpec<BlogAggregationDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
     //then
     blogDTO.value(v -> assertThat(v).isNotNull());
   }
@@ -126,19 +126,19 @@ class BlogApiTest extends IntegrationTestBase {
     return new BlogListFactory(blogRepository, mongoTemplate);
   }
 
-  private ListBodySpec<BlogDTO> thenGetBlogsFromApi() {
+  private ListBodySpec<BlogAggregationDTO> thenGetBlogsFromApi() {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs", port)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(BlogDTO.class);
+        .expectBodyList(BlogAggregationDTO.class);
   }
 
-  private BodySpec<BlogDTO, ?> thenGetOneBlogFromApiById(String id) {
+  private BodySpec<BlogAggregationDTO, ?> thenGetOneBlogFromApiById(String id) {
     return webTestClient.get()
         .uri("http://localhost:{port}/api/v1/blogs/{id}", port, id)
         .exchange()
         .expectStatus().isOk()
-        .expectBody(BlogDTO.class);
+        .expectBody(BlogAggregationDTO.class);
   }
 
   //TODO pozbyc sie template a uzyc webTestClienta
@@ -154,7 +154,4 @@ class BlogApiTest extends IntegrationTestBase {
     template.delete(String.format("http://localhost:%s/api/v1/blogs/%s", port, blogId));
   }
 
-  private void thenEvictCache() {
-    template.postForEntity(String.format("http://localhost:%s/api/v1/blogs/evictCache", port), "", String.class);
-  }
 }

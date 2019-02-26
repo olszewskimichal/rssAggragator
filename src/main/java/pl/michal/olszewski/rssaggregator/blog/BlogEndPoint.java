@@ -35,7 +35,7 @@ class BlogEndPoint {
   @GetMapping(value = "/{id}")
   public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
     log.debug("GET blog by id {}", blogId);
-    UriComponents uriComponents = ServletUriComponentsBuilder.fromCurrentRequest().build();
+    UriComponents uriComponents = getRequestUriComponents();
     return blogService.getBlogDTOById(blogId)
         .map(blog -> addLinkToBlogItems(blog, uriComponents));
   }
@@ -43,7 +43,7 @@ class BlogEndPoint {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public Flux<BlogAggregationDTO> getBlogs() {
     log.debug("GET blogs");
-    UriComponents uriComponents = ServletUriComponentsBuilder.fromCurrentRequest().build();
+    UriComponents uriComponents = getRequestUriComponents();
     return blogService.getAllBlogDTOs()
         .map(blog -> addLinkToSelf(blog, uriComponents))
         .map(blog -> addLinkToBlogItems(blog, uriComponents));
@@ -79,6 +79,14 @@ class BlogEndPoint {
     blogService.evictBlogCache();
   }
 
+  private UriComponents getRequestUriComponents() {
+    try {
+      return ServletUriComponentsBuilder.fromCurrentRequest().build();
+    } catch (IllegalStateException ex) {
+      return ServletUriComponentsBuilder.fromUriString("localhost").build();
+    }
+  }
+
   private BlogAggregationDTO addLinkToSelf(BlogAggregationDTO blog, UriComponents uriComponents) {
     Link link = linkTo(methodOn(BlogEndPoint.class)
         .getBlog(blog.getBlogId())).withSelfRel();
@@ -92,8 +100,11 @@ class BlogEndPoint {
   }
 
   private BlogAggregationDTO composeLink(BlogAggregationDTO blog, UriComponents uriComponents, Link link, String linkName) {
-    String url = "http://" + uriComponents.getHost() + ":" + uriComponents.getPort() + link.getHref();
-    blog.add(new Link(url).withRel(linkName));
+    Link link1 = blog.getLink(linkName);
+    if (link1 == null) {
+      String url = "http://" + uriComponents.getHost() + ":" + uriComponents.getPort() + link.getHref();
+      blog.add(new Link(url).withRel(linkName));
+    }
     return blog;
   }
 

@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @WebFluxTest(BlogEndPoint.class)
@@ -61,6 +62,8 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogsReturnStatusOK() {
+    given(blogService.getAllBlogDTOs()).willReturn(Flux.empty());
+
     webClient.get().uri("/api/v1/blogs")
         .exchange()
         .expectStatus().isOk();
