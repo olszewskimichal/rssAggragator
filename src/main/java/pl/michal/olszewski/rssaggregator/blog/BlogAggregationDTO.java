@@ -6,14 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.hateoas.ResourceSupport;
 
 @Getter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-class BlogAggregationDTO {
+class BlogAggregationDTO extends ResourceSupport {
 
-  private String id;
+  private String blogId;
   private String link;
   private String description;
   private String name;
@@ -23,7 +24,7 @@ class BlogAggregationDTO {
 
 
   BlogAggregationDTO(Blog blog) {
-    this.id = blog.getId();
+    this.blogId = blog.getId();
     this.link = blog.getBlogURL();
     this.description = blog.getDescription();
     this.name = blog.getName();
@@ -41,7 +42,7 @@ class BlogAggregationDTO {
       return false;
     }
     BlogAggregationDTO that = (BlogAggregationDTO) o;
-    return Objects.equals(id, that.id) &&
+    return Objects.equals(blogId, that.blogId) &&
         Objects.equals(link, that.link) &&
         Objects.equals(description, that.description) &&
         Objects.equals(name, that.name) &&
@@ -52,6 +53,6 @@ class BlogAggregationDTO {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, link, description, name, feedURL, publishedDate, blogItemsCount);
+    return Objects.hash(blogId, link, description, name, feedURL, publishedDate, blogItemsCount);
   }
 }
