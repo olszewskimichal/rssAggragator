@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,12 +46,6 @@ class BlogService {
     return blogRepository.save(blog);
   }
 
-  private Mono<Blog> getBlogByName(String name) {
-    log.debug("getBlogByName {}", name);
-    return blogRepository.findByName(name).cache()
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(name)));
-  }
-
   private Mono<Blog> getBlogByFeedUrl(String feedUrl) {
     log.debug("getBlogByFeedUrl {}", feedUrl);
     return blogRepository.findByFeedURL(feedUrl)
@@ -79,22 +72,10 @@ class BlogService {
         );
   }
 
-  private Flux<Blog> getBlogs(Integer limit) {
-    if (limit != null) {
-      return getBlogsWithLimit(limit);
-    }
-    return getAllBlogs();
-  }
-
   @Cacheable("blogs")
   public Flux<Blog> getAllBlogs() {
-    log.debug("Pobieram wszystkie blogi2");
+    log.debug("Pobieram wszystkie blogi");
     return blogRepository.findAllWithoutItems();
-  }
-
-  private Flux<Blog> getBlogsWithLimit(int limit) {
-    log.debug("Pobieram {} blogow", limit);
-    return blogRepository.findAllWithoutItems(PageRequest.of(0, limit));
   }
 
   @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
@@ -112,29 +93,19 @@ class BlogService {
   }
 
   @Transactional(readOnly = true)
-  public Mono<BlogInfoDTO> getBlogDTOById(String id) {
+  public Mono<BlogAggregationDTO> getBlogDTOById(String id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
     return blogRepository.findById(id).cache()
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .map(BlogInfoDTO::new)
+        .map(BlogAggregationDTO::new)
         .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id));
-  }
-
-  @Cacheable("blogsName")
-  @Transactional(readOnly = true)
-  public Mono<BlogInfoDTO> getBlogDTOByName(String name) {
-    log.debug("pobieram bloga w postaci DTO o nazwie {} {}", name, clock.instant());
-    return getBlogByName(name)
-        .map(BlogInfoDTO::new)
-        .doOnEach(blogDTO -> log.trace("getBlogDTOByName {}", blogDTO));
   }
 
   @Cacheable("blogsDTO")
   @Transactional(readOnly = true)
-  public Flux<BlogInfoDTO> getAllBlogDTOs(Integer limit) {
-    log.debug("pobieram wszystkie blogi w postaci DTO z limitem {}", limit);
-    var dtoFlux = getBlogs(limit)
-        .map(BlogInfoDTO::new);
+  public Flux<BlogAggregationDTO> getAllBlogDTOs() {
+    log.debug("pobieram wszystkie blogi w postaci DTO ");
+    var dtoFlux = blogRepository.getBlogsWithCount();
     return dtoFlux
         .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }

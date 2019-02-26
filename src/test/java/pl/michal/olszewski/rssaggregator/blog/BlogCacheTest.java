@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 class BlogCacheTest extends IntegrationTestBase {
 
@@ -85,36 +83,6 @@ class BlogCacheTest extends IntegrationTestBase {
     //then
     assertNotSame(allBlogs, blogs);
     assertThat(blogList).isNotEqualTo(blogs.toIterable());
-  }
-
-
-  @Test
-  void shouldFindByNameFromCache() {
-    //given
-    Mono<BlogInfoDTO> byName = service.getBlogDTOByName("nazwa");
-    BlogInfoDTO blogDTO = byName.block();
-
-    //when
-    Mono<BlogInfoDTO> cachedDTO = service.getBlogDTOByName("nazwa");
-
-    //then
-    assertSame(byName, cachedDTO);
-    assertEquals(blogDTO, cachedDTO.block());
-  }
-
-  @Test
-  void shouldNotEvictFindByNameWhenCreate() {
-    //given
-    Mono<BlogInfoDTO> byName = service.getBlogDTOByName("nazwa");
-    BlogInfoDTO blogDTO = byName.block();
-
-    //when
-    service.createBlog(BlogDTO.builder().name("nazwa2").build()).block();
-    Mono<BlogInfoDTO> cachedDTO = service.getBlogDTOByName("nazwa");
-
-    //then
-    assertSame(byName, cachedDTO);
-    assertEquals(blogDTO, cachedDTO.block());
   }
 
 }

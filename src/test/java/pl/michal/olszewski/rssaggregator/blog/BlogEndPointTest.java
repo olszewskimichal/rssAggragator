@@ -23,7 +23,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusOK() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogInfoDTO()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogAggregationDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -42,7 +42,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnBlogAsJson() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogInfoDTO()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogAggregationDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -51,7 +51,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldReturnCorrectBlogById() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogInfoDTO(Blog.builder().name("nazwa").build())));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogAggregationDTO(Blog.builder().name("nazwa").build())));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -90,24 +90,5 @@ class BlogEndPointTest {
         .exchange()
         .expectStatus()
         .isNoContent();
-  }
-
-  @Test
-  void shouldGetBlogByNameReturnBlogAsJson() {
-    given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(new BlogInfoDTO()));
-
-    webClient.get().uri("/api/v1/blogs/by-name/name")
-        .exchange()
-        .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8);
-  }
-
-  @Test
-  void shouldReturnCorrectBlogByName() {
-    given(blogService.getBlogDTOByName("nazwa")).willReturn(Mono.just(new BlogInfoDTO(Blog.builder().name("nazwa").build())));
-
-    webClient.get().uri("/api/v1/blogs/by-name/nazwa")
-        .exchange()
-        .expectBody(BlogDTO.class)
-        .value(v -> assertThat(v.getName()).isEqualTo("nazwa"));
   }
 }

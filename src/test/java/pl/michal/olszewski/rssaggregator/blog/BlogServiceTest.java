@@ -24,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
@@ -339,7 +338,7 @@ class BlogServiceTest {
     given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
 
     //when
-    Mono<BlogInfoDTO> blogById = blogService.getBlogDTOById("1");
+    Mono<BlogAggregationDTO> blogById = blogService.getBlogDTOById("1");
 
     //then
     assertThat(blogById).isNotNull();
@@ -389,10 +388,10 @@ class BlogServiceTest {
   @Test
   void shouldGetEmptyBlogsDTOs() {
     //given
-    given(blogRepository.findAllWithoutItems()).willReturn(Flux.empty());
+    given(blogRepository.getBlogsWithCount()).willReturn(Flux.empty());
 
     //when
-    Flux<BlogInfoDTO> blogs = blogService.getAllBlogDTOs(null);
+    Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs();
 
     //then
     StepVerifier.create(blogs)
@@ -404,53 +403,15 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogDTOs() {
     //given
-    given(blogRepository.findAllWithoutItems()).willReturn(Flux.just(new Blog()));
+    given(blogRepository.getBlogsWithCount()).willReturn(Flux.just(new BlogAggregationDTO()));
 
     //when
-    Flux<BlogInfoDTO> blogs = blogService.getAllBlogDTOs(null);
+    Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs();
 
     //then
     StepVerifier.create(blogs)
         .expectNextCount(1)
         .expectComplete()
-        .verify();
-  }
-
-  @Test
-  void shouldGetOnly3BlogsDTOs() {
-    //given
-    given(blogRepository.findAllWithoutItems(PageRequest.of(0, 3))).willReturn(Flux.just(new Blog(), new Blog(), new Blog()));
-
-    //when
-    Flux<BlogInfoDTO> blogs = blogService.getAllBlogDTOs(3);
-
-    //then
-    StepVerifier.create(blogs)
-        .expectNextCount(3)
-        .expectComplete()
-        .verify();
-  }
-
-  @Test
-  void shouldGetBlogDTOByName() {
-    //given
-    given(blogRepository.findByName("name")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
-
-    //when
-    Mono<BlogInfoDTO> blogById = blogService.getBlogDTOByName("name");
-
-    //then
-    assertThat(blogById).isNotNull();
-  }
-
-  @Test
-  void shouldThrownExceptionWhenBlogDTOByNameNotExist() {
-    //given
-    given(blogRepository.findByName("name")).willReturn(Mono.empty());
-
-    //when
-    StepVerifier.create(blogService.getBlogDTOByName("name"))
-        .expectErrorMessage("Nie znaleziono bloga = name")
         .verify();
   }
 

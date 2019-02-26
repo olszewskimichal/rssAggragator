@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -28,21 +27,15 @@ class BlogEndPoint {
   }
 
   @GetMapping(value = "/{id}")
-  public Mono<BlogInfoDTO> getBlog(@PathVariable("id") String blogId) {
+  public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
     log.debug("GET blog by id {}", blogId);
     return blogService.getBlogDTOById(blogId);
   }
 
-  @GetMapping(value = "/by-name/{name}")
-  public Mono<BlogInfoDTO> getBlogByName(@PathVariable("name") String name) {
-    log.debug("GET blog by name {}", name);
-    return blogService.getBlogDTOByName(name);
-  }
-
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public Flux<BlogInfoDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit) {
-    log.debug("GET blogs with limit {}", limit);
-    return blogService.getAllBlogDTOs(limit);
+  public Flux<BlogAggregationDTO> getBlogs() {
+    log.debug("GET blogs");
+    return blogService.getAllBlogDTOs();
   }
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

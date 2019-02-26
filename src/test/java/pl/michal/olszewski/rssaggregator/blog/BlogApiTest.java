@@ -60,16 +60,6 @@ class BlogApiTest extends IntegrationTestBase {
   }
 
   @Test
-  void should_get_limit_three_blogs() {
-    givenBlog()
-        .buildNumberOfBlogsDTOAndSave(6);
-
-    ListBodySpec<BlogDTO> blogDefinitionDTOS = thenGetBlogsFromApiWithLimit(3);
-
-    blogDefinitionDTOS.hasSize(3);
-  }
-
-  @Test
   void should_get_one_blog() {
     Blog blog = givenBlog()
         .buildNumberOfBlogsAndSave(1).get(0);
@@ -165,13 +155,6 @@ class BlogApiTest extends IntegrationTestBase {
         .exchange()
         .expectStatus().isOk()
         .expectBody(BlogDTO.class);
-  }
-
-  private ListBodySpec<BlogDTO> thenGetBlogsFromApiWithLimit(int limit) {
-    return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs?limit={limit}", port, limit)
-        .exchange()
-        .expectStatus().isOk()
-        .expectBodyList(BlogDTO.class);
   }
 
   //TODO pozbyc sie template a uzyc webTestClienta
