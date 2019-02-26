@@ -1,6 +1,5 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import java.time.Clock;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,15 +20,13 @@ class BlogService {
 
   private final BlogReactiveRepository blogRepository;
   private final MongoTemplate itemRepository; //TODO refactorName
-  private final Clock clock;
 
-  public BlogService(BlogReactiveRepository blogRepository, Clock clock, MongoTemplate itemRepository) {
+  public BlogService(BlogReactiveRepository blogRepository, MongoTemplate itemRepository) {
     this.blogRepository = blogRepository;
-    this.clock = clock;
     this.itemRepository = itemRepository;
   }
 
-  @CacheEvict(value = {"blogs", "blogsDTO"}, allEntries = true)
+  @CacheEvict(value = {"blogs"}, allEntries = true)
   public Mono<Blog> createBlog(BlogDTO blogDTO) {
     log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
     return blogRepository.findByFeedURL(blogDTO.getFeedURL())
@@ -72,13 +69,7 @@ class BlogService {
         );
   }
 
-  @Cacheable("blogs")
-  public Flux<Blog> getAllBlogs() {
-    log.debug("Pobieram wszystkie blogi");
-    return blogRepository.findAllWithoutItems();
-  }
-
-  @CacheEvict(value = {"blogs", "blogsName", "blogsDTO"}, allEntries = true)
+  @CacheEvict(value = {"blogs"}, allEntries = true)
   public Mono<Void> deleteBlog(String id) {
     log.debug("Usuwam bloga o id {}", id);
     return blogRepository.findById(id)
@@ -101,11 +92,11 @@ class BlogService {
         .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id));
   }
 
-  @Cacheable("blogsDTO")
+  @Cacheable("blogs")
   @Transactional(readOnly = true)
   public Flux<BlogAggregationDTO> getAllBlogDTOs() {
     log.debug("pobieram wszystkie blogi w postaci DTO ");
-    var dtoFlux = blogRepository.getBlogsWithCount();
+    var dtoFlux = blogRepository.getBlogsWithCount().cache();
     return dtoFlux
         .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }
@@ -117,7 +108,7 @@ class BlogService {
         .collect(Collectors.toList());
   }
 
-  @CacheEvict(value = {"blogs", "blogsDTO", "blogsName"}, allEntries = true)
+  @CacheEvict(value = {"blogs"}, allEntries = true)
   public void evictBlogCache() {
     log.debug("Czyszcze cache dla blogów");
   }

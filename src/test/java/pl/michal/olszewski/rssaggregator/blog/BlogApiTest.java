@@ -1,8 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -15,7 +13,6 @@ import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.ItemRepository;
-import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 class BlogApiTest extends IntegrationTestBase {
@@ -123,19 +120,6 @@ class BlogApiTest extends IntegrationTestBase {
     BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
     //then
     blogDTO.value(v -> assertThat(v).isNotNull());
-  }
-
-  @Test
-  void should_evictCache() { //TODO chyba podobny test jest w BlogCacheTescie - trzeba sprawdzic czy nie lepiej tam to przeniesc
-    Flux<Blog> blogs = blogService.getAllBlogs();
-    Flux<Blog> blogsNotCached = blogService.getAllBlogs();
-    assertSame(blogs, blogsNotCached);
-    blogService.evictBlogCache();
-
-    blogs = blogService.getAllBlogs();
-    thenEvictCache();
-    blogsNotCached = blogService.getAllBlogs(); //TODO
-    assertNotSame(blogs, blogsNotCached);  //TODO sprawdzic czy to aby na pewno dziala
   }
 
   private BlogListFactory givenBlog() {

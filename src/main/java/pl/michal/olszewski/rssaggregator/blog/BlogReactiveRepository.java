@@ -1,6 +1,5 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
@@ -22,10 +21,4 @@ public interface BlogReactiveRepository extends ReactiveMongoRepository<Blog, St
 
   @Query("{ 'active' : true}")
   Flux<Blog> findAll();
-
-  @Query(value = "{ 'active' : true}", fields = "{ 'items' : 0 }")
-  Flux<Blog> findAllWithoutItems(); //TODO dopisac test
-
-  @Query("{ 'active' : true}")
-  Flux<Blog> findAll(Pageable pageable);
 }

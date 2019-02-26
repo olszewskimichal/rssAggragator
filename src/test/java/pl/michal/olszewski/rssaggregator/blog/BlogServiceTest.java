@@ -8,9 +8,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,13 +40,13 @@ class BlogServiceTest {
   private BlogReactiveRepository blogRepository;
 
   @Mock
-  private MongoTemplate itemRepository;
+  private MongoTemplate itemRepository; //TODO refactorName
 
   @BeforeEach
   void setUp() {
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
     given(itemRepository.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault()), itemRepository);
+    blogService = new BlogService(blogRepository, itemRepository);
   }
 
   @Test
@@ -352,36 +350,6 @@ class BlogServiceTest {
     //expect
     StepVerifier.create(blogService.getBlogDTOById("1"))
         .expectErrorMessage("Nie znaleziono bloga = 1")
-        .verify();
-  }
-
-  @Test
-  void shouldGetEmptyBlogs() {
-    //given
-    given(blogRepository.findAllWithoutItems()).willReturn(Flux.empty());
-
-    //when
-    Flux<Blog> blogs = blogService.getAllBlogs();
-
-    //then
-    StepVerifier.create(blogs)
-        .expectNextCount(0)
-        .expectComplete()
-        .verify();
-  }
-
-  @Test
-  void shouldGetAllBlogs() {
-    //given
-    given(blogRepository.findAllWithoutItems()).willReturn(Flux.just(new Blog()));
-
-    //when
-    Flux<Blog> blogs = blogService.getAllBlogs();
-
-    //then
-    StepVerifier.create(blogs)
-        .expectNextCount(1)
-        .expectComplete()
         .verify();
   }
 

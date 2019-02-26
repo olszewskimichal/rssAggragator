@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,5 +30,28 @@ class BlogAggregationDTO {
     this.feedURL = blog.getFeedURL();
     this.publishedDate = blog.getPublishedDate();
     this.blogItemsCount = (long) blog.getItems().size();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    BlogAggregationDTO that = (BlogAggregationDTO) o;
+    return Objects.equals(id, that.id) &&
+        Objects.equals(link, that.link) &&
+        Objects.equals(description, that.description) &&
+        Objects.equals(name, that.name) &&
+        Objects.equals(feedURL, that.feedURL) &&
+        Objects.equals(publishedDate, that.publishedDate) &&
+        Objects.equals(blogItemsCount, that.blogItemsCount);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, link, description, name, feedURL, publishedDate, blogItemsCount);
   }
 }
