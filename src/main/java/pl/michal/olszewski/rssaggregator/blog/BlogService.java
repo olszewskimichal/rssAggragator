@@ -1,6 +1,5 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import io.micrometer.core.annotation.Timed;
 import java.time.Clock;
 import java.util.List;
 import java.util.Set;
@@ -9,13 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.michal.olszewski.rssaggregator.config.RegistryTimed;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,15 +21,13 @@ import reactor.core.publisher.Mono;
 class BlogService {
 
   private final BlogReactiveRepository blogRepository;
-  private final MongoTemplate itemRepository; //refactorName
-  private final ReactiveMongoTemplate reactiveMongoTemplate;
+  private final MongoTemplate itemRepository; //TODO refactorName
   private final Clock clock;
 
-  public BlogService(BlogReactiveRepository blogRepository, Clock clock, MongoTemplate itemRepository, ReactiveMongoTemplate reactiveMongoTemplate) {
+  public BlogService(BlogReactiveRepository blogRepository, Clock clock, MongoTemplate itemRepository) {
     this.blogRepository = blogRepository;
     this.clock = clock;
     this.itemRepository = itemRepository;
-    this.reactiveMongoTemplate = reactiveMongoTemplate;
   }
 
   @CacheEvict(value = {"blogs", "blogsDTO"}, allEntries = true)
@@ -168,23 +161,4 @@ class BlogService {
         .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId)))
         .flatMapIterable(this::extractItems);
   }
-
-  @RegistryTimed
-  @Timed
-  Flux<BlogAggregationDTO> getBlogsWithCount() {
-    return reactiveMongoTemplate.aggregate(Aggregation.newAggregation(
-        Aggregation.unwind("items", true),
-        Aggregation.group("id")
-            .first("blogURL").as("link")
-            .first("description").as("description")
-            .first("name").as("name")
-            .first("feedURL").as("feedURL")
-            .first("publishedDate").as("publishedDate")
-            .addToSet("items").as("items"),
-        Aggregation.project("id", "link", "description", "name", "feedURL", "publishedDate")
-            .and("items").project("size").as("blogItemsCount"),
-        Aggregation.sort(Direction.DESC, "blogItemsCount")
-    ), Blog.class, BlogAggregationDTO.class);
-  }
-
 }

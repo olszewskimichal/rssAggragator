@@ -10,10 +10,7 @@ import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-class BlogServiceIntegrationTest extends IntegrationTestBase {
-
-  @Autowired
-  private BlogService blogService;
+class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
 
   @Autowired
   private MongoTemplate mongoTemplate;
@@ -28,9 +25,9 @@ class BlogServiceIntegrationTest extends IntegrationTestBase {
 
   @Test
   void shouldAggregateBlogPosts() {
-    Blog blog = givenBlog().buildBlogWithItemsAndSave(2);
+    givenBlog().buildBlogWithItemsAndSave(2);
 
-    Flux<BlogAggregationDTO> blogsWithCount = blogService.getBlogsWithCount();
+    Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
 
     StepVerifier.create(blogsWithCount)
         .assertNext(v -> {
@@ -41,24 +38,10 @@ class BlogServiceIntegrationTest extends IntegrationTestBase {
   }
 
   @Test
-  void shouldAggregateBlogPosts3() {
-    Blog blog = givenBlog().buildBlogWithItemsAndSave(20);
-
-    Flux<BlogAggregationDTO> blogsWithCount = blogService.getBlogsWithCount();
-
-    StepVerifier.create(blogsWithCount)
-        .assertNext(v -> {
-          System.err.println(v.toString());
-          assertThat(v.getBlogItemsCount()).isEqualTo(20);
-        })
-        .verifyComplete();
-  }
-
-  @Test
   void shouldAggregateBlogPosts2() {
-    Blog blog = givenBlog().buildBlogWithItemsAndSave(0);
+    givenBlog().buildBlogWithItemsAndSave(0);
 
-    Flux<BlogAggregationDTO> blogsWithCount = blogService.getBlogsWithCount();
+    Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
 
     StepVerifier.create(blogsWithCount)
         .assertNext(v -> {

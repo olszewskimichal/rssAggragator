@@ -3,13 +3,11 @@ package pl.michal.olszewski.rssaggregator.blog;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 class BlogAggregationDTO {
 
   private String id;

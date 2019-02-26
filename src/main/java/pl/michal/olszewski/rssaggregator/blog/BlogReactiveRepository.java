@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 @Transactional
-public interface BlogReactiveRepository extends ReactiveMongoRepository<Blog, String> {
+public interface BlogReactiveRepository extends ReactiveMongoRepository<Blog, String>, ReactiveAggregationBlogRepository {
 
   @Query("{ 'feedURL' : ?0 }")
   Mono<Blog> findByFeedURL(String url);
