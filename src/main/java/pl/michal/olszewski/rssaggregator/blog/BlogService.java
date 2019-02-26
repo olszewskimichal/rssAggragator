@@ -19,11 +19,11 @@ import reactor.core.publisher.Mono;
 class BlogService {
 
   private final BlogReactiveRepository blogRepository;
-  private final MongoTemplate itemRepository; //TODO refactorName
+  private final MongoTemplate mongoTemplate;
 
-  public BlogService(BlogReactiveRepository blogRepository, MongoTemplate itemRepository) {
+  public BlogService(BlogReactiveRepository blogRepository, MongoTemplate mongoTemplate) {
     this.blogRepository = blogRepository;
-    this.itemRepository = itemRepository;
+    this.mongoTemplate = mongoTemplate;
   }
 
   @CacheEvict(value = {"blogs"}, allEntries = true)
@@ -39,7 +39,7 @@ class BlogService {
     var blog = new Blog(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)
-        .forEach(v -> blog.addItem(v, itemRepository));
+        .forEach(v -> blog.addItem(v, mongoTemplate));
     return blogRepository.save(blog);
   }
 
@@ -62,7 +62,7 @@ class BlogService {
               blogInfoFromRSS.getItemsList().stream()
                   .map(Item::new)
                   .filter(v -> !linkSet.contains(v.getLink()))
-                  .forEach(v -> blog.addItem(v, itemRepository));
+                  .forEach(v -> blog.addItem(v, mongoTemplate));
               blog.updateFromDto(blogInfoFromRSS);
               return blogRepository.save(blog);
             }
