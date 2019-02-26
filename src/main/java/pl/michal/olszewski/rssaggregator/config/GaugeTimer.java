@@ -31,7 +31,7 @@ public class GaugeTimer {
     stopWatch.start();
     Object retVal = joinPoint.proceed();
     stopWatch.stop();
-    logger.error("Zakonczono {} w czasie {} sekund", joinPoint.getSignature().toShortString(), stopWatch.getTotalTimeSeconds());
+    logger.debug("Zakonczono {} w czasie {} sekund", joinPoint.getSignature().toShortString(), stopWatch.getTotalTimeSeconds());
 
     gauges.putIfAbsent(joinPoint.getSignature().toShortString(), new AtomicDouble());
     registry.gauge(joinPoint.getSignature().toShortString(), gauges.get(joinPoint.getSignature().toShortString())).set(stopWatch.getTotalTimeSeconds());
