@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -46,7 +47,7 @@ class BlogServiceTest {
   void setUp() {
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
     given(itemRepository.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, itemRepository);
+    blogService = new BlogService(blogRepository, itemRepository, new HashMap<>());
   }
 
   @Test

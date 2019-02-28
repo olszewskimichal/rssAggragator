@@ -1,11 +1,10 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +19,15 @@ class BlogService {
 
   private final BlogReactiveRepository blogRepository;
   private final MongoTemplate mongoTemplate;
+  private final Map<String, BlogAggregationDTO> cache;
 
-  public BlogService(BlogReactiveRepository blogRepository, MongoTemplate mongoTemplate) {
+  public BlogService(BlogReactiveRepository blogRepository, MongoTemplate mongoTemplate, Map<String, BlogAggregationDTO> cache) {
     this.blogRepository = blogRepository;
     this.mongoTemplate = mongoTemplate;
+    this.cache = cache;
   }
 
-  @CacheEvict(value = {"blogs"}, allEntries = true)
-  public Mono<Blog> createBlog(BlogDTO blogDTO) {
+  Mono<Blog> createBlog(BlogDTO blogDTO) {
     log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
     return blogRepository.findByFeedURL(blogDTO.getFeedURL())
         .switchIfEmpty(createBlogg(blogDTO));
@@ -35,7 +35,6 @@ class BlogService {
 
   private Mono<Blog> createBlogg(BlogDTO blogDTO) {
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
-
     var blog = new Blog(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)
@@ -69,16 +68,16 @@ class BlogService {
         );
   }
 
-  @CacheEvict(value = {"blogs"}, allEntries = true)
-  public Mono<Void> deleteBlog(String id) {
+  Mono<Void> deleteBlog(String id) {
     log.debug("Usuwam bloga o id {}", id);
     return blogRepository.findById(id)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .flatMap(v -> {
-          if (v.getItems().isEmpty()) {
-            return blogRepository.delete(v);
+        .flatMap(blog -> {
+          if (blog.getItems().isEmpty()) {
+            return blogRepository.delete(blog)
+                .doOnSuccess(v -> cache.remove(id));
           }
-          v.deactive();
+          blog.deactive();
           return Mono.empty();
         });
   }
@@ -86,13 +85,14 @@ class BlogService {
   @Transactional(readOnly = true)
   public Mono<BlogAggregationDTO> getBlogDTOById(String id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
-    return blogRepository.findById(id).cache()
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .map(BlogAggregationDTO::new)
-        .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id));
+    return Mono.justOrEmpty(cache.get(id))
+        .switchIfEmpty(blogRepository.findById(id).cache()
+            .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
+            .map(BlogAggregationDTO::new)
+            .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id))
+            .doOnSuccess(v -> cache.putIfAbsent(id, v)));
   }
 
-  @Cacheable("blogs")
   @Transactional(readOnly = true)
   public Flux<BlogAggregationDTO> getAllBlogDTOs() {
     log.debug("pobieram wszystkie blogi w postaci DTO ");
@@ -108,9 +108,9 @@ class BlogService {
         .collect(Collectors.toList());
   }
 
-  @CacheEvict(value = {"blogs"}, allEntries = true)
-  public void evictBlogCache() {
+  void evictBlogCache() {
     log.debug("Czyszcze cache dla blogów");
+    cache.clear();
   }
 
   Mono<Blog> updateBlog(BlogDTO blogDTO) {
