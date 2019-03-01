@@ -12,6 +12,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +46,12 @@ class BlogServiceTest {
 
   @BeforeEach
   void setUp() {
-    given(blogRepository.save(any(Blog.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
+    given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
+          Blog argument = i.getArgument(0);
+          argument.setId(UUID.randomUUID().toString());
+          return Mono.just(argument);
+        }
+    );
     given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
     blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build());
     blogService.evictBlogCache();
@@ -374,7 +380,9 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogDTOs() {
     //given
-    given(blogRepository.getBlogsWithCount()).willReturn(Flux.just(new BlogAggregationDTO()));
+    Blog blog = new Blog();
+    blog.setId(UUID.randomUUID().toString());
+    given(blogRepository.getBlogsWithCount()).willReturn(Flux.just(new BlogAggregationDTO(blog)));
 
     //when
     Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs();

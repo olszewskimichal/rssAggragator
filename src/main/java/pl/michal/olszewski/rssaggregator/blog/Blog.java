@@ -9,6 +9,7 @@ import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import pl.michal.olszewski.rssaggregator.item.Item;
 public class Blog {
 
   @Id
+  @Setter //TODO pozbyc sie settera
   private String id;
   @Indexed(unique = true)
   private String blogURL;
