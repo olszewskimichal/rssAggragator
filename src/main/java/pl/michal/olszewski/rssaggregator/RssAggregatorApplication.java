@@ -1,8 +1,5 @@
 package pl.michal.olszewski.rssaggregator;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.springframework.boot.SpringApplication;
@@ -59,16 +56,5 @@ public class RssAggregatorApplication {
     return Executors.newSingleThreadExecutor();
   }
 
-  @Profile({Profiles.PRODUCTION, Profiles.DEVELOPMENT})
-  @Bean
-  public Clock prodClock() {
-    return Clock.systemDefaultZone();
-  }
-
-  @Profile(Profiles.TEST)
-  @Bean
-  public Clock testClock() {
-    return Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault());
-  }
 }
 

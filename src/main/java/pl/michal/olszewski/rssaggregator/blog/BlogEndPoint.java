@@ -1,6 +1,10 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,9 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,21 +33,18 @@ class BlogEndPoint {
   }
 
   @GetMapping(value = "/{id}")
-  public Mono<BlogDTO> getBlog(@PathVariable("id") String blogId) {
+  public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
     log.debug("GET blog by id {}", blogId);
-    return blogService.getBlogDTOById(blogId);
-  }
-
-  @GetMapping(value = "/by-name/{name}")
-  public Mono<BlogDTO> getBlogByName(@PathVariable("name") String name) {
-    log.debug("GET blog by name {}", name);
-    return blogService.getBlogDTOByName(name);
+    return blogService.getBlogDTOById(blogId)
+        .map(this::addLinkToBlogItems);
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public Flux<BlogDTO> getBlogs(@RequestParam(value = "limit", required = false) Integer limit) {
-    log.debug("GET blogs with limit {}", limit);
-    return blogService.getAllBlogDTOs(limit);
+  public Flux<BlogAggregationDTO> getBlogs() {
+    log.debug("GET blogs");
+    return blogService.getAllBlogDTOs()
+        .map(this::addLinkToSelf)
+        .map(this::addLinkToBlogItems);
   }
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -58,7 +60,7 @@ class BlogEndPoint {
   public Mono<Blog> addBlog(@RequestBody BlogDTO blogDTO) {
     log.debug("POST - addBlog {}", blogDTO.getName());
     log.trace("POST - addBlog {}", blogDTO);
-    return blogService.createBlog(blogDTO);
+    return blogService.getBlogOrCreate(blogDTO);
   }
 
   @DeleteMapping(value = "/{id}")
@@ -75,5 +77,30 @@ class BlogEndPoint {
     blogService.evictBlogCache();
   }
 
+  private UriComponents getRequestUriComponents() {
+    try {
+      return ServletUriComponentsBuilder.fromCurrentRequest().build();
+    } catch (IllegalStateException ex) {
+      return ServletUriComponentsBuilder.fromUriString("localhost").build();
+    }
+  }
+
+  private BlogAggregationDTO addLinkToSelf(BlogAggregationDTO blog) {
+    if (blog.getLink("self") == null) {
+      Link link = linkTo(methodOn(BlogEndPoint.class)
+          .getBlog(blog.getBlogId())).withSelfRel();
+      blog.add(link);
+    }
+    return blog;
+  }
+
+  private BlogAggregationDTO addLinkToBlogItems(BlogAggregationDTO blog) {
+    if (blog.getLink("items") == null) {
+      Link link = linkTo(methodOn(BlogItemsEndPoint.class)
+          .getBlogItems(blog.getBlogId())).withRel("items");
+      blog.add(link);
+    }
+    return blog;
+  }
 
 }
