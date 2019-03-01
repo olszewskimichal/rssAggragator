@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
