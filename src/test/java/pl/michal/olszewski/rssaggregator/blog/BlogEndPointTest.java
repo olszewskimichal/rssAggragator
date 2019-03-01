@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @WebFluxTest(BlogEndPoint.class)
@@ -23,7 +24,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusOK() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().build()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogAggregationDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -42,7 +43,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnBlogAsJson() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().build()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogAggregationDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -51,7 +52,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldReturnCorrectBlogById() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
+    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogAggregationDTO(Blog.builder().name("nazwa").build())));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -61,6 +62,8 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogsReturnStatusOK() {
+    given(blogService.getAllBlogDTOs()).willReturn(Flux.empty());
+
     webClient.get().uri("/api/v1/blogs")
         .exchange()
         .expectStatus().isOk();
@@ -90,24 +93,5 @@ class BlogEndPointTest {
         .exchange()
         .expectStatus()
         .isNoContent();
-  }
-
-  @Test
-  void shouldGetBlogByNameReturnBlogAsJson() {
-    given(blogService.getBlogDTOByName("name")).willReturn(Mono.just(BlogDTO.builder().build()));
-
-    webClient.get().uri("/api/v1/blogs/by-name/name")
-        .exchange()
-        .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8);
-  }
-
-  @Test
-  void shouldReturnCorrectBlogByName() {
-    given(blogService.getBlogDTOByName("nazwa")).willReturn(Mono.just(BlogDTO.builder().name("nazwa").build()));
-
-    webClient.get().uri("/api/v1/blogs/by-name/nazwa")
-        .exchange()
-        .expectBody(BlogDTO.class)
-        .value(v -> assertThat(v.getName()).isEqualTo("nazwa"));
   }
 }

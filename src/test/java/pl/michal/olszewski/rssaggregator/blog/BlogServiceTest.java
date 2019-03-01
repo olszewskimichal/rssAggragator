@@ -8,11 +8,11 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.time.Clock;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
@@ -43,13 +42,19 @@ class BlogServiceTest {
   private BlogReactiveRepository blogRepository;
 
   @Mock
-  private MongoTemplate itemRepository;
+  private MongoTemplate mongoTemplate;
 
   @BeforeEach
   void setUp() {
-    given(blogRepository.save(any(Blog.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    given(itemRepository.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, Clock.fixed(Instant.parse("2000-01-01T10:00:55.000Z"), ZoneId.systemDefault()), itemRepository);
+    given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
+          Blog argument = i.getArgument(0);
+          argument.setId(UUID.randomUUID().toString());
+          return Mono.just(argument);
+        }
+    );
+    given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
+    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build());
+    blogService.evictBlogCache();
   }
 
   @Test
@@ -62,7 +67,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     assertThat(blog).isNotNull();
@@ -78,7 +83,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     verify(blogRepository, times(1)).findByFeedURL("nazwa");
@@ -95,11 +100,11 @@ class BlogServiceTest {
         .feedURL("feedUrl3")
         .link("blogUrl1")
         .publishedDate(now)
-        .build(); //TODO skrocic link
+        .build();
     given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Mono.empty());
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     StepVerifier.create(blog)
@@ -125,23 +130,24 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Blog blog = blogService.getBlogOrCreate(blogDTO).block();
 
     //then
     assertThat(blog).isNotNull();
-    verify(blogRepository, times(1)).save(blog.block());
+    verify(blogRepository, times(1)).save(blog);
   }
 
   @Test
   void shouldNotCreateBlogWhenThrowException() {
     //given
-    BlogDTO blogDTO = BlogDTO.builder().build();
+    BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl9").build();
+    given(blogRepository.findByFeedURL("feedUrl9")).willReturn(Mono.empty());
     Mockito.doThrow(new DuplicateKeyException("Blog o podanym url juz istnieje"))
         .when(blogRepository).save(any());
 
     //when
     //then
-    assertThatThrownBy(() -> blogService.createBlog(blogDTO)).isNotNull().hasMessage("Blog o podanym url juz istnieje");
+    assertThatThrownBy(() -> blogService.getBlogOrCreate(blogDTO).block()).isNotNull().hasMessage("Blog o podanym url juz istnieje");
   }
 
   @Test
@@ -154,7 +160,7 @@ class BlogServiceTest {
     BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl2").itemsList(itemsList).build();
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     StepVerifier.create(blog)
@@ -176,7 +182,7 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("feedUrl4")).willReturn(Mono.empty());
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     StepVerifier.create(blog)
@@ -225,7 +231,7 @@ class BlogServiceTest {
   void shouldAddItemForBlogWhichHaveOneItem() {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
-    blog.addItem(new Item(ItemDTO.builder().title("title").build()), itemRepository);
+    blog.addItem(new Item(ItemDTO.builder().title("title").build()), mongoTemplate);
     List<ItemDTO> itemsList = IntStream.rangeClosed(2, 2)
         .mapToObj(v -> ItemDTO.builder().author("autor").description("desc").date(Instant.now()).title(v + "").link("link" + v).build()) //TODO przerobic linie
         .collect(Collectors.toList());
@@ -254,7 +260,7 @@ class BlogServiceTest {
         .date(Instant.now())
         .build();
     Blog blog = new Blog("url", "", "url", "", null, null);
-    blog.addItem(new Item(itemDTO), itemRepository);
+    blog.addItem(new Item(itemDTO), mongoTemplate);
     BlogDTO blogDTO = BlogDTO.builder()
         .name("url")
         .feedURL("url")
@@ -339,7 +345,7 @@ class BlogServiceTest {
     given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
 
     //when
-    Mono<BlogDTO> blogById = blogService.getBlogDTOById("1");
+    Mono<BlogAggregationDTO> blogById = blogService.getBlogDTOById("1");
 
     //then
     assertThat(blogById).isNotNull();
@@ -357,42 +363,12 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldGetEmptyBlogs() {
-    //given
-    given(blogRepository.findAll()).willReturn(Flux.empty());
-
-    //when
-    Flux<Blog> blogs = blogService.getAllBlogs();
-
-    //then
-    StepVerifier.create(blogs)
-        .expectNextCount(0)
-        .expectComplete()
-        .verify();
-  }
-
-  @Test
-  void shouldGetAllBlogs() {
-    //given
-    given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
-
-    //when
-    Flux<Blog> blogs = blogService.getAllBlogs();
-
-    //then
-    StepVerifier.create(blogs)
-        .expectNextCount(1)
-        .expectComplete()
-        .verify();
-  }
-
-  @Test
   void shouldGetEmptyBlogsDTOs() {
     //given
-    given(blogRepository.findAll()).willReturn(Flux.empty());
+    given(blogRepository.getBlogsWithCount()).willReturn(Flux.empty());
 
     //when
-    Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
+    Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs();
 
     //then
     StepVerifier.create(blogs)
@@ -404,10 +380,12 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogDTOs() {
     //given
-    given(blogRepository.findAll()).willReturn(Flux.just(new Blog()));
+    Blog blog = new Blog();
+    blog.setId(UUID.randomUUID().toString());
+    given(blogRepository.getBlogsWithCount()).willReturn(Flux.just(new BlogAggregationDTO(blog)));
 
     //when
-    Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(null);
+    Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs();
 
     //then
     StepVerifier.create(blogs)
@@ -417,48 +395,10 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldGetOnly3BlogsDTOs() {
-    //given
-    given(blogRepository.findAll(PageRequest.of(0, 3))).willReturn(Flux.just(new Blog(), new Blog(), new Blog()));
-
-    //when
-    Flux<BlogDTO> blogs = blogService.getAllBlogDTOs(3);
-
-    //then
-    StepVerifier.create(blogs)
-        .expectNextCount(3)
-        .expectComplete()
-        .verify();
-  }
-
-  @Test
-  void shouldGetBlogDTOByName() {
-    //given
-    given(blogRepository.findByName("name")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
-
-    //when
-    Mono<BlogDTO> blogById = blogService.getBlogDTOByName("name");
-
-    //then
-    assertThat(blogById).isNotNull();
-  }
-
-  @Test
-  void shouldThrownExceptionWhenBlogDTOByNameNotExist() {
-    //given
-    given(blogRepository.findByName("name")).willReturn(Mono.empty());
-
-    //when
-    StepVerifier.create(blogService.getBlogDTOByName("name"))
-        .expectErrorMessage("Nie znaleziono bloga = name")
-        .verify();
-  }
-
-  @Test
   void shouldChangeActivityBlogWhenWeTryDeleteBlogWithItems() {
     Item item = new Item(ItemDTO.builder().link("test").build());
     Blog blog = new Blog("", "", "", "", null, null);
-    blog.addItem(item, itemRepository);
+    blog.addItem(item, mongoTemplate);
     given(blogRepository.findById("1")).willReturn(Mono.just(blog));
 
     //when
@@ -466,6 +406,30 @@ class BlogServiceTest {
 
     //then
     assertThat(blog.isActive()).isFalse();
+  }
+
+  @Test
+  void shouldThrownExceptionWhenGetItemsForNotExistingBlog() {
+    //given
+    given(blogRepository.findById("id")).willReturn(Mono.empty());
+
+    //when
+    StepVerifier.create(blogService.getBlogItemsForBlog("id"))
+        .expectErrorMessage("Nie znaleziono bloga = id")
+        .verify();
+  }
+
+  @Test
+  void shouldReturnBlogItemsForBlog() {
+    //given
+    Blog blog = new Blog("url", "", "url", "", null, null);
+    blog.addItem(new Item(ItemDTO.builder().title("title").build()), mongoTemplate);
+    given(blogRepository.findById("id")).willReturn(Mono.just(blog));
+
+    //when
+    StepVerifier.create(blogService.getBlogItemsForBlog("id"))
+        .expectNextCount(1)
+        .verifyComplete();
   }
 
 }
