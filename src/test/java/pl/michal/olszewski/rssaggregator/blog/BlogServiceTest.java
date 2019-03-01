@@ -41,13 +41,14 @@ class BlogServiceTest {
   private BlogReactiveRepository blogRepository;
 
   @Mock
-  private MongoTemplate itemRepository; //TODO refactorName
+  private MongoTemplate mongoTemplate;
 
   @BeforeEach
   void setUp() {
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    given(itemRepository.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, itemRepository, new HashMap<>());
+    given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
+    blogService = new BlogService(blogRepository, mongoTemplate, new HashMap<>());
+    blogService.evictBlogCache();
   }
 
   @Test
@@ -60,7 +61,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     assertThat(blog).isNotNull();
@@ -76,7 +77,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     verify(blogRepository, times(1)).findByFeedURL("nazwa");
@@ -93,11 +94,11 @@ class BlogServiceTest {
         .feedURL("feedUrl3")
         .link("blogUrl1")
         .publishedDate(now)
-        .build(); //TODO skrocic link
+        .build();
     given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Mono.empty());
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     StepVerifier.create(blog)
@@ -123,23 +124,24 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Blog blog = blogService.getBlogOrCreate(blogDTO).block();
 
     //then
     assertThat(blog).isNotNull();
-    verify(blogRepository, times(1)).save(blog.block());
+    verify(blogRepository, times(1)).save(blog);
   }
 
   @Test
   void shouldNotCreateBlogWhenThrowException() {
     //given
-    BlogDTO blogDTO = BlogDTO.builder().build();
+    BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl9").build();
+    given(blogRepository.findByFeedURL("feedUrl9")).willReturn(Mono.empty());
     Mockito.doThrow(new DuplicateKeyException("Blog o podanym url juz istnieje"))
         .when(blogRepository).save(any());
 
     //when
     //then
-    assertThatThrownBy(() -> blogService.createBlog(blogDTO)).isNotNull().hasMessage("Blog o podanym url juz istnieje");
+    assertThatThrownBy(() -> blogService.getBlogOrCreate(blogDTO).block()).isNotNull().hasMessage("Blog o podanym url juz istnieje");
   }
 
   @Test
@@ -152,7 +154,7 @@ class BlogServiceTest {
     BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl2").itemsList(itemsList).build();
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     StepVerifier.create(blog)
@@ -174,7 +176,7 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("feedUrl4")).willReturn(Mono.empty());
 
     //when
-    Mono<Blog> blog = blogService.createBlog(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     StepVerifier.create(blog)
@@ -223,7 +225,7 @@ class BlogServiceTest {
   void shouldAddItemForBlogWhichHaveOneItem() {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
-    blog.addItem(new Item(ItemDTO.builder().title("title").build()), itemRepository);
+    blog.addItem(new Item(ItemDTO.builder().title("title").build()), mongoTemplate);
     List<ItemDTO> itemsList = IntStream.rangeClosed(2, 2)
         .mapToObj(v -> ItemDTO.builder().author("autor").description("desc").date(Instant.now()).title(v + "").link("link" + v).build()) //TODO przerobic linie
         .collect(Collectors.toList());
@@ -252,7 +254,7 @@ class BlogServiceTest {
         .date(Instant.now())
         .build();
     Blog blog = new Blog("url", "", "url", "", null, null);
-    blog.addItem(new Item(itemDTO), itemRepository);
+    blog.addItem(new Item(itemDTO), mongoTemplate);
     BlogDTO blogDTO = BlogDTO.builder()
         .name("url")
         .feedURL("url")
@@ -388,7 +390,7 @@ class BlogServiceTest {
   void shouldChangeActivityBlogWhenWeTryDeleteBlogWithItems() {
     Item item = new Item(ItemDTO.builder().link("test").build());
     Blog blog = new Blog("", "", "", "", null, null);
-    blog.addItem(item, itemRepository);
+    blog.addItem(item, mongoTemplate);
     given(blogRepository.findById("1")).willReturn(Mono.just(blog));
 
     //when
@@ -413,7 +415,7 @@ class BlogServiceTest {
   void shouldReturnBlogItemsForBlog() {
     //given
     Blog blog = new Blog("url", "", "url", "", null, null);
-    blog.addItem(new Item(ItemDTO.builder().title("title").build()), itemRepository);
+    blog.addItem(new Item(ItemDTO.builder().title("title").build()), mongoTemplate);
     given(blogRepository.findById("id")).willReturn(Mono.just(blog));
 
     //when

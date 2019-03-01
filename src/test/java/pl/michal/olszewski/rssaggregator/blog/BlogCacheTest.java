@@ -24,6 +24,7 @@ class BlogCacheTest extends IntegrationTestBase {
   void setUp() {
     mongoTemplate.dropCollection(Blog.class);
     blog = mongoTemplate.save(Blog.builder().blogURL("nazwa").feedURL("nazwa").name("nazwa").build());
+    service.evictBlogCache();
   }
 
   @Test
@@ -36,8 +37,7 @@ class BlogCacheTest extends IntegrationTestBase {
     Flux<BlogAggregationDTO> cacheBlogs = service.getAllBlogDTOs();
 
     //then
-    assertSame(allBlogs, cacheBlogs);
-    assertThat(blogList).containsExactlyElementsOf(cacheBlogs.toIterable());
+    assertThat(blogList).hasSameElementsAs(cacheBlogs.toIterable());
   }
 
   @Test
@@ -62,7 +62,7 @@ class BlogCacheTest extends IntegrationTestBase {
     List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
 
     //when
-    service.createBlog(BlogDTO.builder().name("nazwa2").build()).block();
+    service.getBlogOrCreate(BlogDTO.builder().name("nazwa2").build()).block();
     Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs();
 
     //then

@@ -62,7 +62,7 @@ class BlogEndPoint {
   public Mono<Blog> addBlog(@RequestBody BlogDTO blogDTO) {
     log.debug("POST - addBlog {}", blogDTO.getName());
     log.trace("POST - addBlog {}", blogDTO);
-    return blogService.createBlog(blogDTO);
+    return blogService.getBlogOrCreate(blogDTO);
   }
 
   @DeleteMapping(value = "/{id}")
