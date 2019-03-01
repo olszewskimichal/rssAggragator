@@ -35,18 +35,16 @@ class BlogEndPoint {
   @GetMapping(value = "/{id}")
   public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
     log.debug("GET blog by id {}", blogId);
-    UriComponents uriComponents = getRequestUriComponents();
     return blogService.getBlogDTOById(blogId)
-        .map(blog -> addLinkToBlogItems(blog, uriComponents));
+        .map(this::addLinkToBlogItems);
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public Flux<BlogAggregationDTO> getBlogs() {
     log.debug("GET blogs");
-    UriComponents uriComponents = getRequestUriComponents();
     return blogService.getAllBlogDTOs()
-        .map(blog -> addLinkToSelf(blog, uriComponents))
-        .map(blog -> addLinkToBlogItems(blog, uriComponents));
+        .map(this::addLinkToSelf)
+        .map(this::addLinkToBlogItems);
   }
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -87,23 +85,20 @@ class BlogEndPoint {
     }
   }
 
-  private BlogAggregationDTO addLinkToSelf(BlogAggregationDTO blog, UriComponents uriComponents) {
-    Link link = linkTo(methodOn(BlogEndPoint.class)
-        .getBlog(blog.getBlogId())).withSelfRel();
-    return composeLink(blog, uriComponents, link, "self");
+  private BlogAggregationDTO addLinkToSelf(BlogAggregationDTO blog) {
+    if (blog.getLink("self") == null) {
+      Link link = linkTo(methodOn(BlogEndPoint.class)
+          .getBlog(blog.getBlogId())).withSelfRel();
+      blog.add(link);
+    }
+    return blog;
   }
 
-  private BlogAggregationDTO addLinkToBlogItems(BlogAggregationDTO blog, UriComponents uriComponents) {
-    Link link = linkTo(methodOn(BlogItemsEndPoint.class)
-        .getBlogItems(blog.getBlogId())).withRel("items");
-    return composeLink(blog, uriComponents, link, "items");
-  }
-
-  private BlogAggregationDTO composeLink(BlogAggregationDTO blog, UriComponents uriComponents, Link link, String linkName) {
-    Link link1 = blog.getLink(linkName);
-    if (link1 == null) {
-      String url = "http://" + uriComponents.getHost() + ":" + uriComponents.getPort() + link.getHref();
-      blog.add(new Link(url).withRel(linkName));
+  private BlogAggregationDTO addLinkToBlogItems(BlogAggregationDTO blog) {
+    if (blog.getLink("items") == null) {
+      Link link = linkTo(methodOn(BlogItemsEndPoint.class)
+          .getBlogItems(blog.getBlogId())).withRel("items");
+      blog.add(link);
     }
     return blog;
   }
