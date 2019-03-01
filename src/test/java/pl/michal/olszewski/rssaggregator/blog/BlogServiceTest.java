@@ -8,9 +8,9 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -47,7 +47,7 @@ class BlogServiceTest {
   void setUp() {
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
     given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, mongoTemplate, new HashMap<>());
+    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build());
     blogService.evictBlogCache();
   }
 
