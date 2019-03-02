@@ -36,7 +36,7 @@ class ScheduledBlogUpdateTest {
     scheduledBlogUpdate.runScheduledUpdate();
 
     verify(blogRepository, times(1)).findAll();
-    verify(asyncService, times(1)).updateBlog(Mockito.eq(new Blog()), Mockito.anyString());
+    verify(asyncService, times(1)).updateRssBlogItems(Mockito.eq(new Blog()), Mockito.anyString());
     verifyNoMoreInteractions(blogRepository);
   }
 

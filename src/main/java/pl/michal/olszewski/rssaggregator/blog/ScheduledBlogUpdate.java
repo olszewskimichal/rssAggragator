@@ -25,7 +25,7 @@ class ScheduledBlogUpdate {
   void runScheduledUpdate() {
     String correlationId = UUID.randomUUID().toString();
     log.debug("Rozpoczynam aktualizacje correlationId {}", correlationId);
-    updateBlogService.updateAllActiveBlogs(correlationId)
+    updateBlogService.updateAllActiveBlogsByRss(correlationId)
         .block();
   }
 

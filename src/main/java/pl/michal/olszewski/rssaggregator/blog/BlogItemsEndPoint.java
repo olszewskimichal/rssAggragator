@@ -22,7 +22,8 @@ class BlogItemsEndPoint {
   @GetMapping(value = "/{id}/items")
   public Flux<BlogItemDTO> getBlogItems(@PathVariable("id") String blogId) {
     String correlationId = UUID.randomUUID().toString();
-    log.debug("GET blogItems for id {} correlationId {}", blogId, correlationId);
-    return blogService.getBlogItemsForBlog(blogId, correlationId);
+    log.debug("START GET blogItems for id {} correlationId {}", blogId, correlationId);
+    return blogService.getBlogItemsForBlog(blogId, correlationId)
+        .doOnComplete(() -> log.debug("END GET blogItems for id {} correlationId {}", blogId, correlationId));
   }
 }

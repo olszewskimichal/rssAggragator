@@ -24,13 +24,13 @@ class AsyncService {
     this.rssExtractorService = new RssExtractorService();
   }
 
-  Boolean updateBlog(Blog blog, String correlationID) {
-    log.debug("START updateBlog dla blog {} correlationID {}", blog.getName(), correlationID);
+  Boolean updateRssBlogItems(Blog blog, String correlationID) {
+    log.trace("START updateRssBlogItems dla blog {} correlationID {}", blog.getName(), correlationID);
     try {
       var blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(blog.getFeedURL())), blog.getRssInfo(), correlationID);
       blogService.updateBlog(blog, blogDTO)
           .subscribeOn(SCHEDULER)
-          .doOnSuccess(v -> log.debug("STOP updateBlog dla blog {} correlationID {}", v.getName(), correlationID))
+          .doOnSuccess(v -> log.trace("STOP updateRssBlogItems dla blog {} correlationID {}", v.getName(), correlationID))
           .block();
       return true;
     } catch (IOException e) {
