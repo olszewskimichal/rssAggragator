@@ -9,7 +9,7 @@ import pl.michal.olszewski.rssaggregator.config.RegistryTimed;
 import reactor.core.publisher.Flux;
 
 @Repository
-public class ReactiveAggregationBlogRepositoryImpl implements ReactiveAggregationBlogRepository {
+class ReactiveAggregationBlogRepositoryImpl implements ReactiveAggregationBlogRepository {
 
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 

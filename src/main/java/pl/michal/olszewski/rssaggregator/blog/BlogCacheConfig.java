@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
 
 @Component
-public class BlogCacheConfig {
+class BlogCacheConfig {
 
   @Bean
   @Profile({Profiles.PRODUCTION})

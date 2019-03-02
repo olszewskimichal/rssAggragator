@@ -22,7 +22,7 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Service
 @Slf4j
-public class RssExtractorService {
+class RssExtractorService {
 
   private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
