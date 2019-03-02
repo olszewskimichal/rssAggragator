@@ -27,14 +27,14 @@ class BlogService {
     this.cache = cache;
   }
 
-  Mono<Blog> getBlogOrCreate(BlogDTO blogDTO) {
-    log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
+  Mono<Blog> getBlogOrCreate(BlogDTO blogDTO, String correlationId) {
+    log.debug("Tworzenie nowego bloga {} correlationId {}", blogDTO.getFeedURL(), correlationId);
     return blogRepository.findByFeedURL(blogDTO.getFeedURL())
-        .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO)));
+        .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO, correlationId)));
   }
 
-  private Mono<Blog> createBlog(BlogDTO blogDTO) {
-    log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
+  private Mono<Blog> createBlog(BlogDTO blogDTO, String correlationId) {
+    log.debug("Dodaje nowy blog o nazwie {} correlationId {}", blogDTO.getName(), correlationId);
     var blog = new Blog(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)

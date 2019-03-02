@@ -72,8 +72,11 @@ class BlogEndPointTest {
 
   @Test
   void shouldUpdateBlogReturnStatusNoContent() {
+    BlogDTO blogDTO = BlogDTO.builder().build();
+    given(blogService.updateBlog(Mockito.eq(blogDTO), Mockito.anyString())).willReturn(Mono.just(new Blog()));
+
     webClient.put().uri("/api/v1/blogs")
-        .body(BodyInserters.fromObject(BlogDTO.builder().build()))
+        .body(BodyInserters.fromObject(blogDTO))
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -81,8 +84,11 @@ class BlogEndPointTest {
 
   @Test
   void shouldCreateBlogReturnStatusNoContent() {
+    BlogDTO blogDTO = BlogDTO.builder().name("name").build();
+    given(blogService.getBlogOrCreate(Mockito.eq(blogDTO), Mockito.anyString())).willReturn(Mono.just(new Blog()));
+
     webClient.post().uri("/api/v1/blogs")
-        .body(BodyInserters.fromObject(BlogDTO.builder().build()))
+        .body(BodyInserters.fromObject(blogDTO))
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -90,6 +96,8 @@ class BlogEndPointTest {
 
   @Test
   void shouldDeleteBlogReturnStatusNoContent() {
+    given(blogService.deleteBlog(Mockito.eq("1"), Mockito.anyString())).willReturn(Mono.empty());
+
     webClient.delete().uri("/api/v1/blogs/1")
         .exchange()
         .expectStatus()

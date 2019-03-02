@@ -67,7 +67,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     assertThat(blog).isNotNull();
@@ -83,7 +83,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     verify(blogRepository, times(1)).findByFeedURL("nazwa");
@@ -104,7 +104,7 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Mono.empty());
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     StepVerifier.create(blog)
@@ -130,7 +130,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Blog blog = blogService.getBlogOrCreate(blogDTO).block();
+    Blog blog = blogService.getBlogOrCreate(blogDTO, "correlationId").block();
 
     //then
     assertThat(blog).isNotNull();
@@ -147,7 +147,9 @@ class BlogServiceTest {
 
     //when
     //then
-    assertThatThrownBy(() -> blogService.getBlogOrCreate(blogDTO).block()).isNotNull().hasMessage("Blog o podanym url juz istnieje");
+    assertThatThrownBy(() -> blogService.getBlogOrCreate(blogDTO, "correlationId").block())
+        .isNotNull()
+        .hasMessage("Blog o podanym url juz istnieje");
   }
 
   @Test
@@ -160,7 +162,7 @@ class BlogServiceTest {
     BlogDTO blogDTO = BlogDTO.builder().feedURL("feedUrl2").itemsList(itemsList).build();
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     StepVerifier.create(blog)
@@ -182,7 +184,7 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("feedUrl4")).willReturn(Mono.empty());
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO);
+    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     StepVerifier.create(blog)

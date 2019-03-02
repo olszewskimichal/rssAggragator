@@ -61,7 +61,7 @@ class BlogCacheTest extends IntegrationTestBase {
     List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
 
     //when
-    service.getBlogOrCreate(BlogDTO.builder().name("nazwa2").build()).block();
+    service.getBlogOrCreate(BlogDTO.builder().name("nazwa2").build(), "correlationId").block();
     Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs();
 
     //then

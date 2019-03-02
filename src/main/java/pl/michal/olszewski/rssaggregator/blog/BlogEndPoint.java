@@ -54,18 +54,24 @@ class BlogEndPoint {
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public Mono<Blog> updateBlog(@RequestBody BlogDTO blogDTO, String correlationId) {
+  public Mono<Blog> updateBlog(@RequestBody BlogDTO blogDTO) {
+    String correlationId = UUID.randomUUID().toString();
     log.debug("PUT - updateBlog {} correlationId {}", blogDTO.getName(), correlationId);
     log.trace("PUT - updateBlog {} correlationId {}", blogDTO, correlationId);
-    return blogService.updateBlog(blogDTO, correlationId);
+    return blogService.updateBlog(blogDTO, correlationId)
+        .doOnSuccess(blog -> log.debug("END updateBlog - correlationId {}", correlationId))
+        .doOnError(error -> log.error("ERROR updateBlog - correlationId {}", correlationId, error));
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public Mono<Blog> addBlog(@RequestBody BlogDTO blogDTO) {
-    log.debug("POST - addBlog {}", blogDTO.getName());
-    log.trace("POST - addBlog {}", blogDTO);
-    return blogService.getBlogOrCreate(blogDTO);
+    String correlationId = UUID.randomUUID().toString();
+    log.debug("POST - addBlog {} correlationId {}", blogDTO.getName(), correlationId);
+    log.trace("POST - addBlog {} correlationId {}", blogDTO, correlationId);
+    return blogService.getBlogOrCreate(blogDTO, correlationId)
+        .doOnSuccess(blog -> log.debug("END addBlog {} - correlationId {}", blogDTO.getName(), correlationId))
+        .doOnError(error -> log.error("ERROR addBlog {} - correlationId {}", blogDTO.getName(), correlationId, error));
   }
 
   @DeleteMapping(value = "/{id}")
@@ -73,7 +79,9 @@ class BlogEndPoint {
   public Mono<Void> deleteBlog(@PathVariable("id") String blogId) {
     String correlationId = UUID.randomUUID().toString();
     log.debug("DELETE - deleteBlog id {} correlationId {}", blogId, correlationId);
-    return blogService.deleteBlog(blogId, correlationId);
+    return blogService.deleteBlog(blogId, correlationId)
+        .doOnSuccess(blog -> log.debug("END deleteBlog id {} - correlationId {}", blogId, correlationId))
+        .doOnError(error -> log.error("ERROR deleteBlog id {} - correlationId {}", blogId, correlationId, error));
   }
 
   @PostMapping(value = "/evictCache")
