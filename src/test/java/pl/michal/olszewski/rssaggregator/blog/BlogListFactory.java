@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.blog;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -34,13 +35,14 @@ class BlogListFactory {
   }
 
   Blog buildBlogWithItemsAndSave(int numberOfItems) {
-    Blog blog = new Blog("blog997" + new Random().nextInt(100), "", "", "", null, null);
+    Blog blog = Blog.builder()
+        .name(UUID.randomUUID().toString())
+        .build();
     IntStream.rangeClosed(1, numberOfItems)
         .parallel()
         .forEachOrdered(v -> blog.addItem(new Item(ItemDTO.builder().link("link" + new Random().nextInt(100) + v).title("title" + v).build()), itemRepository));
     log.debug("Zapisuje do bazy blog {} {}", blog, blog.getItems().size());
-    return repository.save(blog)
-        .block();
+    return repository.save(blog).block();
   }
 
   List<Blog> buildNumberOfBlogsAndSave(int numberOfBlogs) {

@@ -26,18 +26,22 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @BeforeEach
   void setUp() {
+    blogRepository.deleteAll().block();
     blogService.evictBlogCache();
   }
 
-  //TODO wyprostowac metode
   @Test
   void shouldUpdateBlog() {
-    blogRepository.deleteAll().block();
-    Blog blog = new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, null); //TODO krotsza linia
+    Blog blog = Blog.builder()
+        .blogURL("https://devstyle.pl")
+        .name("devstyle.pl")
+        .feedURL("https://devstyle.pl/feed")
+        .build();
     blogRepository.save(blog).block();
-    Boolean voidFuture = asyncService.updateBlog(blog);
-    Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
 
+    Boolean voidFuture = asyncService.updateBlog(blog);
+
+    Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
     StepVerifier
         .create(updatedBlog)
         .assertNext(v -> assertThat(v.getItems()).isNotEmpty().hasSize(15))
@@ -45,14 +49,19 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .verify();
   }
 
-  //TODO wyprostowac metode
   @Test
   void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() {
-    blogRepository.deleteAll().block();
-    Blog blog = blogRepository.save(new Blog("https://devstyle.pl", "devstyle.pl", "devstyle.pl", "https://devstyle.pl/feed", null, Instant.now())).block(); //TODO krotsza linia bez blocka
-    Boolean voidFuture = asyncService.updateBlog(blog);
-    Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
 
+    Blog blog = Blog.builder()
+        .blogURL("https://devstyle.pl")
+        .name("devstyle.pl")
+        .feedURL("https://devstyle.pl/feed")
+        .lastUpdateDate(Instant.now())
+        .build();
+
+    Boolean voidFuture = asyncService.updateBlog(blog);
+
+    Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
     StepVerifier
         .create(updatedBlog)
         .assertNext(v -> assertThat(v.getLastUpdateDate()).isNotNull().isBefore(Instant.now()))
@@ -62,8 +71,14 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @Test
   void shouldNotUpdateBlog() {
-    Blog blog = new Blog("https://devstyle.xxx", "DEVSTYLE", "devstyle", "https://devstyle.xxx/feed", null, null); //TODO krotsza linia
+    Blog blog = Blog.builder()
+        .blogURL("https://devstyle.pl")
+        .name("devstyle.pl")
+        .feedURL("https://devstyle.xxx/feed")
+        .build();
+
     blogRepository.save(blog).block();
+
     assertThatThrownBy(() -> asyncService.updateBlog(blog))
         .isInstanceOf(RssException.class)
         .hasCauseInstanceOf(UnknownHostException.class);

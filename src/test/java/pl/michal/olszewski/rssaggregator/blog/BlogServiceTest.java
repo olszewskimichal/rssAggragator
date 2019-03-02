@@ -202,7 +202,8 @@ class BlogServiceTest {
   @Test
   void shouldUpdateBlogWhenNewItemAdd() {
     //given
-    Blog blog = new Blog("url", "", "url", "", null, null);
+    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).blogURL("url").name("url").build();
+
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1)
         .mapToObj(v -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(v + "").link("link" + v).build()) //przerobic linie
         .collect(Collectors.toList());
@@ -230,8 +231,9 @@ class BlogServiceTest {
   @Test
   void shouldAddItemForBlogWhichHaveOneItem() {
     //given
-    Blog blog = new Blog("url", "", "url", "", null, null);
+    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).blogURL("url").name("url").build();
     blog.addItem(new Item(ItemDTO.builder().title("title").build()), mongoTemplate);
+
     List<ItemDTO> itemsList = IntStream.rangeClosed(2, 2)
         .mapToObj(v -> ItemDTO.builder().author("autor").description("desc").date(Instant.now()).title(v + "").link("link" + v).build()) //TODO przerobic linie
         .collect(Collectors.toList());
@@ -259,7 +261,7 @@ class BlogServiceTest {
         .title("title")
         .date(Instant.now())
         .build();
-    Blog blog = new Blog("url", "", "url", "", null, null);
+    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).blogURL("url").name("url").build();
     blog.addItem(new Item(itemDTO), mongoTemplate);
     BlogDTO blogDTO = BlogDTO.builder()
         .name("url")
@@ -281,7 +283,8 @@ class BlogServiceTest {
   @Test
   void shouldNotUpdateBlogWhenNothingChanged() {
     //given
-    Blog blog = new Blog("url", "", "url", "", null, null);
+    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).blogURL("url").name("url").build();
+
     BlogDTO blogDTO = BlogDTO.builder()
         .name("url")
         .feedURL("url")
@@ -301,7 +304,8 @@ class BlogServiceTest {
   @Test
   void shouldUpdateBlogWhenDescriptionChanged() {
     //given
-    Blog blog = new Blog("url", "", "url", "", null, null);
+    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).blogURL("url").name("url").build();
+
     BlogDTO blogDTO = BlogDTO.builder()
         .feedURL("url")
         .description("desc")
@@ -325,7 +329,7 @@ class BlogServiceTest {
   @Test
   void shouldDeleteBlogById() {
     given(blogRepository.delete(any())).willReturn(Mono.empty());
-    given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
+    given(blogRepository.findById("1")).willReturn(Mono.just(Blog.builder().build()));
 
     StepVerifier.create(blogService.deleteBlog("1"))
         .expectComplete()
@@ -342,7 +346,7 @@ class BlogServiceTest {
   @Test
   void shouldGetBlogDTOById() {
     //given
-    given(blogRepository.findById("1")).willReturn(Mono.just(new Blog("", "", "", "", null, null)));
+    given(blogRepository.findById("1")).willReturn(Mono.just(Blog.builder().build()));
 
     //when
     Mono<BlogAggregationDTO> blogById = blogService.getBlogDTOById("1");
@@ -380,8 +384,8 @@ class BlogServiceTest {
   @Test
   void shouldGetAllBlogDTOs() {
     //given
-    Blog blog = new Blog();
-    blog.setId(UUID.randomUUID().toString());
+    Blog blog = Blog.builder().id("id").build();
+
     given(blogRepository.getBlogsWithCount()).willReturn(Flux.just(new BlogAggregationDTO(blog)));
 
     //when
@@ -397,7 +401,7 @@ class BlogServiceTest {
   @Test
   void shouldChangeActivityBlogWhenWeTryDeleteBlogWithItems() {
     Item item = new Item(ItemDTO.builder().link("test").build());
-    Blog blog = new Blog("", "", "", "", null, null);
+    Blog blog = Blog.builder().build();
     blog.addItem(item, mongoTemplate);
     given(blogRepository.findById("1")).willReturn(Mono.just(blog));
 
@@ -422,7 +426,8 @@ class BlogServiceTest {
   @Test
   void shouldReturnBlogItemsForBlog() {
     //given
-    Blog blog = new Blog("url", "", "url", "", null, null);
+    Blog blog = Blog.builder().blogURL("url").name("url").build();
+
     blog.addItem(new Item(ItemDTO.builder().title("title").build()), mongoTemplate);
     given(blogRepository.findById("id")).willReturn(Mono.just(blog));
 
