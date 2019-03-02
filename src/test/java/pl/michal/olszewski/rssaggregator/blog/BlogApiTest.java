@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
+import org.springframework.web.reactive.function.BodyInserters;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 import reactor.test.StepVerifier;
@@ -108,7 +109,9 @@ class BlogApiTest extends IntegrationTestBase {
     thenDeleteOneBlogFromApi(blog.getId());
 
     //then
-    assertThat(blogRepository.findById(blog.getId()).block()).isNull(); //TODO pozbyc sie blocka - zamienic na StepVerifier
+    StepVerifier.create(blogRepository.findById(blog.getId()))
+        .expectSubscription()
+        .verifyComplete();
   }
 
   @Test
@@ -141,17 +144,27 @@ class BlogApiTest extends IntegrationTestBase {
         .expectBody(BlogAggregationDTO.class);
   }
 
-  //TODO pozbyc sie template a uzyc webTestClienta
   private void thenCreateBlogByApi(String link) {
-    template.postForEntity(String.format("http://localhost:%s/api/v1/blogs", port), BlogDTO.builder().link(link).build(), BlogDTO.class);
+    webTestClient.post()
+        .uri("http://localhost:{port}/api/v1/blogs", port)
+        .body(BodyInserters.fromObject(BlogDTO.builder().link(link).build()))
+        .exchange()
+        .expectStatus().isNoContent();
   }
 
   private void thenUpdateBlogByApi(BlogDTO blogDTO) {
-    template.put(String.format("http://localhost:%s/api/v1/blogs/", port), blogDTO);
+    webTestClient.put()
+        .uri("http://localhost:{port}/api/v1/blogs", port)
+        .body(BodyInserters.fromObject(blogDTO))
+        .exchange()
+        .expectStatus().isNoContent();
   }
 
   private void thenDeleteOneBlogFromApi(String blogId) {
-    template.delete(String.format("http://localhost:%s/api/v1/blogs/%s", port, blogId));
+    webTestClient.delete()
+        .uri("http://localhost:{port}/api/v1/blogs/{blogId}", port, blogId)
+        .exchange()
+        .expectStatus().isNoContent();
   }
 
 }
