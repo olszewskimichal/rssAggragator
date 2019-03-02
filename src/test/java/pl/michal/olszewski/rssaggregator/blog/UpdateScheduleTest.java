@@ -39,7 +39,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .build();
     blogRepository.save(blog).block();
 
-    Boolean voidFuture = asyncService.updateBlog(blog);
+    Boolean voidFuture = asyncService.updateBlog(blog, "correlationId");
 
     Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
     StepVerifier
@@ -59,7 +59,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .lastUpdateDate(Instant.now())
         .build();
 
-    Boolean voidFuture = asyncService.updateBlog(blog);
+    Boolean voidFuture = asyncService.updateBlog(blog, "correlationId");
 
     Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
     StepVerifier
@@ -79,7 +79,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
     blogRepository.save(blog).block();
 
-    assertThatThrownBy(() -> asyncService.updateBlog(blog))
+    assertThatThrownBy(() -> asyncService.updateBlog(blog, "correlationId"))
         .isInstanceOf(RssException.class)
         .hasCauseInstanceOf(UnknownHostException.class);
   }

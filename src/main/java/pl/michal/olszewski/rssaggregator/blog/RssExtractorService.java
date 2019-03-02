@@ -87,8 +87,8 @@ public class RssExtractorService {
         new ArrayList<>());
   }
 
-  BlogDTO getBlog(XmlReader xmlReader, Blog.RssInfo info) {
-    log.trace("getBlog START {}", info);
+  BlogDTO getBlog(XmlReader xmlReader, Blog.RssInfo info, String correlationID) {
+    log.trace("getBlog START {} correlationID {}", info, correlationID);
     try (XmlReader reader = xmlReader) {
       SyndFeed feed = new SyndFeedInput().build(reader);
       feed.setEncoding("UTF-8");
@@ -99,11 +99,11 @@ public class RssExtractorService {
       BlogDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
       getItemsForBlog(feed, info.getLastUpdateDate())
           .forEach(blogInfo::addNewItem);
-      log.trace("getBlog STOP {}", info);
+      log.trace("getBlog STOP {} correlationID {}", info, correlationID);
       return blogInfo;
     } catch (IOException | FeedException e) {
-      log.error("wystapił bład przy pobieraniu bloga  {}", info, e);
-      throw new RssException(info.getFeedURL(), e);
+      log.error("wystapił bład przy pobieraniu bloga {} correlationID {}", info, correlationID, e);
+      throw new RssException(info.getFeedURL(), correlationID, e);
     }
   }
 }

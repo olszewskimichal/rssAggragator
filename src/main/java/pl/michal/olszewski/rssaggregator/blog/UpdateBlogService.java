@@ -31,22 +31,22 @@ class UpdateBlogService {
     }
   }
 
-  Mono<List<List<Boolean>>> updateAllActiveBlogs() {
-    log.debug("zaczynam aktualizacje blogów");
-    return Flux.merge(getUpdateBlogList())
+  Mono<List<List<Boolean>>> updateAllActiveBlogs(String correlationId) {
+    log.debug("zaczynam aktualizacje blogów correlationId {}", correlationId);
+    return Flux.merge(getUpdateBlogList(correlationId))
         .collectList()
-        .doOnError(ex -> log.error("Aktualizacja zakonczona bledem ", ex));
+        .doOnError(ex -> log.error("Aktualizacja zakonczona bledem correlationId {}", correlationId, ex));
   }
 
-  private Mono<List<Boolean>> getUpdateBlogList() {
+  private Mono<List<Boolean>> getUpdateBlogList(String correlationId) {
     return repository.findAll()
-        .flatMap(this::updateBlog)
+        .flatMap(blog -> updateBlog(blog, correlationId))
         .collectList();
   }
 
-  private Mono<Boolean> updateBlog(Blog blog) {
-    log.debug("update blog {}", blog.getName());
-    return Mono.fromCallable(() -> asyncService.updateBlog(blog))
+  private Mono<Boolean> updateBlog(Blog blog, String correlationId) {
+    log.debug("update blog {} correlationId {}", blog.getName(), correlationId);
+    return Mono.fromCallable(() -> asyncService.updateBlog(blog, correlationId))
         .subscribeOn(Schedulers.fromExecutor(executor))
         .onErrorReturn(false);
   }
@@ -55,7 +55,7 @@ class UpdateBlogService {
     log.debug("Odswiezam bloga o id {} correlationId {}", id, correlationId);
     repository.findById(id)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id, correlationId)))
-        .map(asyncService::updateBlog)
+        .map(blog -> asyncService.updateBlog(blog, correlationId))
         .subscribe();
   }
 

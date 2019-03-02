@@ -24,18 +24,18 @@ class AsyncService {
     this.rssExtractorService = new RssExtractorService();
   }
 
-  Boolean updateBlog(Blog blog) {
-    log.debug("START updateBlog dla blog {}", blog.getName());
+  Boolean updateBlog(Blog blog, String correlationID) {
+    log.debug("START updateBlog dla blog {} correlationID {}", blog.getName(), correlationID);
     try {
-      var blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(blog.getFeedURL())), blog.getRssInfo());
+      var blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(blog.getFeedURL())), blog.getRssInfo(), correlationID);
       blogService.updateBlog(blog, blogDTO)
           .subscribeOn(SCHEDULER)
-          .doOnSuccess(v -> log.debug("STOP updateBlog dla blog {}", v.getName()))
+          .doOnSuccess(v -> log.debug("STOP updateBlog dla blog {} correlationID {}", v.getName(), correlationID))
           .block();
       return true;
     } catch (IOException e) {
-      log.error("wystapił bład przy aktualizacji bloga o id {}", blog.getId(), e);
-      throw new RssException(blog.getFeedURL(), e);
+      log.error("wystapił bład przy aktualizacji bloga o id {} correlationID {}", blog.getId(), correlationID, e);
+      throw new RssException(blog.getFeedURL(), correlationID, e);
     }
   }
 

@@ -31,7 +31,8 @@ class AtomReadRomeTest {
     try {
       BlogDTO blog = rssExtractorService.getBlog(
           new XmlReader(new File("AtomExample.xml")),
-          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN)
+          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN),
+          "correlationId"
       );
       assertAll(
           () -> assertThat(blog).isNotNull(),
@@ -47,7 +48,8 @@ class AtomReadRomeTest {
     try {
       BlogDTO blog = rssExtractorService.getBlog(
           new XmlReader(new File("AtomExample.xml")),
-          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN)
+          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN),
+          "correlationId"
       );
       assertThat(blog.getName()).isNotNull().isEqualTo("Test RSS");
     } catch (IOException e) {
@@ -60,7 +62,8 @@ class AtomReadRomeTest {
     try {
       BlogDTO blog = rssExtractorService.getBlog(
           new XmlReader(new File("AtomExample.xml")),
-          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN)
+          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN),
+          "correlationId"
       );
       assertThat(blog.getPublishedDate())
           .isNotNull()
@@ -75,7 +78,8 @@ class AtomReadRomeTest {
     try {
       BlogDTO blog = rssExtractorService.getBlog(
           new XmlReader(new File("AtomExample.xml")),
-          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN)
+          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN),
+          "correlationId"
       );
       List<ItemDTO> itemsForBlog = blog.getItemsList();
       assertThat(itemsForBlog).isEmpty();
@@ -88,8 +92,10 @@ class AtomReadRomeTest {
   void shouldThrowException() {
     assertThatThrownBy(() -> rssExtractorService.getBlog(
         null,
-        new Blog.RssInfo("test", "blogURL", Instant.MIN))).isNotNull()
-        .hasMessage("Wystąpił błąd przy pobieraniu informacji z bloga test");
+        new Blog.RssInfo("test", "blogURL", Instant.MIN),
+        "correlationId"))
+        .isNotNull()
+        .hasMessage("Wystąpił błąd przy pobieraniu informacji z bloga test correlationID = correlationId");
   }
 
 }

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 
@@ -35,7 +36,7 @@ class ScheduledBlogUpdateTest {
     scheduledBlogUpdate.runScheduledUpdate();
 
     verify(blogRepository, times(1)).findAll();
-    verify(asyncService, times(1)).updateBlog(new Blog());
+    verify(asyncService, times(1)).updateBlog(Mockito.eq(new Blog()), Mockito.anyString());
     verifyNoMoreInteractions(blogRepository);
   }
 
