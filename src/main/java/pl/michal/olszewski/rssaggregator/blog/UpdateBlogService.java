@@ -51,10 +51,10 @@ class UpdateBlogService {
         .onErrorReturn(false);
   }
 
-  public void refreshBlogFromId(String id) {
-    log.debug("Odswiezam bloga o id {}", id);
+  public void refreshBlogFromId(String id, String correlationId) {
+    log.debug("Odswiezam bloga o id {} correlationId {}", id, correlationId);
     repository.findById(id)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(id, correlationId)))
         .map(asyncService::updateBlog)
         .subscribe();
   }

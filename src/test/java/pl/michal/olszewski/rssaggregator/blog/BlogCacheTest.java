@@ -76,7 +76,7 @@ class BlogCacheTest extends IntegrationTestBase {
     List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
 
     //when
-    service.deleteBlog(blog.getId()).block();
+    service.deleteBlog(blog.getId(), "correlationID").block();
     Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs();
 
     //then

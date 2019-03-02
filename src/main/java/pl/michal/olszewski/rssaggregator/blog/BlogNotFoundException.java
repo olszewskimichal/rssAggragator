@@ -6,8 +6,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 class BlogNotFoundException extends RuntimeException {
 
-  BlogNotFoundException(String name) {
-    super("Nie znaleziono bloga = " + name);
+  private final String correlationID;
+
+  BlogNotFoundException(String name, String correlationID) {
+    super("Nie znaleziono bloga = " + name + " correlationID = " + correlationID);
+    this.correlationID = correlationID;
   }
 
+  @Override
+  public String toString() {
+    return super.toString() + " correlationID " + correlationID;
+  }
 }

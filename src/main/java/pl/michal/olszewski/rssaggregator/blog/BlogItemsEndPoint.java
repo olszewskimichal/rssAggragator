@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +21,8 @@ class BlogItemsEndPoint {
 
   @GetMapping(value = "/{id}/items")
   public Flux<BlogItemDTO> getBlogItems(@PathVariable("id") String blogId) {
-    log.debug("GET blogItems for id {}", blogId);
-    return blogService.getBlogItemsForBlog(blogId);
+    String correlationId = UUID.randomUUID().toString();
+    log.debug("GET blogItems for id {} correlationId {}", blogId, correlationId);
+    return blogService.getBlogItemsForBlog(blogId, correlationId);
   }
 }
