@@ -63,7 +63,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogsReturnStatusOK() {
-    given(blogService.getAllBlogDTOs()).willReturn(Flux.empty());
+    given(blogService.getAllBlogDTOs(Mockito.anyString())).willReturn(Flux.empty());
 
     webClient.get().uri("/api/v1/blogs")
         .exchange()

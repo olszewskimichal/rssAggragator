@@ -45,7 +45,7 @@ class BlogEndPoint {
   public Flux<BlogAggregationDTO> getBlogs() {
     String correlationID = UUID.randomUUID().toString();
     log.debug("START GET blogs correlationId {}", correlationID);
-    return blogService.getAllBlogDTOs()
+    return blogService.getAllBlogDTOs(correlationID)
         .map(this::addLinkToSelf)
         .map(this::addLinkToBlogItems)
         .doOnComplete(() -> log.debug("END GET blogs - correlationId {}", correlationID))

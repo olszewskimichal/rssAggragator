@@ -96,14 +96,14 @@ class BlogService {
   }
 
   @Transactional(readOnly = true)
-  public Flux<BlogAggregationDTO> getAllBlogDTOs() {
-    log.debug("pobieram wszystkie blogi w postaci DTO ");
+  public Flux<BlogAggregationDTO> getAllBlogDTOs(String correlationId) {
+    log.debug("pobieram wszystkie blogi w postaci DTO correlationId {}", correlationId);
     var dtoFlux = Flux.fromIterable(cache.asMap().values())
         .switchIfEmpty(Flux.defer(() -> blogRepository.getBlogsWithCount()
             .doOnNext(blog -> cache.put(blog.getBlogId(), blog)))
             .cache());
     return dtoFlux
-        .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
+        .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {} correlationId {}", blogDTO, correlationId));
   }
 
   private List<BlogItemDTO> extractItems(Blog blog) {

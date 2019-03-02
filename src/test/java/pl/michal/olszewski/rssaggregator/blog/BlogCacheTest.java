@@ -29,11 +29,11 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldReturnTheSameCollectionFromCache() {
     //given
-    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs("correlationId");
     List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
 
     //when
-    Flux<BlogAggregationDTO> cacheBlogs = service.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> cacheBlogs = service.getAllBlogDTOs("correlationId");
 
     //then
     assertThat(blogList).hasSameElementsAs(cacheBlogs.toIterable());
@@ -42,12 +42,12 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldAfterEvictCacheAndReturnNotTheSameCollection() {
     //given
-    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs("correlationId");
     List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
 
     //when
     service.evictBlogCache();
-    Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs("correlationId");
 
     //then
     assertNotSame(allBlogs, blogs);
@@ -57,12 +57,12 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldAfterCreateNewBlogAndReturnNotTheSameCollection() {
     //given
-    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs("correlationId");
     List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
 
     //when
     service.getBlogOrCreate(BlogDTO.builder().name("nazwa2").build(), "correlationId").block();
-    Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs("correlationId");
 
     //then
     assertNotSame(allBlogs, blogs);
@@ -72,12 +72,12 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldAfterDeleteNewBlogAndReturnNotTheSameCollection() {
     //given
-    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs("correlationId");
     List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
 
     //when
     service.deleteBlog(blog.getId(), "correlationID").block();
-    Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs("correlationId");
 
     //then
     assertNotSame(allBlogs, blogs);

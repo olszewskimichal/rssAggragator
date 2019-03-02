@@ -374,7 +374,7 @@ class BlogServiceTest {
     given(blogRepository.getBlogsWithCount()).willReturn(Flux.empty());
 
     //when
-    Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs("correlationId");
 
     //then
     StepVerifier.create(blogs)
@@ -391,7 +391,7 @@ class BlogServiceTest {
     given(blogRepository.getBlogsWithCount()).willReturn(Flux.just(new BlogAggregationDTO(blog)));
 
     //when
-    Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs();
+    Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs("correlationId");
 
     //then
     StepVerifier.create(blogs)
