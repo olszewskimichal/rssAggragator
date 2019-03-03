@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
@@ -35,7 +36,7 @@ class UpdateBlogServiceTest {
     given(blogRepository.findById("1")).willReturn(Mono.empty());
     //when
     //then
-    assertThatThrownBy(() -> updateBlogService.refreshBlogFromId("1")).hasMessageContaining("Nie znaleziono bloga");
+    assertThatThrownBy(() -> updateBlogService.refreshBlogFromId("1", "correlationID")).hasMessageContaining("Nie znaleziono bloga");
   }
 
   @Test
@@ -43,10 +44,10 @@ class UpdateBlogServiceTest {
     //given
     given(blogRepository.findById("1")).willReturn(Mono.just(new Blog()));
     //when
-    updateBlogService.refreshBlogFromId("1");
+    updateBlogService.refreshBlogFromId("1", "correlationID");
 
     verify(blogRepository, times(1)).findById("1");
-    verify(asyncService, times(1)).updateBlog(new Blog());
+    verify(asyncService, times(1)).updateRssBlogItems(Mockito.eq(new Blog()), Mockito.anyString());
     verifyNoMoreInteractions(blogRepository);
   }
 }

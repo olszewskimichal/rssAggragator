@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,8 +24,9 @@ class RefreshBlogEndPoint {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void refreshBlog(@RequestParam(value = "blogId") String blogId) {
-    log.debug("GET - refreshBlog {}", blogId);
-    updateBlogService.refreshBlogFromId(blogId);
+    String correlationId = UUID.randomUUID().toString();
+    log.debug("GET - refreshBlog id {} correlationId {}", blogId, correlationId);
+    updateBlogService.refreshBlogFromId(blogId, correlationId);
   }
 
 }

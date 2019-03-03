@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.blog;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponents;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -34,40 +33,55 @@ class BlogEndPoint {
 
   @GetMapping(value = "/{id}")
   public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
-    log.debug("GET blog by id {}", blogId);
-    return blogService.getBlogDTOById(blogId)
-        .map(this::addLinkToBlogItems);
+    String correlationID = UUID.randomUUID().toString();
+    log.debug("START GET blog by id {} correlationId {}", blogId, correlationID);
+    return blogService.getBlogDTOById(blogId, correlationID)
+        .map(this::addLinkToBlogItems)
+        .doOnSuccess(result -> log.trace("END GET blog by id {} correlationId {}", blogId, correlationID))
+        .doOnError(error -> log.error("ERROR GET blog by id {} correlationId {}", blogId, correlationID, error));
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public Flux<BlogAggregationDTO> getBlogs() {
-    log.debug("GET blogs");
-    return blogService.getAllBlogDTOs()
+    String correlationID = UUID.randomUUID().toString();
+    log.debug("START GET blogs correlationId {}", correlationID);
+    return blogService.getAllBlogDTOs(correlationID)
         .map(this::addLinkToSelf)
-        .map(this::addLinkToBlogItems);
+        .map(this::addLinkToBlogItems)
+        .doOnComplete(() -> log.debug("END GET blogs - correlationId {}", correlationID))
+        .doOnError(error -> log.error("ERROR GET blogs - correlationId {}", correlationID, error));
   }
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public Mono<Blog> updateBlog(@RequestBody BlogDTO blogDTO) {
-    log.debug("PUT - updateBlog {}", blogDTO.getName());
-    log.trace("PUT - updateBlog {}", blogDTO);
-    return blogService.updateBlog(blogDTO);
+    String correlationId = UUID.randomUUID().toString();
+    log.debug("PUT - updateBlog {} correlationId {}", blogDTO.getName(), correlationId);
+    log.trace("PUT - updateBlog {} correlationId {}", blogDTO, correlationId);
+    return blogService.updateBlog(blogDTO, correlationId)
+        .doOnSuccess(blog -> log.debug("END updateBlog - correlationId {}", correlationId))
+        .doOnError(error -> log.error("ERROR updateBlog - correlationId {}", correlationId, error));
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public Mono<Blog> addBlog(@RequestBody BlogDTO blogDTO) {
-    log.debug("POST - addBlog {}", blogDTO.getName());
-    log.trace("POST - addBlog {}", blogDTO);
-    return blogService.getBlogOrCreate(blogDTO);
+    String correlationId = UUID.randomUUID().toString();
+    log.debug("POST - addBlog {} correlationId {}", blogDTO.getName(), correlationId);
+    log.trace("POST - addBlog {} correlationId {}", blogDTO, correlationId);
+    return blogService.getBlogOrCreate(blogDTO, correlationId)
+        .doOnSuccess(blog -> log.debug("END addBlog {} - correlationId {}", blogDTO.getName(), correlationId))
+        .doOnError(error -> log.error("ERROR addBlog {} - correlationId {}", blogDTO.getName(), correlationId, error));
   }
 
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public Mono<Void> deleteBlog(@PathVariable("id") String blogId) {
-    log.debug("DELETE - deleteBlog {}", blogId);
-    return blogService.deleteBlog(blogId);
+    String correlationId = UUID.randomUUID().toString();
+    log.debug("DELETE - deleteBlog id {} correlationId {}", blogId, correlationId);
+    return blogService.deleteBlog(blogId, correlationId)
+        .doOnSuccess(blog -> log.debug("END deleteBlog id {} - correlationId {}", blogId, correlationId))
+        .doOnError(error -> log.error("ERROR deleteBlog id {} - correlationId {}", blogId, correlationId, error));
   }
 
   @PostMapping(value = "/evictCache")
@@ -75,14 +89,6 @@ class BlogEndPoint {
   public void evictCache() {
     log.debug("POST - evict Cache");
     blogService.evictBlogCache();
-  }
-
-  private UriComponents getRequestUriComponents() {
-    try {
-      return ServletUriComponentsBuilder.fromCurrentRequest().build();
-    } catch (IllegalStateException ex) {
-      return ServletUriComponentsBuilder.fromUriString("localhost").build();
-    }
   }
 
   private BlogAggregationDTO addLinkToSelf(BlogAggregationDTO blog) {

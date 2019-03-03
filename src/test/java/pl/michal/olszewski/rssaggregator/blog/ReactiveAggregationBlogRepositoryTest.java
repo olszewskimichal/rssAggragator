@@ -30,10 +30,7 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
     Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
 
     StepVerifier.create(blogsWithCount)
-        .assertNext(v -> {
-          System.err.println(v.toString());
-          assertThat(v.getBlogItemsCount()).isEqualTo(2);
-        })
+        .assertNext(v -> assertThat(v.getBlogItemsCount()).isEqualTo(2))
         .verifyComplete();
   }
 
@@ -44,10 +41,7 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
     Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
 
     StepVerifier.create(blogsWithCount)
-        .assertNext(v -> {
-          System.err.println(v.toString());
-          assertThat(v.getBlogItemsCount()).isEqualTo(0);
-        })
+        .assertNext(v -> assertThat(v.getBlogItemsCount()).isEqualTo(0))
         .verifyComplete();
   }
 

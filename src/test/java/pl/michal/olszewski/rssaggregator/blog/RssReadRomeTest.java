@@ -29,7 +29,7 @@ class RssReadRomeTest {
   @Test
   void shouldCorrectTransformXmlToRome() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN));
+      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN), "correlationId");
       assertAll(
           () -> assertThat(blog).isNotNull(),
           () -> assertThat(blog.getFeedURL()).isEqualTo("feedURL"),
@@ -43,7 +43,7 @@ class RssReadRomeTest {
   @Test
   void shouldTransformWithCorrectTitle() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN));
+      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN), "correlationId");
       assertThat(blog.getName()).isNotNull().isEqualTo("Test RSS");
     } catch (IOException e) {
       Assert.fail();
@@ -53,7 +53,7 @@ class RssReadRomeTest {
   @Test
   void shouldTransformWithCorrectDescriptionAndPublicationDate() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN));
+      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN), "correlationId");
       assertAll(
           () -> assertThat(blog.getDescription()).isNotNull().isEqualTo("Testowy rss"),
           () -> assertThat(blog.getPublishedDate()).isNotNull().isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant())
@@ -81,7 +81,7 @@ class RssReadRomeTest {
   @Test
   void shouldTransformWithCorrectBlogItems() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN));
+      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("RssExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN), "correlationId");
       List<ItemDTO> itemsForBlog = blog.getItemsList().stream().sorted(Comparator.comparing(ItemDTO::getLink)).collect(Collectors.toList());
       assertAll(
           () -> assertThat(itemsForBlog).isNotEmpty().hasSize(2),

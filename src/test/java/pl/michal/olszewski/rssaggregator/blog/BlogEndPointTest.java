@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,7 +25,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusOK() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogAggregationDTO()));
+    given(blogService.getBlogDTOById(Mockito.eq("1"), Mockito.anyString())).willReturn(Mono.just(new BlogAggregationDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -33,7 +34,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnStatusNotFoundWhenBlogNotExist() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.error(new BlogNotFoundException("aaa")));
+    given(blogService.getBlogDTOById(Mockito.eq("1"), Mockito.anyString())).willReturn(Mono.error(new BlogNotFoundException("aaa", "correlationID")));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -43,7 +44,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogByIdReturnBlogAsJson() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogAggregationDTO()));
+    given(blogService.getBlogDTOById(Mockito.eq("1"), Mockito.anyString())).willReturn(Mono.just(new BlogAggregationDTO()));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -52,7 +53,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldReturnCorrectBlogById() {
-    given(blogService.getBlogDTOById("1")).willReturn(Mono.just(new BlogAggregationDTO(Blog.builder().name("nazwa").build())));
+    given(blogService.getBlogDTOById(Mockito.eq("1"), Mockito.anyString())).willReturn(Mono.just(new BlogAggregationDTO(Blog.builder().name("nazwa").build())));
 
     webClient.get().uri("/api/v1/blogs/1")
         .exchange()
@@ -62,7 +63,7 @@ class BlogEndPointTest {
 
   @Test
   void shouldGetBlogsReturnStatusOK() {
-    given(blogService.getAllBlogDTOs()).willReturn(Flux.empty());
+    given(blogService.getAllBlogDTOs(Mockito.anyString())).willReturn(Flux.empty());
 
     webClient.get().uri("/api/v1/blogs")
         .exchange()
@@ -71,8 +72,11 @@ class BlogEndPointTest {
 
   @Test
   void shouldUpdateBlogReturnStatusNoContent() {
+    BlogDTO blogDTO = BlogDTO.builder().build();
+    given(blogService.updateBlog(Mockito.eq(blogDTO), Mockito.anyString())).willReturn(Mono.just(new Blog()));
+
     webClient.put().uri("/api/v1/blogs")
-        .body(BodyInserters.fromObject(BlogDTO.builder().build()))
+        .body(BodyInserters.fromObject(blogDTO))
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -80,8 +84,11 @@ class BlogEndPointTest {
 
   @Test
   void shouldCreateBlogReturnStatusNoContent() {
+    BlogDTO blogDTO = BlogDTO.builder().name("name").build();
+    given(blogService.getBlogOrCreate(Mockito.eq(blogDTO), Mockito.anyString())).willReturn(Mono.just(new Blog()));
+
     webClient.post().uri("/api/v1/blogs")
-        .body(BodyInserters.fromObject(BlogDTO.builder().build()))
+        .body(BodyInserters.fromObject(blogDTO))
         .exchange()
         .expectStatus()
         .isNoContent();
@@ -89,6 +96,8 @@ class BlogEndPointTest {
 
   @Test
   void shouldDeleteBlogReturnStatusNoContent() {
+    given(blogService.deleteBlog(Mockito.eq("1"), Mockito.anyString())).willReturn(Mono.empty());
+
     webClient.delete().uri("/api/v1/blogs/1")
         .exchange()
         .expectStatus()

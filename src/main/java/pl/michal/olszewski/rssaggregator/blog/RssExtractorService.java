@@ -6,10 +6,15 @@ import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.XmlReader;
 import java.io.IOException;
 import java.lang.Character.UnicodeBlock;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.OptionalInt;
@@ -22,7 +27,7 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Service
 @Slf4j
-public class RssExtractorService {
+class RssExtractorService {
 
   private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
@@ -56,24 +61,23 @@ public class RssExtractorService {
     return any.isPresent();
   }
 
-  static String getFinalURL(String linkUrl) {
+  static String getFinalURL(String url) {
     try {
-      log.trace("getFinalURL for link {}", linkUrl);
-      HttpURLConnection con = (HttpURLConnection) new URL(linkUrl).openConnection();
-      con.addRequestProperty("User-Agent", "Mozilla/4.76");
-      con.setInstanceFollowRedirects(false);
-      con.setRequestMethod("HEAD");
-      con.setConnectTimeout(1000);
-      con.connect();
-      if (con.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || con.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
-        log.trace("wykonuje redirect dla linku {}", linkUrl);
-        String redirectUrl = con.getHeaderField("Location");
-        return getFinalURL(redirectUrl).replaceAll("[&?]gi.*", "");
-      }
-    } catch (IOException ignored) {
-      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ignored);
+      HttpRequest request = HttpRequest.newBuilder()
+          .uri(URI.create(url))
+          .GET()
+          .build();
+      return HttpClient
+          .newBuilder()
+          .followRedirects(Redirect.ALWAYS)
+          .connectTimeout(Duration.ofMillis(1000))
+          .build()
+          .send(request, BodyHandlers.discarding())
+          .uri().toString().replaceAll("[&?]gi.*", "");
+    } catch (IOException | InterruptedException e) {
+      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", url, e);
     }
-    return linkUrl;
+    return url;
   }
 
   private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
@@ -83,12 +87,12 @@ public class RssExtractorService {
         syndFeed.getDescription(),
         syndFeed.getTitle(),
         feedURL,
-        syndFeed.getPublishedDate().toInstant(),
+        syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
         new ArrayList<>());
   }
 
-  BlogDTO getBlog(XmlReader xmlReader, Blog.RssInfo info) {
-    log.trace("getBlog START {}", info);
+  BlogDTO getBlog(XmlReader xmlReader, Blog.RssInfo info, String correlationID) {
+    log.trace("getBlog START {} correlationID {}", info, correlationID);
     try (XmlReader reader = xmlReader) {
       SyndFeed feed = new SyndFeedInput().build(reader);
       feed.setEncoding("UTF-8");
@@ -99,11 +103,11 @@ public class RssExtractorService {
       BlogDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
       getItemsForBlog(feed, info.getLastUpdateDate())
           .forEach(blogInfo::addNewItem);
-      log.trace("getBlog STOP {}", info);
+      log.trace("getBlog STOP {} correlationID {}", info, correlationID);
       return blogInfo;
     } catch (IOException | FeedException e) {
-      log.error("wystapił bład przy pobieraniu bloga  {}", info, e);
-      throw new RssException(info.getFeedURL(), e);
+      log.error("wystapił bład przy pobieraniu bloga {} correlationID {}", info, correlationID, e);
+      throw new RssException(info.getFeedURL(), correlationID, e);
     }
   }
 }
