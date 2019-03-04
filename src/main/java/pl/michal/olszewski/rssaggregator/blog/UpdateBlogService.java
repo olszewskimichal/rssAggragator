@@ -56,7 +56,7 @@ class UpdateBlogService {
         .collectList();
   }
 
-  private Mono<Boolean> updateRssBlogItems(Blog blog) {
+  Mono<Boolean> updateRssBlogItems(Blog blog) {
     String correlationId = UUID.randomUUID().toString();
     log.debug("Pobieranie nowych danych dla bloga {} correlationId {}", blog.getName(), correlationId);
     return Mono.fromCallable(() -> updateRssBlogItems(blog, correlationId))

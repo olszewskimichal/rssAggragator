@@ -2,8 +2,8 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @Test
   void shouldUpdateBlog() {
-    Instant now = Instant.now().minus(2, ChronoUnit.DAYS);
     Blog blog = Blog.builder()
         .blogURL("https://spring.io/")
         .name("spring")
@@ -98,6 +97,22 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
     StepVerifier
         .create(result)
+        .expectNext(false)
+        .verifyComplete();
+  }
+
+  @Test
+  void shouldReturnFalseOnTimeout() {
+    Blog blog = Blog.builder()
+        .blogURL("https://spring.io/")
+        .name("spring")
+        .feedURL("https://spring.io/blog.atom/")
+        .build();
+    blogRepository.save(blog).block();
+
+    Mono<Boolean> result = updateBlogService.updateRssBlogItems(blog);
+    StepVerifier.withVirtualTime(() -> result)
+        .thenAwait(Duration.ofSeconds(5))
         .expectNext(false)
         .verifyComplete();
   }
