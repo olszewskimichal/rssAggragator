@@ -22,7 +22,7 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Service
 @Slf4j
-public class RssExtractorService {
+class RssExtractorService {
 
   private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
@@ -63,7 +63,7 @@ public class RssExtractorService {
       con.addRequestProperty("User-Agent", "Mozilla/4.76");
       con.setInstanceFollowRedirects(false);
       con.setRequestMethod("HEAD");
-      con.setConnectTimeout(1000);
+      con.setConnectTimeout(700);
       con.connect();
       if (con.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || con.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
         log.trace("wykonuje redirect dla linku {}", linkUrl);
@@ -83,12 +83,12 @@ public class RssExtractorService {
         syndFeed.getDescription(),
         syndFeed.getTitle(),
         feedURL,
-        syndFeed.getPublishedDate().toInstant(),
+        syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
         new ArrayList<>());
   }
 
-  BlogDTO getBlog(XmlReader xmlReader, Blog.RssInfo info) {
-    log.trace("getBlog START {}", info);
+  BlogDTO getBlog(XmlReader xmlReader, Blog.RssInfo info, String correlationID) {
+    log.trace("getBlog START {} correlationID {}", info, correlationID);
     try (XmlReader reader = xmlReader) {
       SyndFeed feed = new SyndFeedInput().build(reader);
       feed.setEncoding("UTF-8");
@@ -99,11 +99,11 @@ public class RssExtractorService {
       BlogDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
       getItemsForBlog(feed, info.getLastUpdateDate())
           .forEach(blogInfo::addNewItem);
-      log.trace("getBlog STOP {}", info);
+      log.trace("getBlog STOP {} correlationID {}", info, correlationID);
       return blogInfo;
     } catch (IOException | FeedException e) {
-      log.error("wystapił bład przy pobieraniu bloga  {}", info, e);
-      throw new RssException(info.getFeedURL(), e);
+      log.error("wystapił bład przy pobieraniu bloga {} correlationID {}", info, correlationID, e);
+      throw new RssException(info.getFeedURL(), correlationID, e);
     }
   }
 }

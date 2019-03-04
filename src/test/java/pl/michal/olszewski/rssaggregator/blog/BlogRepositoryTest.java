@@ -97,7 +97,7 @@ public class BlogRepositoryTest {
     givenBlog()
         .withURL("url");
     //then
-    assertThatThrownBy(() -> entityManager.save(new Blog("url", "", "", "", null, null))) //TODO skrocic linie
+    assertThatThrownBy(() -> entityManager.save(Blog.builder().blogURL("url").build()))
         .hasCauseInstanceOf(MongoWriteException.class)
         .isInstanceOf(DuplicateKeyException.class)
         .hasMessageContaining("duplicate key error collection");

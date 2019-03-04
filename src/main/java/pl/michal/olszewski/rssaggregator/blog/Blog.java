@@ -28,7 +28,7 @@ import pl.michal.olszewski.rssaggregator.item.Item;
 public class Blog {
 
   @Id
-  @Setter //TODO pozbyc sie settera
+  @Setter
   private String id;
   @Indexed(unique = true)
   private String blogURL;
@@ -42,7 +42,8 @@ public class Blog {
   private Set<Item> items = new HashSet<>();
 
   @Builder
-  public Blog(String blogURL, String description, String name, String feedURL, Instant publishedDate, Instant lastUpdateDate) {
+  public Blog(String id, String blogURL, String description, String name, String feedURL, Instant publishedDate, Instant lastUpdateDate) {
+    this.id = id;
     this.blogURL = blogURL;
     this.description = description;
     this.name = name;

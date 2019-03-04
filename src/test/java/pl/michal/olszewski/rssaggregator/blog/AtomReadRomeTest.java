@@ -29,7 +29,11 @@ class AtomReadRomeTest {
   @Test
   void shouldCorrectTransformXmlToRome() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN)); //TODO skrocic linie
+      BlogDTO blog = rssExtractorService.getBlog(
+          new XmlReader(new File("AtomExample.xml")),
+          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN),
+          "correlationId"
+      );
       assertAll(
           () -> assertThat(blog).isNotNull(),
           () -> assertThat(blog.getFeedURL()).isEqualTo("feedURL")
@@ -42,7 +46,11 @@ class AtomReadRomeTest {
   @Test
   void shouldTransformWithCorrectTitle() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN)); //TODO skrocic linie
+      BlogDTO blog = rssExtractorService.getBlog(
+          new XmlReader(new File("AtomExample.xml")),
+          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN),
+          "correlationId"
+      );
       assertThat(blog.getName()).isNotNull().isEqualTo("Test RSS");
     } catch (IOException e) {
       Assert.fail();
@@ -52,8 +60,14 @@ class AtomReadRomeTest {
   @Test
   void shouldTransformWithCorrectDescriptionAndPublicationDate() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN)); //TODO skrocic linie
-      assertThat(blog.getPublishedDate()).isNotNull().isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant()); //TODO skrocic linie
+      BlogDTO blog = rssExtractorService.getBlog(
+          new XmlReader(new File("AtomExample.xml")),
+          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN),
+          "correlationId"
+      );
+      assertThat(blog.getPublishedDate())
+          .isNotNull()
+          .isEqualTo(LocalDateTime.of(2017, 10, 27, 14, 9).atZone(ZoneId.of("UTC")).toInstant());
     } catch (IOException e) {
       Assert.fail();
     }
@@ -62,7 +76,11 @@ class AtomReadRomeTest {
   @Test
   void shouldTransformWithCorrectBlogItems() {
     try {
-      BlogDTO blog = rssExtractorService.getBlog(new XmlReader(new File("AtomExample.xml")), new Blog.RssInfo("feedURL", "blogURL", Instant.MIN));//TODO skrocic linie
+      BlogDTO blog = rssExtractorService.getBlog(
+          new XmlReader(new File("AtomExample.xml")),
+          new Blog.RssInfo("feedURL", "blogURL", Instant.MIN),
+          "correlationId"
+      );
       List<ItemDTO> itemsForBlog = blog.getItemsList();
       assertThat(itemsForBlog).isEmpty();
     } catch (IOException e) {
@@ -72,8 +90,12 @@ class AtomReadRomeTest {
 
   @Test
   void shouldThrowException() {
-    assertThatThrownBy(() -> rssExtractorService.getBlog(null, new Blog.RssInfo("test", "blogURL", Instant.MIN))).isNotNull()
-        .hasMessage("Wystąpił błąd przy pobieraniu informacji z bloga test"); //TODO skrocic linie
+    assertThatThrownBy(() -> rssExtractorService.getBlog(
+        null,
+        new Blog.RssInfo("test", "blogURL", Instant.MIN),
+        "correlationId"))
+        .isNotNull()
+        .hasMessage("Wystąpił błąd przy pobieraniu informacji z bloga test correlationID = correlationId");
   }
 
 }

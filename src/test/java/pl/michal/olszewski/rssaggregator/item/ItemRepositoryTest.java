@@ -37,7 +37,7 @@ public class ItemRepositoryTest {
   @Test
   void shouldFind2NewestItems() {
     //given
-    Blog blog = new Blog("url", "", "", "", null, null);
+    Blog blog = Blog.builder().blogURL("url").build();
     Instant instant = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     mongoTemplate.save(blog);
     Item title1 = new Item(ItemDTO.builder().link("title1").date(instant).build());
@@ -66,7 +66,7 @@ public class ItemRepositoryTest {
   @Test
   void shouldFindItemsWhenDateIsNull() {
     //given
-    Blog blog = new Blog("url", "", "", "", null, null);
+    Blog blog = Blog.builder().blogURL("url").build();
     blog.addItem(new Item(ItemDTO.builder().link("title1").date(Instant.now()).build()), mongoTemplate);
     blog.addItem(new Item(ItemDTO.builder().link("title2").date(Instant.now()).build()), mongoTemplate);
     blog.addItem(new Item(ItemDTO.builder().link("title3").date(Instant.now()).build()), mongoTemplate);
@@ -84,7 +84,7 @@ public class ItemRepositoryTest {
   @Test
   void shouldNotCreateItemByUniqueConstraint() { //TODO zapiac sie jakas fabryka
     //given
-    Blog blog = new Blog("url", "", "", "", null, null);
+    Blog blog = Blog.builder().blogURL("url").build();
     blog.addItem(new Item(ItemDTO.builder().link("title1").build()), mongoTemplate);
     mongoTemplate.save(blog);
 

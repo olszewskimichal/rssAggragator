@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.item;
 
+import java.util.UUID;
 import java.util.stream.IntStream;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
@@ -15,12 +16,13 @@ class ItemListFactory {
     this.itemRepository = itemRepository;
   }
 
-  //TODO zrefaktorowac
   void buildNumberOfItemsAndSave(int numberOfItems) {
-    Blog blog = new Blog("blog997", "", "", "", null, null);
+    Blog blog = Blog.builder().blogURL(UUID.randomUUID().toString()).build();
+
     IntStream.rangeClosed(1, numberOfItems)
         .parallel()
-        .forEach(v -> blog.addItem(new Item(ItemDTO.builder().link("link" + v).title("title" + v).build()), itemRepository));
+        .forEach(number -> blog.addItem(new Item(ItemDTO.builder().link("link" + number).title("title" + number).build()), itemRepository));
+
     repository.save(blog).block();
   }
 }
