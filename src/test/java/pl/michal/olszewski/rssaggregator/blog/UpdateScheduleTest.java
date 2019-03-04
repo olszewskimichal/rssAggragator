@@ -1,15 +1,15 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.net.UnknownHostException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -17,7 +17,8 @@ import reactor.test.StepVerifier;
 class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLogger {
 
   @Autowired
-  private AsyncService asyncService;
+  private UpdateBlogService updateBlogService;
+
   @Autowired
   private BlogReactiveRepository blogRepository;
 
@@ -32,19 +33,26 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @Test
   void shouldUpdateBlog() {
+    Instant now = Instant.now().minus(2, ChronoUnit.DAYS);
     Blog blog = Blog.builder()
-        .blogURL("https://devstyle.pl")
-        .name("devstyle.pl")
-        .feedURL("https://devstyle.pl/feed")
+        .blogURL("https://spring.io/")
+        .name("spring")
+        .feedURL("https://spring.io/blog.atom/")
         .build();
     blogRepository.save(blog).block();
 
-    Boolean voidFuture = asyncService.updateRssBlogItems(blog, "correlationId");
+    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+
+    StepVerifier
+        .create(result)
+        .expectNext(true)
+        .expectComplete()
+        .verify();
 
     Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
     StepVerifier
         .create(updatedBlog)
-        .assertNext(v -> assertThat(v.getItems()).isNotEmpty().hasSize(15))
+        .assertNext(v -> assertThat(v.getItems()).isNotNull().isNotEmpty())
         .expectComplete()
         .verify();
   }
@@ -58,13 +66,20 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .feedURL("https://devstyle.pl/feed")
         .lastUpdateDate(Instant.now())
         .build();
+    blogRepository.save(blog).block();
 
-    Boolean voidFuture = asyncService.updateRssBlogItems(blog, "correlationId");
+    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+
+    StepVerifier
+        .create(result)
+        .expectNext(true)
+        .expectComplete()
+        .verify();
 
     Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
     StepVerifier
         .create(updatedBlog)
-        .assertNext(v -> assertThat(v.getLastUpdateDate()).isNotNull().isBefore(Instant.now()))
+        .assertNext(v -> assertThat(v.getItems()).hasSize(0))
         .expectComplete()
         .verify();
   }
@@ -79,8 +94,12 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
     blogRepository.save(blog).block();
 
-    assertThatThrownBy(() -> asyncService.updateRssBlogItems(blog, "correlationId"))
-        .isInstanceOf(RssException.class)
-        .hasCauseInstanceOf(UnknownHostException.class);
+    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+
+    StepVerifier
+        .create(result)
+        .expectNext(false)
+        .verifyComplete();
   }
+
 }

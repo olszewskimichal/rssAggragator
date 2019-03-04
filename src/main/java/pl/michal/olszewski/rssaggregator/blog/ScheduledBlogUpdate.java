@@ -23,8 +23,7 @@ class ScheduledBlogUpdate {
   @RegistryTimed
   void runScheduledUpdate() {
     log.debug("Rozpoczynam aktualizacje correlationId");
-    updateBlogService.updateAllActiveBlogsByRss()
-        .block();
+    updateBlogService.updateAllActiveBlogsByRss().collectList().block();
   }
 
 }
