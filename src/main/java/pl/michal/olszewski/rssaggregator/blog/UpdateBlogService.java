@@ -24,8 +24,8 @@ import reactor.core.scheduler.Schedulers;
 @Transactional
 class UpdateBlogService {
 
-  private final BlogReactiveRepository repository;
   private static final Scheduler SCHEDULER = Schedulers.fromExecutor(Executors.newFixedThreadPool(16));
+  private final BlogReactiveRepository repository;
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
   private final BlogService blogService;
