@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.item;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.mongodb.MongoWriteException;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
@@ -19,6 +21,7 @@ import reactor.test.StepVerifier;
 
 @DataMongoTest
 @ActiveProfiles(Profiles.TEST)
+@EnableMongoAuditing
 public class ItemRepositoryTest {
 
   @Autowired
@@ -35,7 +38,7 @@ public class ItemRepositoryTest {
 
   //TODO za dlugie given
   @Test
-  void shouldFind2NewestItems() {
+  void shouldFind2NewestPublishedItems() {
     //given
     Blog blog = Blog.builder().blogURL("url").build();
     Instant instant = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -48,13 +51,36 @@ public class ItemRepositoryTest {
     mongoTemplate.save(blog);
 
     //when
-    Flux<Item> items = itemRepository.findAllNew(2);
+    Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2);
 
     //then
     StepVerifier.create(items)
-        .expectNextCount(2)
+        .expectNext(title3)
+        .expectNext(title1)
         .expectComplete()
         .verify();
+  }
+
+  @Test
+  void shouldFind2NewestPersistedItems() {
+    //given
+    Blog blog = Blog.builder().blogURL("url").build();
+    blog.addItem(new Item(ItemDTO.builder().link("title2").build()), mongoTemplate);
+    mongoTemplate.save(blog);
+
+    Item title1 = new Item(ItemDTO.builder().link("title1").build());
+    blog.addItem(title1, mongoTemplate);
+    mongoTemplate.save(blog);
+
+    Item title3 = new Item(ItemDTO.builder().link("title3").build());
+    Blog blog2 = Blog.builder().blogURL("url2").build();
+    blog2.addItem(title3, mongoTemplate);
+    mongoTemplate.save(blog2);
+
+    //when
+    Flux<Item> items = itemRepository.findAllOrderByCreatedAt(2);
+
+    //then
     StepVerifier.create(items)
         .expectNext(title3)
         .expectNext(title1)
@@ -67,13 +93,13 @@ public class ItemRepositoryTest {
   void shouldFindItemsWhenDateIsNull() {
     //given
     Blog blog = Blog.builder().blogURL("url").build();
-    blog.addItem(new Item(ItemDTO.builder().link("title1").date(Instant.now()).build()), mongoTemplate);
-    blog.addItem(new Item(ItemDTO.builder().link("title2").date(Instant.now()).build()), mongoTemplate);
-    blog.addItem(new Item(ItemDTO.builder().link("title3").date(Instant.now()).build()), mongoTemplate);
+    blog.addItem(new Item(ItemDTO.builder().link("title1").build()), mongoTemplate);
+    blog.addItem(new Item(ItemDTO.builder().link("title2").build()), mongoTemplate);
+    blog.addItem(new Item(ItemDTO.builder().link("title3").build()), mongoTemplate);
     mongoTemplate.save(blog);
 
     //when
-    Flux<Item> items = itemRepository.findAllNew(2);
+    Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2);
     //then
     StepVerifier.create(items)
         .expectNextCount(2)
@@ -94,5 +120,11 @@ public class ItemRepositoryTest {
         .hasCauseInstanceOf(MongoWriteException.class);
   }
 
+  @Test
+  void shouldSetCreatedDateOnPersistNewItem() {
+    Item item = new Item(ItemDTO.builder().link("title1").build());
+    Item save = mongoTemplate.save(item);
 
+    assertThat(save.getCreatedAt()).isNotNull();
+  }
 }
