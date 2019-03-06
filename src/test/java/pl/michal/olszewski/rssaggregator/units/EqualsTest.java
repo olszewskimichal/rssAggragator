@@ -24,7 +24,7 @@ class EqualsTest {
   @Test
   void itemEqualsContractTest() {
     EqualsVerifier.forClass(Item.class)
-        .withIgnoredFields("id")
+        .withIgnoredFields("id", "createdAt")
         .suppress(Warning.NONFINAL_FIELDS)
         .verify();
   }
