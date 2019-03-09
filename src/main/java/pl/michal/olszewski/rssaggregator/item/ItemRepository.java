@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public interface ItemRepository extends ReactiveMongoRepository<Item, String> {
+interface ItemRepository extends ReactiveMongoRepository<Item, String> {
 
   String DATE = "date";
   String CREATED_AT = "createdAt";

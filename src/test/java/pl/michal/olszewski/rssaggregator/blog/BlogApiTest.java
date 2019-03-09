@@ -9,20 +9,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import org.springframework.web.reactive.function.BodyInserters;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import pl.michal.olszewski.rssaggregator.item.ItemRepository;
 import reactor.test.StepVerifier;
 
 class BlogApiTest extends IntegrationTestBase {
 
   @Autowired
   private BlogReactiveRepository blogRepository;
-
-  @Autowired
-  private ItemRepository itemRepository;
 
   @Autowired
   private MongoTemplate mongoTemplate;
@@ -33,7 +30,7 @@ class BlogApiTest extends IntegrationTestBase {
   @BeforeEach
   void setUp() {
     blogRepository.deleteAll().block();
-    itemRepository.deleteAll().block();
+    mongoTemplate.remove(new Query(), "item");
     blogService.evictBlogCache();
   }
 
