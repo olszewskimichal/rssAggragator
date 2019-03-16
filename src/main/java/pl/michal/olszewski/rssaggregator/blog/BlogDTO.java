@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Singular;
 import lombok.ToString;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
@@ -25,8 +26,8 @@ class BlogDTO {
   private String name;
   private String feedURL;
   private Instant publishedDate;
-  @Builder.Default
   @JsonProperty("itemsList")
+  @Singular("item")
   private List<ItemDTO> itemsList = new ArrayList<>();
 
   public BlogDTO(Blog blog, List<ItemDTO> items) {

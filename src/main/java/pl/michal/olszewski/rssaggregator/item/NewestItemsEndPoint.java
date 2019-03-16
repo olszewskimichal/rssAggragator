@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,14 +19,12 @@ class NewestItemsEndPoint {
   }
 
   @GetMapping
-  @Transactional
   public Flux<ItemDTO> getItemsOrderByPublishedDate(@RequestParam(value = "limit", required = false) Integer limit) {
     log.debug("GET ItemsOrderByPublishedDate with limit {}", limit);
     return itemService.getNewestItemsOrderByPublishedDate(limit == null ? 10 : limit);
   }
 
   @GetMapping("/createdAt")
-  @Transactional
   public Flux<ItemDTO> getItemsOrderByCreatedAt(@RequestParam(value = "limit", required = false) Integer limit) {
     log.debug("GET ItemsOrderByCreatedAt with limit {}", limit);
     return itemService.getNewestItemsOrderByCreatedAt(limit == null ? 10 : limit);

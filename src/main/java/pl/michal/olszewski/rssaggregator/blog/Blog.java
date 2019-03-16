@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Singular;
 import lombok.ToString;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -42,14 +43,14 @@ public class Blog {
   private Set<Item> items = new HashSet<>();
 
   @Builder
-  public Blog(String id, String blogURL, String description, String name, String feedURL, Instant publishedDate, Instant lastUpdateDate) {
+  public Blog(String id, String blogURL, String description, String name, String feedURL, Instant publishedDate, Instant lastUpdateDate, @Singular Set<Item> items) {
     this.id = id;
     this.blogURL = blogURL;
     this.description = description;
     this.name = name;
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
-    this.items = new HashSet<>();
+    this.items = new HashSet<>(items);
     this.lastUpdateDate = lastUpdateDate;
   }
 
