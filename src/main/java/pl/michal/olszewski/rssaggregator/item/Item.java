@@ -26,6 +26,7 @@ public final class Item {
   private String link;
   private Instant date;
   private String author;
+  private boolean read;
 
   @CreatedDate
   private Instant createdAt;
@@ -36,6 +37,7 @@ public final class Item {
     this.link = itemDTO.getLink();
     this.date = itemDTO.getDate();
     this.author = itemDTO.getAuthor();
+    this.read = false;
   }
 
   @Override
@@ -58,5 +60,15 @@ public final class Item {
   @Override
   public final int hashCode() {
     return Objects.hash(title, description, link, date, author);
+  }
+
+  Item markAsRead() {
+    this.read = true;
+    return this;
+  }
+
+  Item markAsUnread() {
+    this.read = false;
+    return this;
   }
 }
