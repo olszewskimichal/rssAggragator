@@ -231,11 +231,6 @@
       <groupId>io.springfox</groupId>
       <version>2.9.2</version>
     </dependency>
-    <dependency>
-      <artifactId>sentry-spring</artifactId>
-      <groupId>io.sentry</groupId>
-      <version>1.7.22</version>
-    </dependency>
   </dependencies>
   <description>Agregator RSS</description>
   <groupId>pl.michal.olszewski</groupId>

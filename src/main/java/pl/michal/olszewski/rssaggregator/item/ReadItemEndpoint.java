@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-@RestController("/api/v1/items/mark")
+@RestController()
 @Slf4j
 class ReadItemEndpoint {
 
@@ -20,7 +20,7 @@ class ReadItemEndpoint {
     this.readItemService = readItemService;
   }
 
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/api/v1/items/mark")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public Mono<Boolean> markItem(@RequestBody ReadItemDTO readItemDTO) {
     String correlationId = UUID.randomUUID().toString();
