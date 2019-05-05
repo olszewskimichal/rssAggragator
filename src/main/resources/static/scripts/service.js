@@ -5,7 +5,7 @@ App.factory('Service', ['$http', '$q', function ($http, $q) {
   return {
 
     fetchItems: function () {
-      return $http.get('/api/v1/items?limit=25')
+      return $http.get('/api/v1/items?limit=50')
       .then(
           function (response) {
             return response.data;
