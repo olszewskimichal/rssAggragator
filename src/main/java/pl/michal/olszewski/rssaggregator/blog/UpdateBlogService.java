@@ -2,10 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
 
-import com.rometools.rome.io.XmlReader;
 import io.micrometer.core.instrument.MeterRegistry;
-import java.io.IOException;
-import java.net.URL;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
@@ -68,16 +65,13 @@ class UpdateBlogService {
 
   private Boolean updateRssBlogItems(Blog blog, String correlationID) {
     log.trace("START updateRssBlogItems dla blog {} correlationID {}", blog.getName(), correlationID);
-    try {
-      var blogDTO = rssExtractorService.getBlog(new XmlReader(new URL(blog.getFeedURL())), blog.getRssInfo(), correlationID);
-      blogService.updateBlog(blog, blogDTO)
-          .subscribeOn(SCHEDULER)
-          .doOnSuccess(v -> log.trace("STOP updateRssBlogItems dla blog {} correlationID {}", v.getName(), correlationID))
-          .block();
-      return true;
-    } catch (IOException e) {
-      log.error("wystapił bład przy aktualizacji bloga o id {} correlationID {}", blog.getId(), correlationID, e);
-      throw new RssException(blog.getFeedURL(), correlationID, e);
-    }
+    var blogDTO = rssExtractorService.getBlog(blog.getRssInfo(), correlationID);
+    blogService.updateBlog(blog, blogDTO)
+        .subscribeOn(SCHEDULER)
+        .doOnSuccess(v -> log.trace("STOP updateRssBlogItems dla blog {} correlationID {}", v.getName(), correlationID))
+        .block();
+    return true;
   }
+
+
 }

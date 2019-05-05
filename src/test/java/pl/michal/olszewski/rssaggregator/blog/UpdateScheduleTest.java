@@ -7,6 +7,8 @@ import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
@@ -25,8 +27,12 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   @Autowired
   private BlogService blogService;
 
+  @Autowired
+  private MongoTemplate mongoTemplate;
+
   @BeforeEach
   void setUp() {
+    mongoTemplate.remove(new Query(), "item");
     blogRepository.deleteAll().block();
     blogService.evictBlogCache();
   }
@@ -79,6 +85,25 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     StepVerifier
         .create(updatedBlog)
         .assertNext(v -> assertThat(v.getItems()).hasSize(0))
+        .expectComplete()
+        .verify();
+  }
+
+  @Test
+  void shouldUpdateBlogWithNotValidCertification() {
+    Blog blog = Blog.builder()
+        .blogURL("https://koziolekweb.pl")
+        .name("koziolekweb.pl")
+        .feedURL("https://koziolekweb.pl/feed/")
+        .lastUpdateDate(Instant.now())
+        .build();
+    blogRepository.save(blog).block();
+
+    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+
+    StepVerifier
+        .create(result)
+        .expectNext(true)
         .expectComplete()
         .verify();
   }
