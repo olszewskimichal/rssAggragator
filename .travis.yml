@@ -1,6 +1,6 @@
 language: java
 sudo: false
-jdk: oraclejdk11
+jdk: openjdk12
 dist: trusty
 
 install:
