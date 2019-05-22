@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import pl.michal.olszewski.rssaggregator.config.Profiles;
+import org.springframework.jms.annotation.EnableJms;
 
 @SpringBootApplication
 @EnableCaching
@@ -23,6 +24,7 @@ import pl.michal.olszewski.rssaggregator.config.Profiles;
 )
 @EnableScheduling
 @EnableConfigurationProperties
+@EnableJms
 public class RssAggregatorApplication {
 
   public static void main(String[] args) {

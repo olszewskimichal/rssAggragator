@@ -166,6 +166,14 @@
       <groupId>de.flapdoodle.embed</groupId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <artifactId>activemq-broker</artifactId>
+      <groupId>org.apache.activemq</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-activemq</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
 
 
     <dependency>
