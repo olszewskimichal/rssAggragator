@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
+import pl.michal.olszewski.rssaggregator.events.EventRepository;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
@@ -30,10 +31,14 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   @Autowired
   private MongoTemplate mongoTemplate;
 
+  @Autowired
+  private EventRepository eventRepository;
+
   @BeforeEach
   void setUp() {
     mongoTemplate.remove(new Query(), "item");
     blogRepository.deleteAll().block();
+    eventRepository.deleteAll().block();
     blogService.evictBlogCache();
   }
 
@@ -124,10 +129,14 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .create(result)
         .expectNext(false)
         .verifyComplete();
+
+    StepVerifier.create(eventRepository.count())
+        .expectNext(1L)
+        .verifyComplete();
   }
 
   @Test
-  void shouldReturnFalseOnTimeout() {
+  void shouldReturnFalseOnTimeoutAndWriteNewEventToDB() {
     Blog blog = Blog.builder()
         .blogURL("https://spring.io/")
         .name("spring")
@@ -140,6 +149,8 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .thenAwait(Duration.ofSeconds(5))
         .expectNext(false)
         .verifyComplete();
+    StepVerifier.create(eventRepository.count())
+        .expectNext(1L)
+        .verifyComplete();
   }
-
 }
