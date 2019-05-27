@@ -30,11 +30,20 @@ import javax.net.ssl.X509TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriUtils;
+import pl.michal.olszewski.rssaggregator.events.BlogUpdateFailedEvent;
+import pl.michal.olszewski.rssaggregator.events.EventRepository;
+import pl.michal.olszewski.rssaggregator.events.GetFinalLinkFailedEvent;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Service
 @Slf4j
 class RssExtractorService {
+
+  private final EventRepository eventRepository;
+
+  RssExtractorService(EventRepository eventRepository) {
+    this.eventRepository = eventRepository;
+  }
 
   private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
@@ -82,8 +91,9 @@ class RssExtractorService {
         String redirectUrl = con.getHeaderField("Location");
         return getFinalURL(redirectUrl).replaceAll("[&?]gi.*", "");
       }
-    } catch (IOException ignored) {
-      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ignored);
+    } catch (IOException ex) {
+      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ex);
+      throw new GetFinalLinkException(String.format("Wystapil blad przy próbie wyciagniecia finalnego linku z %s o tresci ", linkUrl), ex);
     }
     return linkUrl;
   }
@@ -119,9 +129,12 @@ class RssExtractorService {
           .forEach(blogInfo::addNewItem);
       log.trace("getBlog STOP {} correlationID {}", info, correlationID);
       return blogInfo;
-    } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException e) {
-      log.error("wystapił bład przy pobieraniu bloga {} correlationID {}", info, correlationID, e);
-      throw new RssException(info.getFeedURL(), correlationID, e);
+    } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException ex) {
+      eventRepository.save(new BlogUpdateFailedEvent(Instant.now(), correlationID, info.getFeedURL(), ex.getMessage())).block();
+      throw new RssException(info.getFeedURL(), correlationID, ex);
+    } catch (GetFinalLinkException ex) {
+      eventRepository.save(new GetFinalLinkFailedEvent(Instant.now(), ex.getMessage())).block();
+      throw new RssException(info.getFeedURL(), correlationID, ex);
     }
   }
 
