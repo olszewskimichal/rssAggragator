@@ -34,9 +34,9 @@ class NewestItemServiceTest {
     List<Item> itemList = IntStream.rangeClosed(1, 10).parallel()
         .mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())) //TODO do fabryki
         .collect(Collectors.toList());
-    given(itemRepository.findAllOrderByPublishedDate(10)).willReturn(Flux.fromIterable(itemList));
+    given(itemRepository.findAllOrderByPublishedDate(10, 0)).willReturn(Flux.fromIterable(itemList));
     //when
-    Flux<ItemDTO> newestItems = itemService.getNewestItemsOrderByPublishedDate(10);
+    Flux<ItemDTO> newestItems = itemService.getNewestItemsOrderByPublishedDate(10, 0);
     //then
     StepVerifier.create(newestItems)
         .recordWith(ArrayList::new)
@@ -51,9 +51,9 @@ class NewestItemServiceTest {
     List<Item> itemList = IntStream.rangeClosed(1, 10).parallel()
         .mapToObj(value -> new Item(ItemDTO.builder().title("title" + value).date(Instant.now()).build())) //TODO do fabryki
         .collect(Collectors.toList());
-    given(itemRepository.findAllOrderByCreatedAt(10)).willReturn(Flux.fromIterable(itemList));
+    given(itemRepository.findAllOrderByCreatedAt(10, 0)).willReturn(Flux.fromIterable(itemList));
     //when
-    Flux<ItemDTO> newestItems = itemService.getNewestItemsOrderByCreatedAt(10);
+    Flux<ItemDTO> newestItems = itemService.getNewestItemsOrderByCreatedAt(10, 0);
     //then
     StepVerifier.create(newestItems)
         .recordWith(ArrayList::new)

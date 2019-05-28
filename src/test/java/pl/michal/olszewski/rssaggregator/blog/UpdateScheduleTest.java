@@ -1,14 +1,19 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
+import pl.michal.olszewski.rssaggregator.events.BlogUpdateFailedEventProducer;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
@@ -29,6 +34,9 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @Autowired
   private MongoTemplate mongoTemplate;
+
+  @MockBean
+  private BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
 
   @BeforeEach
   void setUp() {
@@ -124,10 +132,12 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .create(result)
         .expectNext(false)
         .verifyComplete();
+
+    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
   }
 
   @Test
-  void shouldReturnFalseOnTimeout() {
+  void shouldReturnFalseOnTimeoutAndWriteNewEventToDB() {
     Blog blog = Blog.builder()
         .blogURL("https://spring.io/")
         .name("spring")
@@ -140,6 +150,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .thenAwait(Duration.ofSeconds(5))
         .expectNext(false)
         .verifyComplete();
+    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
   }
-
 }

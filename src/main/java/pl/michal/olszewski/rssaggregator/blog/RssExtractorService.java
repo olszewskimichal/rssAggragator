@@ -1,5 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import static net.logstash.logback.encoder.org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
+
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
 import com.rometools.fetcher.impl.FeedFetcherCache;
@@ -30,11 +32,19 @@ import javax.net.ssl.X509TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriUtils;
+import pl.michal.olszewski.rssaggregator.events.BlogUpdateFailedEvent;
+import pl.michal.olszewski.rssaggregator.events.BlogUpdateFailedEventProducer;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Service
 @Slf4j
 class RssExtractorService {
+
+  private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
+
+  RssExtractorService(BlogUpdateFailedEventProducer blogUpdateFailedEventProducer) {
+    this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
+  }
 
   private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
@@ -82,8 +92,9 @@ class RssExtractorService {
         String redirectUrl = con.getHeaderField("Location");
         return getFinalURL(redirectUrl).replaceAll("[&?]gi.*", "");
       }
-    } catch (IOException ignored) {
-      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ignored);
+    } catch (IOException ex) {
+      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ex);
+      throw new GetFinalLinkException(String.format("Wystapil blad przy próbie wyciagniecia finalnego linku z %s o tresci ", linkUrl), ex);
     }
     return linkUrl;
   }
@@ -119,9 +130,9 @@ class RssExtractorService {
           .forEach(blogInfo::addNewItem);
       log.trace("getBlog STOP {} correlationID {}", info, correlationID);
       return blogInfo;
-    } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException e) {
-      log.error("wystapił bład przy pobieraniu bloga {} correlationID {}", info, correlationID, e);
-      throw new RssException(info.getFeedURL(), correlationID, e);
+    } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException | GetFinalLinkException ex) {
+      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationID, info.getFeedURL(), ex.getMessage(), getStackTrace(ex)));
+      throw new RssException(info.getFeedURL(), correlationID, ex);
     }
   }
 
