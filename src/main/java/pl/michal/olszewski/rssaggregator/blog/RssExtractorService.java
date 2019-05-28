@@ -131,7 +131,7 @@ class RssExtractorService {
       log.trace("getBlog STOP {} correlationID {}", info, correlationID);
       return blogInfo;
     } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException | GetFinalLinkException ex) {
-      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationID, info.getFeedURL(), ex.getMessage(), getStackTrace(ex)));
+      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationID, info.getFeedURL(), null, ex.getMessage(), getStackTrace(ex)));
       throw new RssException(info.getFeedURL(), correlationID, ex);
     }
   }

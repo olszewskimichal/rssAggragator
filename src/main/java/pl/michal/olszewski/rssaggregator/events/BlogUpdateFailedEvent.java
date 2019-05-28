@@ -18,14 +18,16 @@ public class BlogUpdateFailedEvent implements Serializable {
   private final Instant occurredAt;
   private final String correlationId;
   private final String blogUrl;
+  private final String blogId;
   private final String errorMsg;
   @Id
   private String id;
 
-  public BlogUpdateFailedEvent(Instant occurredAt, String correlationId, String blogUrl, String errorMsg, String stackTrace) {
+  public BlogUpdateFailedEvent(Instant occurredAt, String correlationId, String blogUrl, String blogId, String errorMsg, String stackTrace) {
     this.occurredAt = occurredAt;
     this.correlationId = correlationId;
     this.blogUrl = blogUrl;
+    this.blogId = blogId;
     this.errorMsg = errorMsg;
     this.stackTrace = stackTrace;
   }
