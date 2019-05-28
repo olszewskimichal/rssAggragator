@@ -32,8 +32,8 @@ import javax.net.ssl.X509TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriUtils;
-import pl.michal.olszewski.rssaggregator.events.BlogUpdateFailedEvent;
-import pl.michal.olszewski.rssaggregator.events.BlogUpdateFailedEventProducer;
+import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEvent;
+import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEventProducer;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Service

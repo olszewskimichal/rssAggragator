@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.events.items;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
@@ -14,6 +15,11 @@ class NewItemInBlogProducerTest extends IntegrationTestBase {
 
   @Autowired
   private NewItemInBlogEventRepository repository;
+
+  @BeforeEach
+  void setUp() {
+    repository.deleteAll();
+  }
 
   @Test
   void shouldPersistNewEventToDbWhenWriteEventToQueue() throws InterruptedException {

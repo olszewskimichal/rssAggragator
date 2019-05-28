@@ -14,12 +14,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 public class NewItemInBlogEvent implements Serializable {
 
-  @Id
-  private String id;
   private final Instant occuredAt;
   private final String linkUrl;
   private final String linkTitle;
   private final String blogId;
+  @Id
+  private String id;
 
   public NewItemInBlogEvent(Instant occuredAt, String linkUrl, String linkTitle, String blogId) {
     this.occuredAt = occuredAt;

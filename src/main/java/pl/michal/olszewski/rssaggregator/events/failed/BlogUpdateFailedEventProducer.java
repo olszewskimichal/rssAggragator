@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.events;
+package pl.michal.olszewski.rssaggregator.events.failed;
 
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
