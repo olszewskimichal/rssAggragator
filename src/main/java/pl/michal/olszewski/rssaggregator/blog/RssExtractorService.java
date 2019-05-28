@@ -2,8 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
-import com.rometools.fetcher.impl.FeedFetcherCache;
-import com.rometools.fetcher.impl.HashMapFeedInfoCache;
 import com.rometools.fetcher.impl.HttpClientFeedFetcher;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
@@ -30,11 +28,18 @@ import javax.net.ssl.X509TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriUtils;
+import pl.michal.olszewski.rssaggregator.config.FeedFetcherCache;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Service
 @Slf4j
 class RssExtractorService {
+
+  private final FeedFetcherCache feedFetcherCache;
+
+  RssExtractorService(FeedFetcherCache feedFetcherCache) {
+    this.feedFetcherCache = feedFetcherCache;
+  }
 
   private static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
@@ -102,8 +107,7 @@ class RssExtractorService {
   BlogDTO getBlog(Blog.RssInfo info, String correlationID) {
     log.trace("getBlog START {} correlationID {}", info, correlationID);
     try {
-      FeedFetcherCache feedInfoCache = HashMapFeedInfoCache.getInstance();
-      FeedFetcher feedFetcher = new HttpClientFeedFetcher(feedInfoCache);
+      FeedFetcher feedFetcher = new HttpClientFeedFetcher(feedFetcherCache);
       SSLContext ctx = SSLContext.getInstance("TLS");
       ctx.init(new KeyManager[0], new TrustManager[]{new DefaultTrustManager()}, new SecureRandom());
       SSLContext.setDefault(ctx);

@@ -11,6 +11,7 @@ import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.michal.olszewski.rssaggregator.config.FeedFetcherCache;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -27,9 +28,9 @@ class UpdateBlogService {
   private final RssExtractorService rssExtractorService;
   private final BlogService blogService;
 
-  public UpdateBlogService(BlogReactiveRepository repository, Executor executor, MeterRegistry registry, BlogService blogService) {
+  public UpdateBlogService(BlogReactiveRepository repository, Executor executor, MeterRegistry registry, BlogService blogService, FeedFetcherCache feedFetcherCache) {
     this.repository = repository;
-    this.rssExtractorService = new RssExtractorService();
+    this.rssExtractorService = new RssExtractorService(feedFetcherCache);
     this.blogService = blogService;
     if (registry != null) {
       this.executor = monitor(registry, executor, "prod_pool");
