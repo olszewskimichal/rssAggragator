@@ -25,6 +25,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import pl.michal.olszewski.rssaggregator.events.items.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import reactor.core.publisher.Flux;
@@ -44,6 +45,9 @@ class BlogServiceTest {
   @Mock
   private MongoTemplate mongoTemplate;
 
+  @Mock
+  private NewItemInBlogEventProducer producer;
+
   @BeforeEach
   void setUp() {
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
@@ -53,7 +57,7 @@ class BlogServiceTest {
         }
     );
     given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build());
+    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build(), producer);
     blogService.evictBlogCache();
   }
 
@@ -173,6 +177,7 @@ class BlogServiceTest {
         })
         .expectComplete()
         .verify();
+    verify(producer, times(2)).writeEventToQueue(Mockito.any());
   }
 
   @Test
@@ -200,6 +205,7 @@ class BlogServiceTest {
         })
         .expectComplete()
         .verify();
+    verify(producer, times(2)).writeEventToQueue(Mockito.any());
   }
 
   @Test
@@ -228,7 +234,7 @@ class BlogServiceTest {
         ))
         .expectComplete()
         .verify();
-
+    verify(producer, times(1)).writeEventToQueue(Mockito.any());
   }
 
   @Test
@@ -259,10 +265,10 @@ class BlogServiceTest {
         ))
         .expectComplete()
         .verify();
+    verify(producer, times(1)).writeEventToQueue(Mockito.any());
   }
 
   @Test
-    //TODO zmniejszyc liczbe linii w sekcji given
   void shouldNotAddItemWhenIsTheSame() {
     //given
     ItemDTO itemDTO = ItemDTO.builder()

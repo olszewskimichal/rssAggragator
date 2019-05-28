@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.events;
+package pl.michal.olszewski.rssaggregator.events.failed;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class BlogUpdateFailedEventConsumer {
+class BlogUpdateFailedEventConsumer {
 
   private final BlogUpdateFailedEventRepository blogUpdateFailedEventRepository;
 

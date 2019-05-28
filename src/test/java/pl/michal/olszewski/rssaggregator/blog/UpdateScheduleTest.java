@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import pl.michal.olszewski.rssaggregator.events.BlogUpdateFailedEventProducer;
+import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEventProducer;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
