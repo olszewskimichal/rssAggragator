@@ -1,15 +1,19 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import pl.michal.olszewski.rssaggregator.events.EventRepository;
+import pl.michal.olszewski.rssaggregator.events.BlogUpdateFailedEventProducer;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
@@ -31,14 +35,13 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  @Autowired
-  private EventRepository eventRepository;
+  @MockBean
+  private BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
 
   @BeforeEach
   void setUp() {
     mongoTemplate.remove(new Query(), "item");
     blogRepository.deleteAll().block();
-    eventRepository.deleteAll().block();
     blogService.evictBlogCache();
   }
 
@@ -130,9 +133,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .expectNext(false)
         .verifyComplete();
 
-    StepVerifier.create(eventRepository.count())
-        .expectNext(1L)
-        .verifyComplete();
+    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
   }
 
   @Test
@@ -149,8 +150,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .thenAwait(Duration.ofSeconds(5))
         .expectNext(false)
         .verifyComplete();
-    StepVerifier.create(eventRepository.count())
-        .expectNext(1L)
-        .verifyComplete();
+    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
   }
 }
