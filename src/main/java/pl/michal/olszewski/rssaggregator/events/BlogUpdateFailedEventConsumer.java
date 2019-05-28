@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class BlogUpdateFailedEventConsumer {
+class BlogUpdateFailedEventConsumer {
 
   private final BlogUpdateFailedEventRepository blogUpdateFailedEventRepository;
 
