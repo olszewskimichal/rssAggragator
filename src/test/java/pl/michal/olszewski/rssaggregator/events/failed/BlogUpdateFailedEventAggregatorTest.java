@@ -43,11 +43,16 @@ class BlogUpdateFailedEventAggregatorTest extends IntegrationTestBase {
     //when
     Flux<UpdateBlogFailureCount> failureCounts = aggregator.aggregateAllFailureOfBlogs();
 
+    List<UpdateBlogFailureCount> expectedEvents = Arrays.asList(
+        new UpdateBlogFailureCount("id2", "msg1", 2L),
+        new UpdateBlogFailureCount("id1", "msg1", 3L),
+        new UpdateBlogFailureCount("id2", "msg2", 2L)
+    );
+
     StepVerifier.create(failureCounts)
-        .expectNext(
-            new UpdateBlogFailureCount("id2", "msg1", 2L),
-            new UpdateBlogFailureCount("id1", "msg1", 3L),
-            new UpdateBlogFailureCount("id2", "msg2", 2L))
+        .assertNext(expectedEvents::contains)
+        .assertNext(expectedEvents::contains)
+        .assertNext(expectedEvents::contains)
         .expectComplete()
         .verify();
   }
@@ -70,11 +75,13 @@ class BlogUpdateFailedEventAggregatorTest extends IntegrationTestBase {
     //when
     Flux<UpdateBlogFailureCount> failureCounts = aggregator.aggregateAllFailureOfBlogsFromPrevious24h();
 
+    List<UpdateBlogFailureCount> expectedEvents = Arrays.asList(
+        new UpdateBlogFailureCount("id2", "error", 2L),
+        new UpdateBlogFailureCount("id1", "error", 2L)
+    );
     StepVerifier.create(failureCounts)
-        .expectNext(
-            new UpdateBlogFailureCount("id2", "error", 2L),
-            new UpdateBlogFailureCount("id1", "error", 2L)
-        )
+        .assertNext(expectedEvents::contains)
+        .assertNext(expectedEvents::contains)
         .expectComplete()
         .verify();
   }
