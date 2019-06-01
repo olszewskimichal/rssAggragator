@@ -2,8 +2,7 @@ package pl.michal.olszewski.rssaggregator.events.failed;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
@@ -11,6 +10,7 @@ import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 @Repository
 public class BlogUpdateFailedEventAggregator {
@@ -19,29 +19,29 @@ public class BlogUpdateFailedEventAggregator {
   private static final String BLOG_ID = "blogId";
   private static final String TOTAL = "total";
   private static final String OCCURRED_AT = "occurredAt";
-  private final MongoTemplate mongoTemplate;
+  private final ReactiveMongoTemplate mongoTemplate;
 
-  public BlogUpdateFailedEventAggregator(MongoTemplate mongoTemplate) {
+  public BlogUpdateFailedEventAggregator(ReactiveMongoTemplate mongoTemplate) {
     this.mongoTemplate = mongoTemplate;
   }
 
   //{ "$group" : { "_id" : { "blogId" : "$blogId" , "errorMsg" : "$errorMsg"} , "total" : { "$sum" : 1}}} , { "$match" : { "total" : { "$gt" : 1}}} , { "$project" : { "total" : 1 , "errorMsg" : "$_id.errorMsg" , "blogId" : "$_id.blogId"}}
-  List<UpdateBlogFailureCount> aggregateAllFailureOfBlogs() {
+  public Flux<UpdateBlogFailureCount> aggregateAllFailureOfBlogs() {
     return mongoTemplate.aggregate(Aggregation.newAggregation(
         groupByBlogIdAndErrorMsg(),
         whereTotalGreaterThanOne(),
         selectTotalAndBlogId()
-    ), BlogUpdateFailedEvent.class, UpdateBlogFailureCount.class).getMappedResults();
+    ), BlogUpdateFailedEvent.class, UpdateBlogFailureCount.class);
   }
 
   //{ "$match" : { "occurredAt" : { "$gte" : { "$date" : "2019-05-31T10:04:52.687Z"} , "$lte" : { "$date" : "2019-06-01T10:04:52.687Z"}}}} , { "$group" : { "_id" : { "blogId" : "$blogId" , "errorMsg" : "$errorMsg"} , "total" : { "$sum" : 1}}} , { "$match" : { "total" : { "$gt" : 1}}} , { "$project" : { "total" : 1 , "errorMsg" : "$_id.errorMsg" , "blogId" : "$_id.blogId"}}
-  List<UpdateBlogFailureCount> aggregateAllFailureOfBlogsFromPrevious24h() {
+  public Flux<UpdateBlogFailureCount> aggregateAllFailureOfBlogsFromPrevious24h() {
     return mongoTemplate.aggregate(Aggregation.newAggregation(
         whereOccurredAtFromLast24hours(),
         groupByBlogIdAndErrorMsg(),
         whereTotalGreaterThanOne(),
         selectTotalAndBlogId()
-    ), BlogUpdateFailedEvent.class, UpdateBlogFailureCount.class).getMappedResults();
+    ), BlogUpdateFailedEvent.class, UpdateBlogFailureCount.class);
   }
 
   private MatchOperation whereTotalGreaterThanOne() {

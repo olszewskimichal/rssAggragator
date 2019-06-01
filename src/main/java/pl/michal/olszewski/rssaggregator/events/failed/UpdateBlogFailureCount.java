@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-final class UpdateBlogFailureCount {
+public final class UpdateBlogFailureCount {
 
   private final String blogId;
   private final String errorMsg;

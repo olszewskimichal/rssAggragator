@@ -1,7 +1,5 @@
 package pl.michal.olszewski.rssaggregator.events.failed;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -10,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 class BlogUpdateFailedEventAggregatorTest extends IntegrationTestBase {
 
@@ -41,13 +41,15 @@ class BlogUpdateFailedEventAggregatorTest extends IntegrationTestBase {
     );
     eventRepository.saveAll(events);
     //when
-    List<UpdateBlogFailureCount> failureCounts = aggregator.aggregateAllFailureOfBlogs();
+    Flux<UpdateBlogFailureCount> failureCounts = aggregator.aggregateAllFailureOfBlogs();
 
-    assertThat(failureCounts).contains(
-        new UpdateBlogFailureCount("id2", "msg1", 2L),
-        new UpdateBlogFailureCount("id1", "msg1", 3L),
-        new UpdateBlogFailureCount("id2", "msg2", 2L)
-    );
+    StepVerifier.create(failureCounts)
+        .expectNext(
+            new UpdateBlogFailureCount("id2", "msg1", 2L),
+            new UpdateBlogFailureCount("id1", "msg1", 3L),
+            new UpdateBlogFailureCount("id2", "msg2", 2L))
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -66,12 +68,15 @@ class BlogUpdateFailedEventAggregatorTest extends IntegrationTestBase {
     eventRepository.saveAll(eventList);
 
     //when
-    List<UpdateBlogFailureCount> failureCounts = aggregator.aggregateAllFailureOfBlogsFromPrevious24h();
+    Flux<UpdateBlogFailureCount> failureCounts = aggregator.aggregateAllFailureOfBlogsFromPrevious24h();
 
-    assertThat(failureCounts).contains(
-        new UpdateBlogFailureCount("id2", "error", 2L),
-        new UpdateBlogFailureCount("id1", "error", 2L)
-    );
+    StepVerifier.create(failureCounts)
+        .expectNext(
+            new UpdateBlogFailureCount("id2", "error", 2L),
+            new UpdateBlogFailureCount("id1", "error", 2L)
+        )
+        .expectComplete()
+        .verify();
   }
 
 }
