@@ -69,7 +69,7 @@ class UpdateBlogService {
         .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
         .doOnError(ex -> {
               if (ex instanceof UpdateTimeoutException) {
-                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationId, blog.getFeedURL(), blog.getId(), ex.getMessage(), getStackTrace(ex)));
+                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationId, blog.getFeedURL(), blog.getId(), ex.getMessage()));
               }
               log.warn("Niepowiodlo sie pobieranie nowych danych dla bloga {} correlation Id {}", blog.getName(), correlationId, ex);
             }

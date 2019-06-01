@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.events.failed;
 
 import java.io.Serializable;
 import java.time.Instant;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -11,10 +12,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 @Getter
 @EqualsAndHashCode
-@ToString(exclude = "stackTrace")
+@ToString
 public class BlogUpdateFailedEvent implements Serializable {
 
-  private final String stackTrace;
   private final Instant occurredAt;
   private final String correlationId;
   private final String blogUrl;
@@ -23,12 +23,12 @@ public class BlogUpdateFailedEvent implements Serializable {
   @Id
   private String id;
 
-  public BlogUpdateFailedEvent(Instant occurredAt, String correlationId, String blogUrl, String blogId, String errorMsg, String stackTrace) {
+  @Builder
+  public BlogUpdateFailedEvent(Instant occurredAt, String correlationId, String blogUrl, String blogId, String errorMsg) {
     this.occurredAt = occurredAt;
     this.correlationId = correlationId;
     this.blogUrl = blogUrl;
     this.blogId = blogId;
     this.errorMsg = errorMsg;
-    this.stackTrace = stackTrace;
   }
 }
