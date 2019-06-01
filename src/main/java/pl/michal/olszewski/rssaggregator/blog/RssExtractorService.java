@@ -1,7 +1,5 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import static net.logstash.logback.encoder.org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
-
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
 import com.rometools.fetcher.impl.FeedFetcherCache;
@@ -131,8 +129,8 @@ class RssExtractorService {
       log.trace("getBlog STOP {} correlationID {}", info, correlationID);
       return blogInfo;
     } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException | GetFinalLinkException ex) {
-      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationID, info.getFeedURL(), null, ex.getMessage(), getStackTrace(ex)));
-      throw new RssException(info.getFeedURL(), correlationID, ex);
+      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationID, info.getFeedURL(), info.getBlogId(), ex.getMessage()));
+      throw new RssException(info.getFeedURL(), ex);
     }
   }
 

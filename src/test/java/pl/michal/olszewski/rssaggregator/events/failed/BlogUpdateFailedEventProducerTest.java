@@ -24,7 +24,7 @@ class BlogUpdateFailedEventProducerTest extends IntegrationTestBase {
   @Test
   void shouldPersistNewEventToDbWhenWriteEventToQueue() throws InterruptedException {
     //given
-    eventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), "id", "url", "id", "msg", "trace"));
+    eventProducer.writeEventToQueue(BlogUpdateFailedEvent.builder().occurredAt(Instant.now()).blogId("id").build());
     //when
     Thread.sleep(100);
     //then

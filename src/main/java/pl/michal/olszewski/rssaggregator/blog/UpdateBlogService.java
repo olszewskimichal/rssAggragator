@@ -66,10 +66,10 @@ class UpdateBlogService {
     String correlationId = UUID.randomUUID().toString();
     log.debug("Pobieranie nowych danych dla bloga {} correlationId {}", blog.getName(), correlationId);
     return Mono.fromCallable(() -> updateRssBlogItems(blog, correlationId))
-        .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName(), correlationId)))
+        .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
         .doOnError(ex -> {
               if (ex instanceof UpdateTimeoutException) {
-                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationId, blog.getFeedURL(), blog.getId(), ex.getMessage(), getStackTrace(ex)));
+                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationId, blog.getFeedURL(), blog.getId(), ex.getMessage()));
               }
               log.warn("Niepowiodlo sie pobieranie nowych danych dla bloga {} correlation Id {}", blog.getName(), correlationId, ex);
             }
