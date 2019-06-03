@@ -1,13 +1,17 @@
 package pl.michal.olszewski.rssaggregator.events.failed;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -30,7 +34,8 @@ public class BlogUpdateFailedEventAggregator {
     return mongoTemplate.aggregate(Aggregation.newAggregation(
         groupByBlogIdAndErrorMsg(),
         whereTotalGreaterThanOne(),
-        selectTotalAndBlogId()
+        selectTotalAndBlogId(),
+        orderByTotal()
     ), BlogUpdateFailedEvent.class, UpdateBlogFailureCount.class);
   }
 
@@ -40,7 +45,8 @@ public class BlogUpdateFailedEventAggregator {
         whereOccurredAtFromLast24hours(),
         groupByBlogIdAndErrorMsg(),
         whereTotalGreaterThanOne(),
-        selectTotalAndBlogId()
+        selectTotalAndBlogId(),
+        orderByTotal()
     ), BlogUpdateFailedEvent.class, UpdateBlogFailureCount.class);
   }
 
@@ -48,6 +54,9 @@ public class BlogUpdateFailedEventAggregator {
     return Aggregation.match(Criteria.where(TOTAL).gt(1L));
   }
 
+  private SortOperation orderByTotal() {
+    return sort(Direction.DESC, "total");
+  }
   private ProjectionOperation selectTotalAndBlogId() {
     return Aggregation.project(TOTAL)
         .and("_id.errorMsg").as(ERROR_MSG)
