@@ -84,7 +84,7 @@ class BlogService {
             return blogRepository.delete(blog)
                 .doOnSuccess(v -> cache.invalidate(id));
           }
-          blog.deactive();
+          blog.deactivate();
           return Mono.empty();
         });
   }

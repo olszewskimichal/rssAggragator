@@ -80,12 +80,16 @@ public class Blog {
     this.lastUpdateDate = Instant.now().minus(2, ChronoUnit.DAYS);
   }
 
-  boolean isActive() {
+  public boolean isActive() {
     return active;
   }
 
-  void deactive() {
+  public void deactivate() {
     active = false;
+  }
+
+  public void activate() {
+    active = true;
   }
 
   @Override
