@@ -19,9 +19,13 @@ class BlogActivityEventProducerTest extends IntegrationTestBase {
   @Autowired
   private BlogReactiveRepository repository;
 
+  @Autowired
+  private ChangeActivityBlogEventRepository activityBlogEventRepository;
+
   @BeforeEach
   void setUp() {
     repository.deleteAll().block();
+    activityBlogEventRepository.deleteAll().block();
   }
 
   @Test
@@ -35,6 +39,10 @@ class BlogActivityEventProducerTest extends IntegrationTestBase {
         .assertNext(v -> assertThat(v.isActive()).isTrue())
         .expectComplete()
         .verify();
+    StepVerifier.create(activityBlogEventRepository.count())
+        .expectNext(1L)
+        .expectComplete()
+        .verify();
   }
 
   @Test
@@ -46,6 +54,10 @@ class BlogActivityEventProducerTest extends IntegrationTestBase {
     //then
     StepVerifier.create(repository.findById(blog.getId()))
         .assertNext(v -> assertThat(v.isActive()).isFalse())
+        .expectComplete()
+        .verify();
+    StepVerifier.create(activityBlogEventRepository.count())
+        .expectNext(1L)
         .expectComplete()
         .verify();
   }

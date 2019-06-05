@@ -72,7 +72,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @Test
   void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() {
-
     Blog blog = Blog.builder()
         .blogURL("https://devstyle.pl")
         .name("devstyle.pl")
