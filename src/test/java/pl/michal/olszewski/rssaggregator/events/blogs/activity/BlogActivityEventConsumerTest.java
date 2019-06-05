@@ -11,10 +11,10 @@ import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.test.StepVerifier;
 
-class BlogActivityEventProducerTest extends IntegrationTestBase {
+class BlogActivityEventConsumerTest extends IntegrationTestBase {
 
   @Autowired
-  private BlogActivityEventProducer eventProducer;
+  private BlogActivityEventConsumer eventConsumer;
 
   @Autowired
   private BlogReactiveRepository repository;
@@ -29,11 +29,9 @@ class BlogActivityEventProducerTest extends IntegrationTestBase {
   }
 
   @Test
-  void shouldActivateBlogByEvent() throws InterruptedException {
+  void shouldActivateBlogByEvent() {
     Blog blog = repository.save(Blog.builder().build()).block();
-    eventProducer.writeEventToQueue(ActivateBlog.builder().occurredAt(Instant.now()).blogId(blog.getId()).build());
-    //when
-    Thread.sleep(100);
+    eventConsumer.receiveActivateMessage(ActivateBlog.builder().occurredAt(Instant.now()).blogId(blog.getId()).build());
     //then
     StepVerifier.create(repository.findById(blog.getId()))
         .assertNext(v -> assertThat(v.isActive()).isTrue())
@@ -46,11 +44,10 @@ class BlogActivityEventProducerTest extends IntegrationTestBase {
   }
 
   @Test
-  void shouldDeactivateBlogByEvent() throws InterruptedException {
+  void shouldDeactivateBlogByEvent() {
     Blog blog = repository.save(Blog.builder().build()).block();
-    eventProducer.writeEventToQueue(DeactivateBlog.builder().occurredAt(Instant.now()).blogId(blog.getId()).build());
+    eventConsumer.receiveDeactivateMessage(DeactivateBlog.builder().occurredAt(Instant.now()).blogId(blog.getId()).build());
     //when
-    Thread.sleep(100);
     //then
     StepVerifier.create(repository.findById(blog.getId()))
         .assertNext(v -> assertThat(v.isActive()).isFalse())
