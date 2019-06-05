@@ -4,7 +4,6 @@ import static pl.michal.olszewski.rssaggregator.blog.BlogItemsFromFeedExtractor.
 
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
-import com.rometools.fetcher.impl.HttpClientFeedFetcher;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.io.FeedException;
 import java.io.IOException;
@@ -22,16 +21,15 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.config.FeedFetcherCache;
 
 @Service
 @Slf4j
 class RssExtractorService {
 
-  private final FeedFetcherCache feedFetcherCache;
+  private final FeedFetcher feedFetcher;
 
-  RssExtractorService(FeedFetcherCache feedFetcherCache) {
-    this.feedFetcherCache = feedFetcherCache;
+  RssExtractorService(FeedFetcher feedFetcher) {
+    this.feedFetcher = feedFetcher;
   }
 
   private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
@@ -48,7 +46,6 @@ class RssExtractorService {
   BlogDTO getBlog(Blog.RssInfo info, String correlationID) {
     log.trace("getBlog START {} correlationID {}", info, correlationID);
     try {
-      FeedFetcher feedFetcher = new HttpClientFeedFetcher(feedFetcherCache);
       SSLContext ctx = SSLContext.getInstance("TLS");
       ctx.init(new KeyManager[0], new TrustManager[]{new DefaultTrustManager()}, new SecureRandom());
       SSLContext.setDefault(ctx);

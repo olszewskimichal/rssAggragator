@@ -2,6 +2,8 @@ package pl.michal.olszewski.rssaggregator.config;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.rometools.fetcher.FeedFetcher;
+import com.rometools.fetcher.impl.HttpClientFeedFetcher;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.concurrent.TimeUnit;
 import org.springframework.context.annotation.Bean;
@@ -32,5 +34,10 @@ class FeedCacheConfig {
         .expireAfterAccess(10, TimeUnit.MINUTES)
         .maximumSize(300000)
         .build();
+  }
+
+  @Bean
+  public FeedFetcher feedFetcher(FeedFetcherCache feedFetcherCache) {
+    return new HttpClientFeedFetcher(feedFetcherCache);
   }
 }
