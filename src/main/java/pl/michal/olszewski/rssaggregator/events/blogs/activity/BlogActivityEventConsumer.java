@@ -21,7 +21,8 @@ class BlogActivityEventConsumer {
     log.info("Received <{}>", event);
     activityBlogEventRepository.save(event)
         .flatMap(activateBlog -> activityUpdater.activateBlog(event.getBlogId()))
-        .subscribe(blog -> log.debug("Blog {} activated", blog.getId()));
+        .doOnSuccess(blog -> log.debug("Blog {} activated", blog.getId()))
+        .block();
   }
 
   @JmsListener(destination = "deactivateBlogEvent")
@@ -29,6 +30,7 @@ class BlogActivityEventConsumer {
     log.info("Received <{}>", event);
     activityBlogEventRepository.save(event)
         .flatMap(deactivateBlog -> activityUpdater.deactivateBlog(event.getBlogId()))
-        .subscribe(blog -> log.debug("Blog {} deactivated", blog.getId()));
+        .doOnSuccess(blog -> log.debug("Blog {} deactivated", blog.getId()))
+        .block();
   }
 }

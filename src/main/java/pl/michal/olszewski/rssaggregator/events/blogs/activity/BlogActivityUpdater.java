@@ -16,17 +16,17 @@ public class BlogActivityUpdater {
 
   Mono<Blog> activateBlog(String id) {
     return blogReactiveRepository.findById(id)
-        .flatMap(v -> {
-          v.activate();
-          return blogReactiveRepository.save(v);
+        .flatMap(blog -> {
+          blog.activate();
+          return blogReactiveRepository.save(blog);
         });
   }
 
   Mono<Blog> deactivateBlog(String id) {
     return blogReactiveRepository.findById(id)
-        .flatMap(v -> {
-          v.deactivate();
-          return blogReactiveRepository.save(v);
+        .flatMap(blog -> {
+          blog.deactivate();
+          return blogReactiveRepository.save(blog);
         });
   }
 }
