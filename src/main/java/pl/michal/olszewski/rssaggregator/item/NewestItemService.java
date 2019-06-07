@@ -16,15 +16,15 @@ class NewestItemService {
     this.itemRepository = itemRepository;
   }
 
-  Flux<ItemDTO> getNewestItemsOrderByPublishedDate(int size) {
-    log.debug("Pobieram wpisy z limitem {}", size);
-    return itemRepository.findAllOrderByPublishedDate(size)
+  Flux<ItemDTO> getNewestItemsOrderByPublishedDate(int size, int page) {
+    log.debug("Pobieram wpisy z limitem {} strona {}", size, page);
+    return itemRepository.findAllOrderByPublishedDate(size, page)
         .map(ItemDTO::new);
   }
 
-  Flux<ItemDTO> getNewestItemsOrderByCreatedAt(int size) {
-    log.debug("Pobieram najnowsze wpisy z limitem {}", size);
-    return itemRepository.findAllOrderByCreatedAt(size)
+  Flux<ItemDTO> getNewestItemsOrderByCreatedAt(int size, int page) {
+    log.debug("Pobieram najnowsze wpisy z limitem {} strona {}", size, page);
+    return itemRepository.findAllOrderByCreatedAt(size, page)
         .map(ItemDTO::new);
   }
 }

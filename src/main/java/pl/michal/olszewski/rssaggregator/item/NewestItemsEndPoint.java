@@ -19,14 +19,20 @@ class NewestItemsEndPoint {
   }
 
   @GetMapping
-  public Flux<ItemDTO> getItemsOrderByPublishedDate(@RequestParam(value = "limit", required = false) Integer limit) {
-    log.debug("GET ItemsOrderByPublishedDate with limit {}", limit);
-    return itemService.getNewestItemsOrderByPublishedDate(limit == null ? 10 : limit);
+  public Flux<ItemDTO> getItemsOrderByPublishedDate(@RequestParam(value = "limit", required = false) Integer limit, @RequestParam(value = "page", required = false) Integer page) {
+    log.debug("GET ItemsOrderByPublishedDate with limit {} and page {}", limit, page);
+    return itemService.getNewestItemsOrderByPublishedDate(
+        limit == null ? 10 : limit,
+        page == null ? 0 : page - 1
+    );
   }
 
   @GetMapping("/createdAt")
-  public Flux<ItemDTO> getItemsOrderByCreatedAt(@RequestParam(value = "limit", required = false) Integer limit) {
-    log.debug("GET ItemsOrderByCreatedAt with limit {}", limit);
-    return itemService.getNewestItemsOrderByCreatedAt(limit == null ? 10 : limit);
+  public Flux<ItemDTO> getItemsOrderByCreatedAt(@RequestParam(value = "limit", required = false) Integer limit, @RequestParam(value = "page", required = false) Integer page) {
+    log.debug("GET ItemsOrderByCreatedAt with limit {} and page {}", limit, page);
+    return itemService.getNewestItemsOrderByCreatedAt(
+        limit == null ? 10 : limit,
+        page == null ? 0 : page - 1
+    );
   }
 }

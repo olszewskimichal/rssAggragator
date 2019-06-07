@@ -18,15 +18,19 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEvent;
+import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEventProducer;
 
 @Service
 @Slf4j
 class RssExtractorService {
 
   private final FeedFetcher feedFetcher;
+  private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
 
-  RssExtractorService(FeedFetcher feedFetcher) {
+  RssExtractorService(FeedFetcher feedFetcher, BlogUpdateFailedEventProducer blogUpdateFailedEventProducer) {
     this.feedFetcher = feedFetcher;
+    this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
   }
 
   private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
@@ -58,9 +62,9 @@ class RssExtractorService {
           .forEach(blogInfo::addNewItem);
       log.trace("getBlog STOP {} correlationID {}", info, correlationID);
       return blogInfo;
-    } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException e) {
-      log.error("wystapił bład przy pobieraniu bloga {} correlationID {}", info, correlationID, e);
-      throw new RssException(info.getFeedURL(), correlationID, e);
+    } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException | GetFinalLinkException ex) {
+      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationID, info.getFeedURL(), info.getBlogId(), ex.getMessage()));
+      throw new RssException(info.getFeedURL(), ex);
     }
   }
 

@@ -15,12 +15,12 @@ interface ItemRepository extends ReactiveMongoRepository<Item, String> {
 
   Flux<Item> findAllBy(Pageable pageable);
 
-  default Flux<Item> findAllOrderByPublishedDate(Integer limit) {
-    return findAllBy(PageRequest.of(0, limit, new Sort(Sort.Direction.DESC, DATE)));
+  default Flux<Item> findAllOrderByPublishedDate(Integer limit, Integer page) {
+    return findAllBy(PageRequest.of(page, limit, new Sort(Sort.Direction.DESC, DATE)));
   }
 
-  default Flux<Item> findAllOrderByCreatedAt(Integer limit) {
-    return findAllBy(PageRequest.of(0, limit, new Sort(Sort.Direction.DESC, CREATED_AT)));
+  default Flux<Item> findAllOrderByCreatedAt(Integer limit, Integer page) {
+    return findAllBy(PageRequest.of(page, limit, new Sort(Sort.Direction.DESC, CREATED_AT)));
   }
 
 }

@@ -2,8 +2,8 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 class UpdateTimeoutException extends RuntimeException {
 
-  UpdateTimeoutException(String name, String correlationId) {
-    super("Timeout aktualizacji bloga = " + name + " correlationId = " + correlationId);
+  UpdateTimeoutException(String name) {
+    super(String.format("Timeout aktualizacji bloga = %s", name));
   }
 
 }

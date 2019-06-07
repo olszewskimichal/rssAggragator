@@ -2,8 +2,10 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
 
+import com.rometools.fetcher.FeedFetcher;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
@@ -11,6 +13,8 @@ import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEvent;
+import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEventProducer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -26,10 +30,19 @@ class UpdateBlogService {
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
   private final BlogService blogService;
+  private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
 
-  public UpdateBlogService(BlogReactiveRepository repository, Executor executor, MeterRegistry registry, BlogService blogService, RssExtractorService rssExtractorService) {
+  public UpdateBlogService(
+      BlogReactiveRepository repository,
+      Executor executor,
+      MeterRegistry registry,
+      BlogService blogService,
+      BlogUpdateFailedEventProducer blogUpdateFailedEventProducer,
+      FeedFetcher feedFetcher
+  ) {
     this.repository = repository;
-    this.rssExtractorService = rssExtractorService;
+    this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
+    this.rssExtractorService = new RssExtractorService(feedFetcher, blogUpdateFailedEventProducer);
     this.blogService = blogService;
     if (registry != null) {
       this.executor = monitor(registry, executor, "prod_pool");
@@ -44,7 +57,9 @@ class UpdateBlogService {
         .collectList()
         .flatMapMany(Flux::fromIterable)
         .flatMapIterable(v -> v)
-        .doOnError(ex -> log.error("Aktualizacja zakonczona bledem ", ex));
+        .doOnError(ex ->
+            log.error("Aktualizacja zakonczona bledem ", ex)
+        );
   }
 
   private Mono<List<Boolean>> getUpdateBlogByRssList() {
@@ -57,8 +72,14 @@ class UpdateBlogService {
     String correlationId = UUID.randomUUID().toString();
     log.debug("Pobieranie nowych danych dla bloga {} correlationId {}", blog.getName(), correlationId);
     return Mono.fromCallable(() -> updateRssBlogItems(blog, correlationId))
-        .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName(), correlationId)))
-        .doOnError(ex -> log.warn("Niepowiodlo sie pobieranie nowych danych dla bloga {} correlation Id {}", blog.getName(), correlationId, ex))
+        .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
+        .doOnError(ex -> {
+              if (ex instanceof UpdateTimeoutException) {
+                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationId, blog.getFeedURL(), blog.getId(), ex.getMessage()));
+              }
+              log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {} correlation Id {}", blog.getName(), correlationId, ex);
+            }
+        )
         .subscribeOn(Schedulers.fromExecutor(executor))
         .onErrorReturn(false);
   }

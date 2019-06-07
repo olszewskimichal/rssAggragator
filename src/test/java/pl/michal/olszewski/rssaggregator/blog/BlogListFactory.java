@@ -40,7 +40,7 @@ class BlogListFactory {
         .build();
     IntStream.rangeClosed(1, numberOfItems)
         .parallel()
-        .forEachOrdered(v -> blog.addItem(new Item(ItemDTO.builder().link("link" + new Random().nextInt(100) + v).title("title" + v).build()), itemRepository));
+        .forEachOrdered(v -> blog.addItem(new Item(ItemDTO.builder().link("link" + new Random().nextInt(1000000) + v).title("title" + v).build()), itemRepository));
     log.debug("Zapisuje do bazy blog {} {}", blog, blog.getItems().size());
     return repository.save(blog).block();
   }

@@ -108,7 +108,7 @@ public class Blog {
   }
 
   RssInfo getRssInfo() {
-    return new RssInfo(feedURL, blogURL, lastUpdateDate);
+    return new RssInfo(feedURL, blogURL, id, lastUpdateDate);
   }
 
   @Override
@@ -123,11 +123,13 @@ public class Blog {
 
     private final String feedURL;
     private final String blogURL;
+    private final String blogId;
     private final Instant lastUpdateDate;
 
-    RssInfo(String feedURL, String blogURL, Instant lastUpdateDate) {
+    RssInfo(String feedURL, String blogURL, String blogId, Instant lastUpdateDate) {
       this.feedURL = feedURL;
       this.blogURL = blogURL;
+      this.blogId = blogId;
       this.lastUpdateDate = lastUpdateDate == null ? Instant.MIN : lastUpdateDate;
     }
   }

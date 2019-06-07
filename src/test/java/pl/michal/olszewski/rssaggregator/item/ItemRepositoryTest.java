@@ -50,7 +50,7 @@ public class ItemRepositoryTest {
         .build();
     mongoTemplate.save(blog);
     //when
-    Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2);
+    Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2, 0);
 
     //then
     StepVerifier.create(items)
@@ -68,7 +68,7 @@ public class ItemRepositoryTest {
     Item title3 = mongoTemplate.save(new Item(ItemDTO.builder().link("title3").build()));
 
     //when
-    Flux<Item> items = itemRepository.findAllOrderByCreatedAt(2);
+    Flux<Item> items = itemRepository.findAllOrderByCreatedAt(2, 0);
 
     //then
     StepVerifier.create(items)
@@ -90,7 +90,7 @@ public class ItemRepositoryTest {
     mongoTemplate.save(blog);
 
     //when
-    Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2);
+    Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2, 0);
     //then
     StepVerifier.create(items)
         .expectNextCount(2)
