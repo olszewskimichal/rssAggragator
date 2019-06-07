@@ -11,7 +11,6 @@ import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.io.FeedException;
 import java.io.IOException;
-import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -164,6 +163,27 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     Mono<Boolean> result = updateBlogService.updateRssBlogItems(blog);
     StepVerifier.withVirtualTime(() -> result)
         .thenAwait(Duration.ofSeconds(5))
+        .expectNext(false)
+        .verifyComplete();
+    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
+  }
+
+  @Test
+  void shouldWriteNewEventToDBWhenFetcherFailed() throws FetcherException, IOException, FeedException {
+    given(feedFetcher.retrieveFeed(Mockito.anyString(), Mockito.any())).willThrow(new FeedException("some exception"));
+
+    Blog blog = Blog.builder()
+        .blogURL("https://devstyle.pl")
+        .name("devstyle.pl")
+        .feedURL("https://devstyle.xxx/feed")
+        .build();
+
+    blogRepository.save(blog).block();
+
+    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+
+    StepVerifier
+        .create(result)
         .expectNext(false)
         .verifyComplete();
     verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
