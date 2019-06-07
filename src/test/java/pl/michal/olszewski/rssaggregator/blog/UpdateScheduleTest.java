@@ -13,7 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEventProducer;
+import org.springframework.jms.core.JmsTemplate;
+import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
@@ -36,7 +37,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   private MongoTemplate mongoTemplate;
 
   @MockBean
-  private BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
+  private JmsTemplate jmsTemplate;
 
   @BeforeEach
   void setUp() {
@@ -132,7 +133,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .expectNext(false)
         .verifyComplete();
 
-    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(BlogUpdateFailedEvent.class));
   }
 
   @Test
@@ -149,6 +150,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .thenAwait(Duration.ofSeconds(5))
         .expectNext(false)
         .verifyComplete();
-    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(BlogUpdateFailedEvent.class));
   }
 }
