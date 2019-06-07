@@ -62,7 +62,7 @@ class RssExtractorService {
           .forEach(blogInfo::addNewItem);
       log.trace("getBlog STOP {} correlationID {}", info, correlationID);
       return blogInfo;
-    } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException | GetFinalLinkException ex) {
+    } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException ex) {
       blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationID, info.getFeedURL(), info.getBlogId(), ex.getMessage()));
       throw new RssException(info.getFeedURL(), ex);
     }
