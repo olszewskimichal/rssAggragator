@@ -57,6 +57,7 @@ public class BlogUpdateFailedEventAggregator {
   private SortOperation orderByTotal() {
     return sort(Direction.DESC, "total");
   }
+
   private ProjectionOperation selectTotalAndBlogId() {
     return Aggregation.project(TOTAL)
         .and("_id.errorMsg").as(ERROR_MSG)

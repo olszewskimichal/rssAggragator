@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
-import static net.logstash.logback.encoder.org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
