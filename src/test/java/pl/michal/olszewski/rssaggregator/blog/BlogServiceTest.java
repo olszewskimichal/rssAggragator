@@ -25,8 +25,10 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.events.blogs.activity.BlogActivityEventProducer;
 import pl.michal.olszewski.rssaggregator.events.blogs.activity.DeactivateBlog;
+import pl.michal.olszewski.rssaggregator.events.items.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.events.items.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
@@ -48,10 +50,7 @@ class BlogServiceTest {
   private MongoTemplate mongoTemplate;
 
   @Mock
-  private NewItemInBlogEventProducer producer;
-
-  @Mock
-  private BlogActivityEventProducer blogActivityEventProducer;
+  private JmsTemplate jmsTemplate;
 
   @BeforeEach
   void setUp() {
@@ -62,7 +61,7 @@ class BlogServiceTest {
         }
     );
     given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build(), producer, blogActivityEventProducer);
+    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build(), new NewItemInBlogEventProducer(jmsTemplate), new BlogActivityEventProducer(jmsTemplate));
     blogService.evictBlogCache();
   }
 
@@ -182,7 +181,7 @@ class BlogServiceTest {
         })
         .expectComplete()
         .verify();
-    verify(producer, times(2)).writeEventToQueue(Mockito.any());
+    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
   }
 
   @Test
@@ -210,7 +209,7 @@ class BlogServiceTest {
         })
         .expectComplete()
         .verify();
-    verify(producer, times(2)).writeEventToQueue(Mockito.any());
+    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
   }
 
   @Test
@@ -239,7 +238,7 @@ class BlogServiceTest {
         ))
         .expectComplete()
         .verify();
-    verify(producer, times(1)).writeEventToQueue(Mockito.any());
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
   }
 
   @Test
@@ -270,7 +269,7 @@ class BlogServiceTest {
         ))
         .expectComplete()
         .verify();
-    verify(producer, times(1)).writeEventToQueue(Mockito.any());
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
   }
 
   @Test
@@ -433,7 +432,7 @@ class BlogServiceTest {
     blogService.deleteBlog("1", "correlationID").block();
 
     //then
-    verify(blogActivityEventProducer, times(1)).writeEventToQueue(Mockito.any(DeactivateBlog.class));
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(DeactivateBlog.class));
   }
 
   @Test
