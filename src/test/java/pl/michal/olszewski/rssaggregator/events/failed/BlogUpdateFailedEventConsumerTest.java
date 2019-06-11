@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
-class BlogUpdateFailedEventProducerTest extends IntegrationTestBase {
+class BlogUpdateFailedEventConsumerTest extends IntegrationTestBase {
 
   @Autowired
-  private BlogUpdateFailedEventProducer eventProducer;
+  private BlogUpdateFailedEventConsumer eventConsumer;
 
   @Autowired
   private BlogUpdateFailedEventRepository blogUpdateFailedEventRepository;
@@ -22,12 +22,10 @@ class BlogUpdateFailedEventProducerTest extends IntegrationTestBase {
   }
 
   @Test
-  void shouldPersistNewEventToDbWhenWriteEventToQueue() throws InterruptedException {
+  void shouldPersistNewEventToDbOnEvent() {
     //given
-    eventProducer.writeEventToQueue(BlogUpdateFailedEvent.builder().occurredAt(Instant.now()).blogId("id").build());
+    eventConsumer.receiveMessage(BlogUpdateFailedEvent.builder().occurredAt(Instant.now()).blogId("id").build());
     //when
-    Thread.sleep(100);
-    //then
     assertThat(blogUpdateFailedEventRepository.count()).isEqualTo(1L);
   }
 }

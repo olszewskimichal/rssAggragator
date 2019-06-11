@@ -7,9 +7,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.michal.olszewski.rssaggregator.events.blogs.activity.BlogActivityEventProducer;
+import pl.michal.olszewski.rssaggregator.events.blogs.activity.DeactivateBlog;
+import pl.michal.olszewski.rssaggregator.events.blogs.activity.BlogActivityEventProducer;
 import pl.michal.olszewski.rssaggregator.events.items.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.events.items.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.item.Item;
@@ -25,16 +29,19 @@ class BlogService {
   private final MongoTemplate mongoTemplate;
   private final Cache<String, BlogAggregationDTO> cache;
   private final NewItemInBlogEventProducer producer;
+  private final BlogActivityEventProducer blogActivityEventProducer;
 
   public BlogService(
       BlogReactiveRepository blogRepository,
       MongoTemplate mongoTemplate,
       @Qualifier("blogCache") Cache<String, BlogAggregationDTO> cache,
-      NewItemInBlogEventProducer producer) {
+      NewItemInBlogEventProducer producer,
+      BlogActivityEventProducer blogActivityEventProducer) {
     this.blogRepository = blogRepository;
     this.mongoTemplate = mongoTemplate;
     this.cache = cache;
     this.producer = producer;
+    this.blogActivityEventProducer = blogActivityEventProducer;
   }
 
   Mono<Blog> getBlogOrCreate(BlogDTO blogDTO, String correlationId) {
@@ -89,7 +96,7 @@ class BlogService {
             return blogRepository.delete(blog)
                 .doOnSuccess(v -> cache.invalidate(id));
           }
-          blog.deactive();
+          blogActivityEventProducer.writeEventToQueue(new DeactivateBlog(id, Instant.now()));
           return Mono.empty();
         });
   }

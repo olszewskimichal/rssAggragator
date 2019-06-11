@@ -63,7 +63,7 @@ class BlogListFactory {
 
   void notActive() {
     Blog blog = Blog.builder().blogURL("test").feedURL("test").build();
-    blog.deactive();
+    blog.deactivate();
     repository.save(blog).block();
   }
 

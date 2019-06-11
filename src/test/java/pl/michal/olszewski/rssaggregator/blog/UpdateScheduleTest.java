@@ -21,7 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEventProducer;
+import org.springframework.jms.core.JmsTemplate;
+import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
@@ -47,7 +48,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   private FeedFetcher feedFetcher;
 
   @MockBean
-  private BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
+  private JmsTemplate jmsTemplate;
 
   @BeforeEach
   void setUp() {
@@ -134,24 +135,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   }*/
 
   @Test
-  void shouldNotUpdateBlog() {
-    Blog blog = Blog.builder()
-        .blogURL("https://devstyle.pl")
-        .name("devstyle.pl")
-        .feedURL("https://devstyle.xxx/feed")
-        .build();
-
-    blogRepository.save(blog).block();
-
-    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
-
-    StepVerifier
-        .create(result)
-        .expectNext(false)
-        .verifyComplete();
-  }
-
-  @Test
   void shouldReturnFalseOnTimeoutAndWriteNewEventToDB() {
     Blog blog = Blog.builder()
         .blogURL("https://spring.io/")
@@ -165,7 +148,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .thenAwait(Duration.ofSeconds(5))
         .expectNext(false)
         .verifyComplete();
-    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(BlogUpdateFailedEvent.class));
   }
 
   @Test
@@ -186,7 +169,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .create(result)
         .expectNext(false)
         .verifyComplete();
-    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(BlogUpdateFailedEvent.class));
   }
 
   private SyndFeedImpl buildSyndFeed() {

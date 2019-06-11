@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
-class NewItemInBlogProducerTest extends IntegrationTestBase {
+class NewItemInBlogConsumerTest extends IntegrationTestBase {
 
   @Autowired
-  private NewItemInBlogEventProducer eventProducer;
+  private NewItemInBlogEventConsumer eventConsumer;
 
   @Autowired
   private NewItemInBlogEventRepository repository;
@@ -22,11 +22,9 @@ class NewItemInBlogProducerTest extends IntegrationTestBase {
   }
 
   @Test
-  void shouldPersistNewEventToDbWhenWriteEventToQueue() throws InterruptedException {
+  void shouldPersistNewEventToDbOnEvent() {
     //given
-    eventProducer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), "link", "title", "id"));
-    //when
-    Thread.sleep(100);
+    eventConsumer.receiveMessage(new NewItemInBlogEvent(Instant.now(), "link", "title", "id"));
     //then
     assertThat(repository.count()).isEqualTo(1L);
   }
