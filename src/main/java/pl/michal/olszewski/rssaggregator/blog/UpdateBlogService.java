@@ -1,8 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
-import static net.logstash.logback.encoder.org.apache.commons.lang.exception.ExceptionUtils.getStackTrace;
 
+import com.rometools.fetcher.FeedFetcher;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.time.Instant;
@@ -32,11 +32,17 @@ class UpdateBlogService {
   private final BlogService blogService;
   private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
 
-  public UpdateBlogService(BlogReactiveRepository repository, Executor executor, MeterRegistry registry, BlogService blogService,
-      BlogUpdateFailedEventProducer blogUpdateFailedEventProducer) {
+  public UpdateBlogService(
+      BlogReactiveRepository repository,
+      Executor executor,
+      MeterRegistry registry,
+      BlogService blogService,
+      BlogUpdateFailedEventProducer blogUpdateFailedEventProducer,
+      FeedFetcher feedFetcher
+  ) {
     this.repository = repository;
     this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
-    this.rssExtractorService = new RssExtractorService(blogUpdateFailedEventProducer);
+    this.rssExtractorService = new RssExtractorService(feedFetcher, blogUpdateFailedEventProducer);
     this.blogService = blogService;
     if (registry != null) {
       this.executor = monitor(registry, executor, "prod_pool");
@@ -71,7 +77,7 @@ class UpdateBlogService {
               if (ex instanceof UpdateTimeoutException) {
                 blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationId, blog.getFeedURL(), blog.getId(), ex.getMessage()));
               }
-              log.warn("Niepowiodlo sie pobieranie nowych danych dla bloga {} correlation Id {}", blog.getName(), correlationId, ex);
+              log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {} correlation Id {}", blog.getName(), correlationId, ex);
             }
         )
         .subscribeOn(Schedulers.fromExecutor(executor))

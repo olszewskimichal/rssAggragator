@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,11 @@ class BlogService {
   private final Cache<String, BlogAggregationDTO> cache;
   private final NewItemInBlogEventProducer producer;
 
-  public BlogService(BlogReactiveRepository blogRepository, MongoTemplate mongoTemplate, Cache<String, BlogAggregationDTO> cache, NewItemInBlogEventProducer producer) {
+  public BlogService(
+      BlogReactiveRepository blogRepository,
+      MongoTemplate mongoTemplate,
+      @Qualifier("blogCache") Cache<String, BlogAggregationDTO> cache,
+      NewItemInBlogEventProducer producer) {
     this.blogRepository = blogRepository;
     this.mongoTemplate = mongoTemplate;
     this.cache = cache;
@@ -110,7 +115,6 @@ class BlogService {
     return dtoFlux
         .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {} correlationId {}", blogDTO, correlationId));
   }
-
 
   void evictBlogCache() {
     log.debug("Czyszcze cache dla blogów");

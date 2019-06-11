@@ -1,11 +1,19 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.rometools.fetcher.FeedFetcher;
+import com.rometools.fetcher.FetcherException;
+import com.rometools.rome.feed.synd.SyndEntryImpl;
+import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.io.FeedException;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,6 +44,9 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   private MongoTemplate mongoTemplate;
 
   @MockBean
+  private FeedFetcher feedFetcher;
+
+  @MockBean
   private BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
 
   @BeforeEach
@@ -46,11 +57,14 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   }
 
   @Test
-  void shouldUpdateBlog() {
+  void shouldUpdateBlog() throws IOException, FetcherException, FeedException {
+    SyndFeedImpl syndFeed = buildSyndFeed();
+    given(feedFetcher.retrieveFeed(Mockito.anyString(), Mockito.any())).willReturn(syndFeed);
+
     Blog blog = Blog.builder()
         .blogURL("https://spring.io/")
         .name("spring")
-        .feedURL("https://spring.io/blog.atom/")
+        .feedURL("https://spring.blog.test/")
         .build();
     blogRepository.save(blog).block();
 
@@ -71,7 +85,10 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   }
 
   @Test
-  void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() {
+  void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() throws IOException, FetcherException, FeedException {
+    SyndFeedImpl syndFeed = buildSyndFeed();
+
+    given(feedFetcher.retrieveFeed(Mockito.anyString(), Mockito.any())).willReturn(syndFeed);
 
     Blog blog = Blog.builder()
         .blogURL("https://devstyle.pl")
@@ -97,7 +114,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .verify();
   }
 
-  @Test
+ /* @Test
   void shouldUpdateBlogWithNotValidCertification() {
     Blog blog = Blog.builder()
         .blogURL("https://koziolekweb.pl")
@@ -114,7 +131,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .expectNext(true)
         .expectComplete()
         .verify();
-  }
+  }*/
 
   @Test
   void shouldNotUpdateBlog() {
@@ -132,8 +149,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .create(result)
         .expectNext(false)
         .verifyComplete();
-
-    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
   }
 
   @Test
@@ -141,7 +156,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     Blog blog = Blog.builder()
         .blogURL("https://spring.io/")
         .name("spring")
-        .feedURL("https://spring.io/blog.atom/")
+        .feedURL("https://xcasdasda.io/")
         .build();
     blogRepository.save(blog).block();
 
@@ -152,4 +167,35 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .verifyComplete();
     verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
   }
+
+  @Test
+  void shouldWriteNewEventToDBWhenFetcherFailed() throws FetcherException, IOException, FeedException {
+    given(feedFetcher.retrieveFeed(Mockito.anyString(), Mockito.any())).willThrow(new FeedException("some exception"));
+
+    Blog blog = Blog.builder()
+        .blogURL("https://devstyle.pl")
+        .name("devstyle.pl")
+        .feedURL("https://devstyle.xxx/feed")
+        .build();
+
+    blogRepository.save(blog).block();
+
+    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+
+    StepVerifier
+        .create(result)
+        .expectNext(false)
+        .verifyComplete();
+    verify(blogUpdateFailedEventProducer, times(1)).writeEventToQueue(Mockito.any());
+  }
+
+  private SyndFeedImpl buildSyndFeed() {
+    SyndFeedImpl syndFeed = new SyndFeedImpl();
+    SyndEntryImpl syndEntry = new SyndEntryImpl();
+    syndEntry.setPublishedDate(new Date());
+    syndEntry.setLink("link");
+    syndFeed.getEntries().add(syndEntry);
+    return syndFeed;
+  }
+
 }
