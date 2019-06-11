@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.controller;
+package pl.michal.olszewski.rssaggregator.home;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
