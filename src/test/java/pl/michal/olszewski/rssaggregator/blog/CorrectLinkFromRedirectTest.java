@@ -1,9 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static pl.michal.olszewski.rssaggregator.blog.RssExtractorService.convertURLToAscii;
-import static pl.michal.olszewski.rssaggregator.blog.RssExtractorService.getFinalURL;
+import static pl.michal.olszewski.rssaggregator.blog.BlogItemsFromFeedExtractor.convertURLToAscii;
+import static pl.michal.olszewski.rssaggregator.blog.BlogItemsFromFeedExtractor.getFinalURL;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,8 +35,4 @@ class CorrectLinkFromRedirectTest {
     assertThat(finalURL).isEqualTo(finalURL2);
   }
 
-  @Test
-  void shouldThrowExceptionWhenSomethingFailed() {
-    assertThrows(GetFinalLinkException.class, () -> getFinalURL("http://jvm-bloggersadad/r/1asdsadsadsadasd"));
-  }
 }

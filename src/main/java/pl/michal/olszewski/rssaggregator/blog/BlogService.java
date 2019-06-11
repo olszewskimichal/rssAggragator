@@ -6,11 +6,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.events.blogs.activity.BlogActivityEventProducer;
 import pl.michal.olszewski.rssaggregator.events.blogs.activity.DeactivateBlog;
+import pl.michal.olszewski.rssaggregator.events.blogs.activity.BlogActivityEventProducer;
 import pl.michal.olszewski.rssaggregator.events.items.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.events.items.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.item.Item;
@@ -28,7 +31,11 @@ class BlogService {
   private final NewItemInBlogEventProducer producer;
   private final BlogActivityEventProducer blogActivityEventProducer;
 
-  public BlogService(BlogReactiveRepository blogRepository, MongoTemplate mongoTemplate, Cache<String, BlogAggregationDTO> cache, NewItemInBlogEventProducer producer,
+  public BlogService(
+      BlogReactiveRepository blogRepository,
+      MongoTemplate mongoTemplate,
+      @Qualifier("blogCache") Cache<String, BlogAggregationDTO> cache,
+      NewItemInBlogEventProducer producer,
       BlogActivityEventProducer blogActivityEventProducer) {
     this.blogRepository = blogRepository;
     this.mongoTemplate = mongoTemplate;
@@ -115,7 +122,6 @@ class BlogService {
     return dtoFlux
         .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {} correlationId {}", blogDTO, correlationId));
   }
-
 
   void evictBlogCache() {
     log.debug("Czyszcze cache dla blogów");
