@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.events.blogs.activity;
+package pl.michal.olszewski.rssaggregator.blog.activity;
 
 import java.io.Serializable;
 import java.time.Instant;

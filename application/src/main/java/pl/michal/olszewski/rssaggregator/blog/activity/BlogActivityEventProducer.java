@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.events.blogs.activity;
+package pl.michal.olszewski.rssaggregator.blog.activity;
 
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
