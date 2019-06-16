@@ -26,16 +26,13 @@ import org.mockito.quality.Strictness;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import pl.michal.olszewski.rssaggregator.blog.activity.BlogActivityEventProducer;
-import pl.michal.olszewski.rssaggregator.blog.activity.DeactivateBlog;
+import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEvent;
-import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEventProducer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -61,7 +58,7 @@ class BlogServiceTest {
         }
     );
     given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build(), new NewItemInBlogEventProducer(jmsTemplate), new BlogActivityEventProducer(jmsTemplate));
+    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build(), new NewItemInBlogEventProducer(jmsTemplate));
     blogService.evictBlogCache();
   }
 
@@ -432,6 +429,6 @@ class BlogServiceTest {
     blogService.deleteBlog("1", "correlationID").block();
 
     //then
-    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(DeactivateBlog.class));
+    assertThat(blog.isActive()).isFalse();
   }
 }

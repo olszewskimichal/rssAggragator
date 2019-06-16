@@ -83,6 +83,7 @@
     <module>items</module>
     <module>application</module>
     <module>failureAggregator</module>
+    <module>blogs</module>
   </modules>
   <dependencies>
     <dependency>

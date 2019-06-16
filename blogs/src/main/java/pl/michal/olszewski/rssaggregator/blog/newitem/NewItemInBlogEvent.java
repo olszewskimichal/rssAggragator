@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.newitem;
+package pl.michal.olszewski.rssaggregator.blog.newitem;
 
 import java.io.Serializable;
 import java.time.Instant;

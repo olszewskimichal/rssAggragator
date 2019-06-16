@@ -12,11 +12,11 @@ public class BlogActivityEventProducer {
     this.jmsTemplate = jmsTemplate;
   }
 
-  public void writeEventToQueue(ActivateBlog event) {
+  void writeEventToQueue(ActivateBlog event) {
     jmsTemplate.convertAndSend("activateBlogEvent", event);
   }
 
-  public void writeEventToQueue(DeactivateBlog event) {
+  void writeEventToQueue(DeactivateBlog event) {
     jmsTemplate.convertAndSend("deactivateBlogEvent", event);
   }
 }

@@ -9,11 +9,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.michal.olszewski.rssaggregator.blog.activity.BlogActivityEventProducer;
-import pl.michal.olszewski.rssaggregator.blog.activity.DeactivateBlog;
+import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEvent;
-import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEventProducer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -27,19 +25,17 @@ class BlogService {
   private final MongoTemplate mongoTemplate;
   private final Cache<String, BlogAggregationDTO> cache;
   private final NewItemInBlogEventProducer producer;
-  private final BlogActivityEventProducer blogActivityEventProducer;
 
   public BlogService(
       BlogReactiveRepository blogRepository,
       MongoTemplate mongoTemplate,
       @Qualifier("blogCache") Cache<String, BlogAggregationDTO> cache,
-      NewItemInBlogEventProducer producer,
-      BlogActivityEventProducer blogActivityEventProducer) {
+      NewItemInBlogEventProducer producer
+  ) {
     this.blogRepository = blogRepository;
     this.mongoTemplate = mongoTemplate;
     this.cache = cache;
     this.producer = producer;
-    this.blogActivityEventProducer = blogActivityEventProducer;
   }
 
   Mono<Blog> getBlogOrCreate(BlogDTO blogDTO, String correlationId) {
@@ -94,7 +90,7 @@ class BlogService {
             return blogRepository.delete(blog)
                 .doOnSuccess(v -> cache.invalidate(id));
           }
-          blogActivityEventProducer.writeEventToQueue(new DeactivateBlog(id, Instant.now()));
+          blog.deactivate();
           return Mono.empty();
         });
   }
