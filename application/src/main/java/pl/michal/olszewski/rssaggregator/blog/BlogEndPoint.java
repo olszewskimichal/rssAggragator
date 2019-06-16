@@ -33,7 +33,7 @@ class BlogEndPoint {
   }
 
   @GetMapping(value = "/{id}")
-  public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
+  private Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
     String correlationID = UUID.randomUUID().toString();
     log.debug("START GET blog by id {} correlationId {}", blogId, correlationID);
     return blogService.getBlogDTOById(blogId, correlationID)

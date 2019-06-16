@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode
 @Document
 @ToString
-public class NewItemInBlogEvent implements Serializable {
+class NewItemInBlogEvent implements Serializable {
 
   private final Instant occurredAt;
   private final String linkUrl;

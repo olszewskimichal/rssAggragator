@@ -18,7 +18,7 @@ import reactor.test.StepVerifier;
 
 @DataMongoTest
 @ActiveProfiles(Profiles.TEST)
-public class BlogRepositoryTest {
+class BlogRepositoryTest {
 
   @Autowired
   protected MongoTemplate entityManager;

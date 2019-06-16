@@ -7,7 +7,7 @@ import lombok.ToString;
 
 @ToString
 @Getter
-public class ActivateBlog extends ChangeActivityBlogEvent {
+class ActivateBlog extends ChangeActivityBlogEvent {
 
   @Builder
   public ActivateBlog(String blogId, Instant occurredAt) {

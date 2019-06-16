@@ -20,7 +20,7 @@ import reactor.test.StepVerifier;
 @DataMongoTest
 @ActiveProfiles("test")
 @EnableMongoAuditing
-public class ItemRepositoryTest {
+class ItemRepositoryTest {
 
   @Autowired
   protected MongoTemplate mongoTemplate;
