@@ -18,6 +18,9 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 @Slf4j
 class BlogItemsFromFeedExtractor {
 
+  private BlogItemsFromFeedExtractor() {
+  }
+
   static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
     return syndFeed.getEntries().parallelStream()

@@ -43,7 +43,16 @@ public class Blog {
   private Set<Item> items = new HashSet<>();
 
   @Builder
-  public Blog(String id, String blogURL, String description, String name, String feedURL, Instant publishedDate, Instant lastUpdateDate, @Singular Set<Item> items) {
+  public Blog(
+      String id,
+      String blogURL,
+      String description,
+      String name,
+      String feedURL,
+      Instant publishedDate,
+      Instant lastUpdateDate,
+      @Singular Set<Item> items
+  ) {
     this.id = id;
     this.blogURL = blogURL;
     this.description = description;

@@ -37,7 +37,7 @@ class FeedCacheConfig {
   }
 
   @Bean
-  public FeedFetcher feedFetcher(FeedFetcherCache feedFetcherCache) {
+  public FeedFetcher feedFetcher(FeedFetcherCacheImpl feedFetcherCache) {
     return new HttpClientFeedFetcher(feedFetcherCache);
   }
 }

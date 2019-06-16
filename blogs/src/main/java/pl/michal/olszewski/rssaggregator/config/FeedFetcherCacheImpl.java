@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class FeedFetcherCache implements com.rometools.fetcher.impl.FeedFetcherCache {
+public class FeedFetcherCacheImpl implements com.rometools.fetcher.impl.FeedFetcherCache {
 
   private final Cache<String, SyndFeedInfo> feedCacheProd;
 
-  public FeedFetcherCache(@Qualifier("feedCache") Cache<String, SyndFeedInfo> feedCacheProd) {
+  public FeedFetcherCacheImpl(@Qualifier("feedCache") Cache<String, SyndFeedInfo> feedCacheProd) {
     this.feedCacheProd = feedCacheProd;
   }
 

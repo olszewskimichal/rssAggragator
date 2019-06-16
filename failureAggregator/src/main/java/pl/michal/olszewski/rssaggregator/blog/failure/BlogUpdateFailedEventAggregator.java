@@ -55,7 +55,7 @@ public class BlogUpdateFailedEventAggregator {
   }
 
   private SortOperation orderByTotal() {
-    return sort(Direction.DESC, "total");
+    return sort(Direction.DESC, TOTAL);
   }
 
   private ProjectionOperation selectTotalAndBlogId() {
