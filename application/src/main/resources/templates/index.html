@@ -1,0 +1,82 @@
+<html>
+<head>
+  <title>Rss Aggregator</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body class="ng-cloak" ng-app="myApp">
+<div class="generic-container" ng-controller="Controller as ctrl">
+  <div class="panel panel-default">
+    <div class="panel-heading"><span class="lead">Dodaj nowego bloga</span></div>
+    <div class="formcontainer">
+      <form class="form-group" name="myForm" ng-submit="ctrl.submit()">
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label class="col-md-2 control-lable" for="uname">RSS/Feed adres</label>
+            <div class="col-md-7">
+              <input class="form-control input-sm" id="uname" ng-model="ctrl.blog.feedURL"
+                     placeholder="Podaj adres RSS bloga" required="required"
+                     type="text"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label class="col-md-2 control-lable" for="name">Nazwa bloga</label>
+            <div class="col-md-7">
+              <input class="form-control input-sm" id="name" ng-model="ctrl.blog.name" placeholder="Podaj nazwe bloga"
+                     type="text"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label class="col-md-2 control-lable" for="link">Link do bloga</label>
+            <div class="col-md-7">
+              <input class="form-control input-sm" id="link" ng-model="ctrl.blog.link"
+                     placeholder="Podaj adres bloga" required="required"
+                     type="text"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="form-group col-md-12">
+            <input class="btn btn-primary btn-sm" type="submit" value="Dodaj nowy"/>
+            <button class="btn btn-warning btn-sm" ng-click="ctrl.reset()" type="button">Reset</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading"><span class="lead">Najswieższe wpisy na blogach </span></div>
+    <div class="tablecontainer">
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>Autor</th>
+          <th>Tytuł</th>
+          <th>Link</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="u in ctrl.items">
+          <td><span ng-bind="u.author"></span></td>
+          <td><span ng-bind="u.title"></span></td>
+          <td><a ng-bind="u.link" ng-href="{{u.link}}"></a></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="scripts/app.js"></script>
+<script src="scripts/service.js"></script>
+<script src="scripts/controller.js"></script>
+</body>
+</html>

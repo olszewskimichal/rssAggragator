@@ -14,13 +14,11 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.ActiveProfiles;
-import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.config.Profiles;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 @DataMongoTest
-@ActiveProfiles(Profiles.TEST)
+@ActiveProfiles("test")
 @EnableMongoAuditing
 public class ItemRepositoryTest {
 
@@ -43,12 +41,9 @@ public class ItemRepositoryTest {
     Instant instant = Instant.now().truncatedTo(ChronoUnit.MILLIS);
     Item title3 = new Item(ItemDTO.builder().link("title3").date(instant.plusSeconds(10)).build());
     Item title1 = new Item(ItemDTO.builder().link("title1").date(instant).build());
-    Blog blog = Blog.builder().blogURL("url")
-        .item(mongoTemplate.save(title1))
-        .item(mongoTemplate.save(title3))
-        .item(mongoTemplate.save(new Item(ItemDTO.builder().link("title2").date(instant.minusSeconds(10)).build())))
-        .build();
-    mongoTemplate.save(blog);
+    mongoTemplate.save(title1);
+    mongoTemplate.save(title3);
+    mongoTemplate.save(new Item(ItemDTO.builder().link("title2").date(instant.minusSeconds(10)).build()));
     //when
     Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2, 0);
 
@@ -81,13 +76,9 @@ public class ItemRepositoryTest {
   @Test
   void shouldFindItemsWhenDateIsNull() {
     //given
-    Blog blog = Blog.builder()
-        .blogURL("url")
-        .item(mongoTemplate.save(new Item(ItemDTO.builder().link("title1").build())))
-        .item(mongoTemplate.save(new Item(ItemDTO.builder().link("title2").build())))
-        .item(mongoTemplate.save(new Item(ItemDTO.builder().link("title3").build())))
-        .build();
-    mongoTemplate.save(blog);
+    mongoTemplate.save(new Item(ItemDTO.builder().link("title1").build()));
+    mongoTemplate.save(new Item(ItemDTO.builder().link("title2").build()));
+    mongoTemplate.save(new Item(ItemDTO.builder().link("title3").build()));
 
     //when
     Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2, 0);

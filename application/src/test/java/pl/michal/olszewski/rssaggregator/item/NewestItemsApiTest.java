@@ -106,7 +106,7 @@ class NewestItemsApiTest extends IntegrationTestBase {
   }
 
   private ItemListFactory givenItem() {
-    return new ItemListFactory(repository, entityManager);
+    return new ItemListFactory(entityManager);
   }
 
   private ListBodySpec<ItemDTO> thenGetItemsFromApi() {
