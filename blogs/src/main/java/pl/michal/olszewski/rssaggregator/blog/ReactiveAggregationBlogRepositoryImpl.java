@@ -34,16 +34,16 @@ class ReactiveAggregationBlogRepositoryImpl implements ReactiveAggregationBlogRe
   public Flux<BlogAggregationDTO> getBlogsWithCount() {
     return reactiveMongoTemplate.aggregate(Aggregation.newAggregation(
         Aggregation.unwind(ITEMS, true),
-        Aggregation.group(ID)
-            .first(NAME).as(NAME)
-            .first(BLOG_URL).as(LINK)
-            .first(DESCRIPTION).as(DESCRIPTION)
-            .first(ID).as(BLOG_ID)
-            .first(FEED_URL).as(FEED_URL)
-            .first(PUBLISHED_DATE).as(PUBLISHED_DATE)
+        Aggregation.group(ID, NAME, DESCRIPTION, FEED_URL, PUBLISHED_DATE, BLOG_URL)
             .addToSet(ITEMS).as(ITEMS),
-        Aggregation.project(BLOG_ID, LINK, DESCRIPTION, NAME, FEED_URL, PUBLISHED_DATE)
-            .and(ITEMS).project(SIZE).as(BLOG_ITEMS_COUNT),
+        Aggregation.project()
+            .and(ITEMS).project(SIZE).as(BLOG_ITEMS_COUNT)
+            .and("_id." + ID).as(BLOG_ID)
+            .and("_id." + NAME).as(NAME)
+            .and("_id." + DESCRIPTION).as(DESCRIPTION)
+            .and("_id." + FEED_URL).as(FEED_URL)
+            .and("_id." + PUBLISHED_DATE).as(PUBLISHED_DATE)
+            .and("_id." + BLOG_URL).as(LINK),
         Aggregation.sort(Direction.DESC, BLOG_ITEMS_COUNT)
     ), Blog.class, BlogAggregationDTO.class);
   }
