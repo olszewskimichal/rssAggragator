@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import java.time.Instant;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -133,22 +132,8 @@ class BlogService {
         .flatMap(blog -> updateBlog(blog, blogDTO));
   }
 
-  Flux<BlogItemDTO> getBlogItemsForBlog(String blogId, String correlationId) {
-    log.debug("getBlogItemsForBlog {} correlationId {}", blogId, correlationId);
-    return blogRepository.findById(blogId)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId, correlationId)))
-        .flatMapIterable(this::extractItems);
-  }
-
   private void addItemToBlog(Blog blog, Item item) {
     blog.addItem(item, mongoTemplate);
     producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item.getLink(), item.getTitle(), blog.getId()));
-  }
-
-  private List<BlogItemDTO> extractItems(Blog blog) {
-    return blog.getItems().stream()
-        .parallel()
-        .map(BlogItemDTO::new)
-        .collect(Collectors.toList());
   }
 }

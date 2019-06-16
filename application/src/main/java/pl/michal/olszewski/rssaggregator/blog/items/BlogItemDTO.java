@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.blog.items;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

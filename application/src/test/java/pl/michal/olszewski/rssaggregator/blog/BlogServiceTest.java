@@ -434,33 +434,4 @@ class BlogServiceTest {
     //then
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(DeactivateBlog.class));
   }
-
-  @Test
-  void shouldThrownExceptionWhenGetItemsForNotExistingBlog() {
-    //given
-    given(blogRepository.findById("id")).willReturn(Mono.empty());
-
-    //when
-    StepVerifier.create(blogService.getBlogItemsForBlog("id", "correlationID"))
-        .expectErrorMessage("Nie znaleziono bloga = id correlationID = correlationID")
-        .verify();
-  }
-
-  @Test
-  void shouldReturnBlogItemsForBlog() {
-    //given
-    Blog blog = Blog.builder()
-        .blogURL("url")
-        .name("url")
-        .item(new Item(ItemDTO.builder().title("title").build()))
-        .build();
-
-    given(blogRepository.findById("id")).willReturn(Mono.just(blog));
-
-    //when
-    StepVerifier.create(blogService.getBlogItemsForBlog("id", "correlationID"))
-        .expectNextCount(1)
-        .verifyComplete();
-  }
-
 }

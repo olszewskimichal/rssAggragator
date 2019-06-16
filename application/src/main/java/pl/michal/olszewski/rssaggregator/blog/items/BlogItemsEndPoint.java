@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.blog.items;
 
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -11,11 +11,11 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/api/v1/blogs")
 @Slf4j
-class BlogItemsEndPoint {
+public class BlogItemsEndPoint {
 
-  private final BlogService blogService;
+  private final BlogItemsService blogService;
 
-  public BlogItemsEndPoint(BlogService blogService) {
+  public BlogItemsEndPoint(BlogItemsService blogService) {
     this.blogService = blogService;
   }
 
