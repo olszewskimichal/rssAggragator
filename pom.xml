@@ -2,83 +2,6 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <artifactId>rss-aggregator</artifactId>
-
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <release>${java.version}</release>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <artifactId>asm</artifactId>
-            <groupId>org.ow2.asm</groupId>
-            <version>7.0</version>
-          </dependency>
-        </dependencies>
-        <version>3.8.0</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*.java</include>
-          </includes>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <artifactId>junit-platform-surefire-provider</artifactId>
-            <groupId>org.junit.platform</groupId>
-            <version>${junit.platform.version}</version>
-          </dependency>
-        </dependencies>
-        <version>2.22.1</version>
-      </plugin>
-      <plugin>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <groupId>org.springframework.boot</groupId>
-      </plugin>
-      <plugin>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>
-              **/pl/michal/olszewski/rssaggregator/config/**
-            </exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <id>report</id>
-            <phase>test</phase>
-          </execution>
-        </executions>
-        <groupId>org.jacoco</groupId>
-        <version>0.8.3</version>
-      </plugin>
-      <plugin>
-        <artifactId>git-commit-id-plugin</artifactId>
-        <configuration>
-          <failOnNoGitDirectory>false</failOnNoGitDirectory>
-          <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
-          <format>properties</format>
-          <generateGitPropertiesFile>true</generateGitPropertiesFile>
-          <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
-          <injectAllReactorProjects>true</injectAllReactorProjects>
-        </configuration>
-        <groupId>pl.project13.maven</groupId>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <artifactId>spring-boot-starter-webflux</artifactId>
@@ -247,11 +170,16 @@
   </dependencies>
   <description>Agregator RSS</description>
   <groupId>pl.michal.olszewski</groupId>
-
   <modelVersion>4.0.0</modelVersion>
+  <modules>
+    <module>items</module>
+    <module>application</module>
+    <module>failureAggregator</module>
+    <module>blogs</module>
+  </modules>
   <name>rss-aggregator</name>
 
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <parent>
     <artifactId>spring-boot-starter-parent</artifactId>
