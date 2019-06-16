@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.events.items;
+package pl.michal.olszewski.rssaggregator.newitem;
 
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;

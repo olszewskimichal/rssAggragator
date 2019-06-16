@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.events.items;
+package pl.michal.olszewski.rssaggregator.newitem;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

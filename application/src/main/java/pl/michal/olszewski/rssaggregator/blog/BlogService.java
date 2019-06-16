@@ -7,16 +7,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.events.blogs.activity.BlogActivityEventProducer;
 import pl.michal.olszewski.rssaggregator.events.blogs.activity.DeactivateBlog;
-import pl.michal.olszewski.rssaggregator.events.blogs.activity.BlogActivityEventProducer;
-import pl.michal.olszewski.rssaggregator.events.items.NewItemInBlogEvent;
-import pl.michal.olszewski.rssaggregator.events.items.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.item.Item;
+import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEvent;
+import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEventProducer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
