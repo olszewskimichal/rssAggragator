@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.events.failed;
+package pl.michal.olszewski.rssaggregator.failure;
 
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
 

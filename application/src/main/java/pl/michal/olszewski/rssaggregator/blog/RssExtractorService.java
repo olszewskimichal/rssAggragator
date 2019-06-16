@@ -18,8 +18,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEvent;
-import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEventProducer;
+import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEvent;
+import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEventProducer;
 
 @Service
 @Slf4j

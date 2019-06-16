@@ -22,7 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.jms.core.JmsTemplate;
-import pl.michal.olszewski.rssaggregator.events.failed.BlogUpdateFailedEvent;
+import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
