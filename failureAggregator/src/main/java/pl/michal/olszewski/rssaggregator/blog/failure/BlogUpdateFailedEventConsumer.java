@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.failure;
+package pl.michal.olszewski.rssaggregator.blog.failure;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.annotation.JmsListener;

@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.failure;
+package pl.michal.olszewski.rssaggregator.blog.failure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

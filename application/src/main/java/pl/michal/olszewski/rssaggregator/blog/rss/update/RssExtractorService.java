@@ -20,10 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog.RssInfo;
 import pl.michal.olszewski.rssaggregator.blog.BlogDTO;
-import pl.michal.olszewski.rssaggregator.blog.rss.update.DefaultTrustManager;
-import pl.michal.olszewski.rssaggregator.blog.rss.update.RssException;
-import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEvent;
-import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEventProducer;
+import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
+import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEventProducer;
 
 @Service
 @Slf4j

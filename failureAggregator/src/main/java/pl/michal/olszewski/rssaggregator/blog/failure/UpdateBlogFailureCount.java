@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.failure;
+package pl.michal.olszewski.rssaggregator.blog.failure;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
