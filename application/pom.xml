@@ -11,16 +11,16 @@
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>pl.michal.olszewski</groupId>
       <artifactId>failureAggregator</artifactId>
-      <version>0.0.11-SNAPSHOT</version>
+      <groupId>pl.michal.olszewski</groupId>
       <scope>compile</scope>
+      <version>0.0.11-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>pl.michal.olszewski</groupId>
       <artifactId>blogs</artifactId>
-      <version>0.0.11-SNAPSHOT</version>
+      <groupId>pl.michal.olszewski</groupId>
       <scope>compile</scope>
+      <version>0.0.11-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

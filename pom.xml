@@ -79,12 +79,6 @@
       </plugin>
     </plugins>
   </build>
-  <modules>
-    <module>items</module>
-    <module>application</module>
-    <module>failureAggregator</module>
-    <module>blogs</module>
-  </modules>
   <dependencies>
     <dependency>
       <artifactId>spring-boot-starter-webflux</artifactId>
@@ -254,6 +248,12 @@
   <description>Agregator RSS</description>
   <groupId>pl.michal.olszewski</groupId>
   <modelVersion>4.0.0</modelVersion>
+  <modules>
+    <module>items</module>
+    <module>application</module>
+    <module>failureAggregator</module>
+    <module>blogs</module>
+  </modules>
   <name>rss-aggregator</name>
 
   <packaging>pom</packaging>
