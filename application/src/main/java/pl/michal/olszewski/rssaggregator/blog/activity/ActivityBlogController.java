@@ -20,14 +20,14 @@ public class ActivityBlogController {
   }
 
   @PostMapping(value = "/enable/{id}")
-  Mono<Boolean> enableBlogById(@PathVariable("id") String blogId) {
+  public Mono<Boolean> enableBlogById(@PathVariable("id") String blogId) {
     log.debug("Enable blog by Id {} ", blogId);
     eventProducer.writeEventToQueue(ActivateBlog.builder().blogId(blogId).occurredAt(Instant.now()).build());
     return Mono.just(Boolean.TRUE);
   }
 
   @PostMapping(value = "/disable/{id}")
-  Mono<Boolean> disableBlogById(@PathVariable("id") String blogId) {
+  public Mono<Boolean> disableBlogById(@PathVariable("id") String blogId) {
     log.debug("Disable blog by Id {} ", blogId);
     eventProducer.writeEventToQueue(DeactivateBlog.builder().blogId(blogId).occurredAt(Instant.now()).build());
     return Mono.just(Boolean.TRUE);

@@ -18,12 +18,12 @@ public class FailureUpdatesBlogController {
   }
 
   @GetMapping
-  Flux<UpdateBlogFailureCount> getAllFailure() {
+  public Flux<UpdateBlogFailureCount> getAllFailure() {
     return failedEventAggregator.aggregateAllFailureOfBlogs();
   }
 
   @GetMapping(value = "/lastDay")
-  Flux<UpdateBlogFailureCount> getFailureFromLast24() {
+  public Flux<UpdateBlogFailureCount> getFailureFromLast24() {
     return failedEventAggregator.aggregateAllFailureOfBlogsFromPrevious24h();
   }
 }
