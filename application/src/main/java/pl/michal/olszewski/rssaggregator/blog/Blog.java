@@ -111,7 +111,7 @@ public class Blog {
         Objects.equals(items, blog.items);
   }
 
-  RssInfo getRssInfo() {
+  public RssInfo getRssInfo() {
     return new RssInfo(feedURL, blogURL, id, lastUpdateDate);
   }
 
@@ -122,7 +122,7 @@ public class Blog {
 
   @Value
   @ToString
-  static
+  public static
   class RssInfo {
 
     private final String feedURL;

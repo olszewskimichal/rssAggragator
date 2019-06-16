@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 @Service
 @Transactional
 @Slf4j
+public
 class BlogService {
 
   private final BlogReactiveRepository blogRepository;

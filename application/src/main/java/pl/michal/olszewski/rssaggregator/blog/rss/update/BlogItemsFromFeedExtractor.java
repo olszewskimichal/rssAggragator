@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import com.rometools.rome.feed.synd.SyndFeed;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import org.springframework.web.util.UriUtils;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Slf4j
-public class BlogItemsFromFeedExtractor {
+class BlogItemsFromFeedExtractor {
 
   static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
     log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);

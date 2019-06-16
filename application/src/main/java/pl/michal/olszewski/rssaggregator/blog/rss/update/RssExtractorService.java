@@ -1,6 +1,6 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
-import static pl.michal.olszewski.rssaggregator.blog.BlogItemsFromFeedExtractor.getItemsForBlog;
+import static pl.michal.olszewski.rssaggregator.blog.rss.update.BlogItemsFromFeedExtractor.getItemsForBlog;
 
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
@@ -18,6 +18,10 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.michal.olszewski.rssaggregator.blog.Blog.RssInfo;
+import pl.michal.olszewski.rssaggregator.blog.BlogDTO;
+import pl.michal.olszewski.rssaggregator.blog.rss.update.DefaultTrustManager;
+import pl.michal.olszewski.rssaggregator.blog.rss.update.RssException;
 import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEventProducer;
 
@@ -44,7 +48,7 @@ class RssExtractorService {
         new ArrayList<>());
   }
 
-  BlogDTO getBlog(Blog.RssInfo info, String correlationID) {
+  BlogDTO getBlog(RssInfo info, String correlationID) {
     log.trace("getBlog START {} correlationID {}", info, correlationID);
     try {
       SSLContext ctx = SSLContext.getInstance("TLS");

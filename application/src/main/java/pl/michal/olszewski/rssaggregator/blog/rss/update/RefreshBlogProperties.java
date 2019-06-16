@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

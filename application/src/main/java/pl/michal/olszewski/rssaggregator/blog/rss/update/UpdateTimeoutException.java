@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 class UpdateTimeoutException extends RuntimeException {
 

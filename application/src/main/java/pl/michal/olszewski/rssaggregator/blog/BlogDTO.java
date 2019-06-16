@@ -19,6 +19,7 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+public
 class BlogDTO {
 
   private String link;
@@ -46,7 +47,7 @@ class BlogDTO {
     return Collections.unmodifiableList(itemsList);
   }
 
-  void addNewItem(ItemDTO itemDTO) {
+  public void addNewItem(ItemDTO itemDTO) {
     this.itemsList.add(itemDTO);
   }
 

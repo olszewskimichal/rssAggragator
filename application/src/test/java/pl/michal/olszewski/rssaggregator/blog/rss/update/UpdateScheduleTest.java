@@ -1,10 +1,11 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
 import com.rometools.rome.feed.synd.SyndEntryImpl;
@@ -18,10 +19,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.jms.core.JmsTemplate;
+import pl.michal.olszewski.rssaggregator.blog.Blog;
+import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
+import pl.michal.olszewski.rssaggregator.blog.BlogService;
+import pl.michal.olszewski.rssaggregator.blog.rss.update.UpdateBlogService;
 import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
@@ -39,7 +45,8 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   private BlogReactiveRepository blogRepository;
 
   @Autowired
-  private BlogService blogService;
+  @Qualifier(value = "blogCache")
+  private Cache blogCache;
 
   @Autowired
   private MongoTemplate mongoTemplate;
@@ -54,7 +61,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   void setUp() {
     mongoTemplate.remove(new Query(), "item");
     blogRepository.deleteAll().block();
-    blogService.evictBlogCache();
+    blogCache.invalidateAll();
   }
 
   @Test

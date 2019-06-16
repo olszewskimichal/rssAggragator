@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
 
@@ -13,6 +13,9 @@ import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.michal.olszewski.rssaggregator.blog.Blog;
+import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
+import pl.michal.olszewski.rssaggregator.blog.BlogService;
 import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.failure.BlogUpdateFailedEventProducer;
 import reactor.core.publisher.Flux;

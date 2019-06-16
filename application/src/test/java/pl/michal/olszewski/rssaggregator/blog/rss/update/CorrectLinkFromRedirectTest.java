@@ -1,8 +1,8 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static pl.michal.olszewski.rssaggregator.blog.BlogItemsFromFeedExtractor.convertURLToAscii;
-import static pl.michal.olszewski.rssaggregator.blog.BlogItemsFromFeedExtractor.getFinalURL;
+import static pl.michal.olszewski.rssaggregator.blog.rss.update.BlogItemsFromFeedExtractor.convertURLToAscii;
+import static pl.michal.olszewski.rssaggregator.blog.rss.update.BlogItemsFromFeedExtractor.getFinalURL;
 
 import org.junit.jupiter.api.Test;
 
