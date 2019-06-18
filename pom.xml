@@ -176,6 +176,7 @@
     <module>application</module>
     <module>failureAggregator</module>
     <module>blogs</module>
+    <module>model</module>
   </modules>
   <name>rss-aggregator</name>
 

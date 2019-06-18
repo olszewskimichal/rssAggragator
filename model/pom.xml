@@ -2,17 +2,9 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <artifactId>blogs</artifactId>
-  <dependencies>
-    <dependency>
-      <groupId>pl.michal.olszewski</groupId>
-      <artifactId>model</artifactId>
-      <version>0.0.11-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
-
+  <artifactId>model</artifactId>
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <artifactId>rss-aggregator</artifactId>
     <groupId>pl.michal.olszewski</groupId>
