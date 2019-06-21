@@ -9,4 +9,8 @@ public class BlogNotFoundException extends RuntimeException {
   public BlogNotFoundException(String name, String correlationID) {
     super("Nie znaleziono bloga = " + name + " correlationID = " + correlationID);
   }
+
+  public BlogNotFoundException(String name) {
+    super("Nie znaleziono bloga = " + name);
+  }
 }
