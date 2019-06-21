@@ -72,7 +72,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
+    Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     assertThat(blog).isNotNull();
@@ -88,7 +88,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
+    Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     verify(blogRepository, times(1)).findByFeedURL("nazwa");
@@ -109,7 +109,7 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Mono.empty());
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
+    Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     StepVerifier.create(blog)
@@ -118,7 +118,7 @@ class BlogServiceTest {
             () -> assertThat(v.getDescription()).isEqualTo("desc"),
             () -> assertThat(v.getName()).isEqualTo("nazwa1"),
             () -> assertThat(v.getFeedURL()).isEqualTo("feedUrl3"),
-            () -> assertThat(v.getBlogURL()).isEqualTo("blogUrl1"),
+            () -> assertThat(v.getLink()).isEqualTo("blogUrl1"),
             () -> assertThat(v.getPublishedDate()).isAfterOrEqualTo(now).isBeforeOrEqualTo(now)
         ))
         .expectComplete()
@@ -135,11 +135,11 @@ class BlogServiceTest {
         .build();
 
     //when
-    Blog blog = blogService.getBlogOrCreate(blogDTO, "correlationId").block();
+    BlogDTO blog = blogService.getBlogOrCreate(blogDTO, "correlationId").block();
 
     //then
     assertThat(blog).isNotNull();
-    verify(blogRepository, times(1)).save(blog);
+    verify(blogRepository, times(1)).save(Mockito.any(Blog.class));
   }
 
   @Test
@@ -168,13 +168,13 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
+    Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     StepVerifier.create(blog)
         .assertNext(v -> {
           assertThat(v).isNotNull();
-          assertThat(v.getItems()).isNotEmpty().hasSize(2);
+          assertThat(v.getItemsList()).isNotEmpty().hasSize(2);
         })
         .expectComplete()
         .verify();
@@ -191,13 +191,13 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("feedUrl4")).willReturn(Mono.empty());
 
     //when
-    Mono<Blog> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
+    Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO, "correlationId");
 
     //then
     StepVerifier.create(blog)
         .assertNext(v -> {
-          assertThat(v.getItems()).isNotEmpty().hasSize(2);
-          for (Item item : v.getItems()) {
+          assertThat(v.getItemsList()).isNotEmpty().hasSize(2);
+          for (ItemDTO item : v.getItemsList()) {
             assertThat(item.getAuthor()).isEqualTo("autor");
             assertThat(item.getDate()).isBeforeOrEqualTo(now).isAfterOrEqualTo(now);
             assertThat(item.getTitle()).isNotNull().isNotEmpty();
@@ -212,7 +212,7 @@ class BlogServiceTest {
   @Test
   void shouldUpdateBlogWhenNewItemAdd() {
     //given
-    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).blogURL("url").name("url").build();
+    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
 
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1)
         .mapToObj(v -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(v + "").link("link" + v).build()) //przerobic linie
@@ -225,13 +225,13 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
 
     //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
+    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
 
     //then
     StepVerifier.create(updateBlog)
         .assertNext(v -> assertAll(
-            () -> assertThat(v).isEqualToIgnoringGivenFields(blog, "items"),
-            () -> assertThat(v.getItems()).isNotEmpty().hasSize(1)
+            () -> assertThat(v).isEqualToIgnoringGivenFields(blogDTO, "itemsList"),
+            () -> assertThat(v.getItemsList()).isNotEmpty().hasSize(1)
         ))
         .expectComplete()
         .verify();
@@ -243,7 +243,7 @@ class BlogServiceTest {
     //given
     Blog blog = Blog.builder()
         .id(UUID.randomUUID().toString())
-        .blogURL("url")
+        .feedURL("url")
         .name("url")
         .item(new Item(ItemDTO.builder().title("title").build()))
         .build();
@@ -256,13 +256,13 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
 
     //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
+    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
 
     //then
     StepVerifier.create(updateBlog)
         .assertNext(v -> assertAll(
-            () -> assertThat(v).isEqualToIgnoringGivenFields(blog, "items"),
-            () -> assertThat(v.getItems()).isNotEmpty().hasSize(2)
+            () -> assertThat(v).isEqualToIgnoringGivenFields(blogDTO, "itemsList"),
+            () -> assertThat(v.getItemsList()).isNotEmpty().hasSize(2)
         ))
         .expectComplete()
         .verify();
@@ -278,7 +278,7 @@ class BlogServiceTest {
         .build();
     Blog blog = Blog.builder()
         .id(UUID.randomUUID().toString())
-        .blogURL("url")
+        .feedURL("url")
         .name("url")
         .item(new Item(itemDTO))
         .build();
@@ -291,11 +291,11 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
 
     //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
+    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
 
     //then
     StepVerifier.create(updateBlog)
-        .assertNext(v -> assertThat(v).isEqualToComparingFieldByField(blog))
+        .assertNext(result -> assertThat(result.getItemsList()).hasSize(1))
         .expectComplete()
         .verify();
   }
@@ -303,7 +303,7 @@ class BlogServiceTest {
   @Test
   void shouldNotUpdateBlogWhenNothingChanged() {
     //given
-    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).blogURL("url").name("url").build();
+    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
 
     BlogDTO blogDTO = BlogDTO.builder()
         .name("url")
@@ -312,11 +312,11 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
 
     //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
+    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
 
     //then
     StepVerifier.create(updateBlog)
-        .assertNext(v -> assertThat(v).isEqualToComparingFieldByField(blog))
+        .assertNext(v -> assertThat(v).isEqualToComparingFieldByField(blogDTO))
         .expectComplete()
         .verify();
   }
@@ -324,7 +324,7 @@ class BlogServiceTest {
   @Test
   void shouldUpdateBlogWhenDescriptionChanged() {
     //given
-    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).blogURL("url").name("url").build();
+    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
 
     BlogDTO blogDTO = BlogDTO.builder()
         .feedURL("url")
@@ -334,12 +334,12 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
 
     //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
+    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO, "correlationID");
 
     //then
     StepVerifier.create(updateBlog)
         .assertNext(v -> assertAll(
-            () -> assertThat(v).isEqualToIgnoringGivenFields(blog, "description"),
+            () -> assertThat(v).isEqualToIgnoringGivenFields(blogDTO, "description"),
             () -> assertThat(v.getDescription()).isEqualTo("desc")
         ))
         .expectComplete()

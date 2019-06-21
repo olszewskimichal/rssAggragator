@@ -23,7 +23,7 @@ public class BlogActivityUpdater {
   }
 
   Mono<Blog> deactivateBlog(String id) {
-    return blogReactiveRepository.findById(id)
+    return blogReactiveRepository.findById(id) //orError
         .flatMap(blog -> {
           blog.deactivate();
           return blogReactiveRepository.save(blog);

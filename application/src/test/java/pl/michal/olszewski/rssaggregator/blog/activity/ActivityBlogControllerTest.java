@@ -31,7 +31,6 @@ class ActivityBlogControllerTest {
   void shouldAddNewActivateBlogEventToQueue() {
     StepVerifier.create(
         activityBlogController.enableBlogById("id"))
-        .expectNext(true)
         .expectComplete()
         .verify();
 
@@ -42,7 +41,6 @@ class ActivityBlogControllerTest {
   void shouldAddNewDeactivateBlogEventToQueue() {
     StepVerifier.create(
         activityBlogController.disableBlogById("id"))
-        .expectNext(true)
         .expectComplete()
         .verify();
 

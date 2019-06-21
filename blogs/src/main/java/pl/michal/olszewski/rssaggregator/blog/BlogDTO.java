@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,13 +32,15 @@ class BlogDTO {
   @Singular("item")
   private List<ItemDTO> itemsList = new ArrayList<>();
 
-  public BlogDTO(Blog blog, List<ItemDTO> items) {
+  public BlogDTO(Blog blog) {
     this.link = blog.getBlogURL();
     this.description = blog.getDescription();
     this.name = blog.getName();
     this.feedURL = blog.getFeedURL();
     this.publishedDate = blog.getPublishedDate();
-    this.itemsList = items;
+    this.itemsList = blog.getItems().stream()
+        .map(ItemDTO::new)
+        .collect(Collectors.toList());
   }
 
   List<ItemDTO> getItemsList() {
