@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition;
+import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
 import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
@@ -24,6 +26,11 @@ class BlogTextSearchRepositoryImplTest extends IntegrationTestBase {
   @BeforeEach
   void setUp() {
     mongoTemplate.remove(new Query(), "blog");
+    TextIndexDefinition textIndex = new TextIndexDefinitionBuilder()
+        .onField("name", 2F)
+        .onField("description", 1F)
+        .build();
+    mongoTemplate.indexOps(Blog.class).ensureIndex(textIndex);
   }
 
   @Test
