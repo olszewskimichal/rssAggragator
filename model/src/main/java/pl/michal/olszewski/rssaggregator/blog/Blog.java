@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import pl.michal.olszewski.rssaggregator.item.Item;
@@ -33,7 +34,9 @@ public class Blog {
   private String id;
   @Indexed(unique = true)
   private String blogURL;
+  @TextIndexed(weight = 1)
   private String description;
+  @TextIndexed(weight = 2)
   private String name;
   private String feedURL;
   private Instant publishedDate;
