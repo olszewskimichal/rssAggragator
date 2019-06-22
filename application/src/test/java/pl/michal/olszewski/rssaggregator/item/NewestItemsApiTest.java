@@ -5,13 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
-import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
 class NewestItemsApiTest extends IntegrationTestBase {
 
-  @Autowired
-  private BlogReactiveRepository repository;
 
   @Autowired
   private ItemRepository itemRepository;
@@ -21,7 +18,6 @@ class NewestItemsApiTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    repository.deleteAll().block();
     itemRepository.deleteAll().block();
   }
 

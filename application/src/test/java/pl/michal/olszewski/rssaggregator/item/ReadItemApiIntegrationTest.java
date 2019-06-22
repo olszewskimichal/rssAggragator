@@ -8,14 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.reactive.function.BodyInserters;
-import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.test.StepVerifier;
 
 class ReadItemApiIntegrationTest extends IntegrationTestBase {
 
-  @Autowired
-  private BlogReactiveRepository blogRepository;
 
   @Autowired
   private MongoTemplate mongoTemplate;
@@ -25,7 +22,6 @@ class ReadItemApiIntegrationTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    blogRepository.deleteAll().block();
     mongoTemplate.remove(new Query(), "item");
   }
 
