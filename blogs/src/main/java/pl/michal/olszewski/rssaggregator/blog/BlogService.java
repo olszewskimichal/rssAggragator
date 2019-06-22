@@ -38,10 +38,11 @@ class BlogService {
     this.producer = producer;
   }
 
-  Mono<Blog> getBlogOrCreate(BlogDTO blogDTO, String correlationId) {
+  Mono<BlogDTO> getBlogOrCreate(BlogDTO blogDTO, String correlationId) {
     log.debug("Tworzenie nowego bloga {} correlationId {}", blogDTO.getFeedURL(), correlationId);
     return blogRepository.findByFeedURL(blogDTO.getFeedURL())
-        .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO, correlationId)));
+        .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO, correlationId)))
+        .map(BlogDTO::new);
   }
 
   private Mono<Blog> createBlog(BlogDTO blogDTO, String correlationId) {
@@ -122,10 +123,11 @@ class BlogService {
     cache.invalidateAll();
   }
 
-  Mono<Blog> updateBlog(BlogDTO blogDTO, String correlationId) {
+  Mono<BlogDTO> updateBlog(BlogDTO blogDTO, String correlationId) {
     log.debug("Aktualizacja bloga {} correlationId {}", blogDTO.getLink(), correlationId);
     return getBlogByFeedUrl(blogDTO.getFeedURL(), correlationId)
-        .flatMap(blog -> updateBlog(blog, blogDTO));
+        .flatMap(blog -> updateBlog(blog, blogDTO))
+        .map(BlogDTO::new);
   }
 
   private void addItemToBlog(Blog blog, Item item) {

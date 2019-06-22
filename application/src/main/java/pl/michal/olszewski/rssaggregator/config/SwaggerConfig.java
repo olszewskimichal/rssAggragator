@@ -19,7 +19,7 @@ public class SwaggerConfig {
   public Docket swaggerApi() {
     return new Docket(DocumentationType.SWAGGER_2)
         .select()
-        .apis(RequestHandlerSelectors.basePackage("pl.michal.olszewski.rssaggregator.api"))
+        .apis(RequestHandlerSelectors.withMethodAnnotation(SwaggerDocumented.class))
         .paths(PathSelectors.any())
         .build()
         .apiInfo(apiInfo());
@@ -28,7 +28,7 @@ public class SwaggerConfig {
   private ApiInfo apiInfo() {
     return new ApiInfoBuilder()
         .title("Rss Aggregator")
-        .description("Aggregator blogów ")
+        .description("Aggregator blogów")
         .contact(new Contact("Michał Olszewski", "https://github.com/olszewskimichal", "olszewskimichal@outlook.com"))
         .build();
   }
