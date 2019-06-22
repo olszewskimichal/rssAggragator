@@ -31,28 +31,11 @@
       <groupId>org.springframework</groupId>
     </dependency>
     <dependency>
-      <artifactId>spring-boot-starter-web</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
       <artifactId>spring-boot-devtools</artifactId>
       <groupId>org.springframework.boot</groupId>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <artifactId>rome</artifactId>
-      <groupId>com.rometools</groupId>
-      <version>1.12.0</version>
-    </dependency>
-    <dependency>
-      <artifactId>rome-fetcher</artifactId>
-      <groupId>com.rometools</groupId>
-      <version>1.12.0</version>
-    </dependency>
+
     <dependency>
       <artifactId>lombok</artifactId>
       <groupId>org.projectlombok</groupId>
@@ -156,16 +139,6 @@
       <artifactId>jaxb-api</artifactId>
       <groupId>javax.xml.bind</groupId>
       <version>2.3.0</version>
-    </dependency>
-    <dependency>
-      <artifactId>springfox-swagger-ui</artifactId>
-      <groupId>io.springfox</groupId>
-      <version>2.9.2</version>
-    </dependency>
-    <dependency>
-      <artifactId>springfox-swagger2</artifactId>
-      <groupId>io.springfox</groupId>
-      <version>2.9.2</version>
     </dependency>
     <dependency>
       <artifactId>guava</artifactId>
