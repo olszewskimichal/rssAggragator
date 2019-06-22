@@ -3,6 +3,14 @@
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <artifactId>failureAggregator</artifactId>
+  <dependencies>
+    <dependency>
+      <artifactId>model</artifactId>
+      <groupId>pl.michal.olszewski</groupId>
+      <scope>compile</scope>
+      <version>0.0.11-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
