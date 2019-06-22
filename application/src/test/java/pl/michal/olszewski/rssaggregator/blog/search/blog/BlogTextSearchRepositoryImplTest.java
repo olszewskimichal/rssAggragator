@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.search;
+package pl.michal.olszewski.rssaggregator.blog.search.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,7 +14,6 @@ import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.test.StepVerifier;
 
 class BlogTextSearchRepositoryImplTest extends IntegrationTestBase {
-
 
   @Autowired
   private MongoTemplate mongoTemplate;

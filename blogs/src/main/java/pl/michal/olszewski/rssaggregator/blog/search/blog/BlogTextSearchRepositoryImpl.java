@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.search;
+package pl.michal.olszewski.rssaggregator.blog.search.blog;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;

@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.search;
+package pl.michal.olszewski.rssaggregator.blog.search.blog;
 
 import reactor.core.publisher.Flux;
 
