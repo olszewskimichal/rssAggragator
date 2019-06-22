@@ -1,6 +1,5 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -29,7 +28,7 @@ class BlogListFactory {
         .map(repository::save)
         .forEach(Mono::block);
     repository.findAll()
-        .map(blog -> new BlogDTO(blog, Collections.emptyList()))
+        .map(BlogDTO::new)
         .collectList()
         .block();
   }

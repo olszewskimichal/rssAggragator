@@ -25,7 +25,7 @@ class ReadItemEndpointTest {
   void shouldReturnNoContentWhenMarkItemSuccess() {
     var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(true).build();
 
-    given(readItemService.processRequest(Mockito.eq(readItemDTO), Mockito.anyString())).willReturn(Mono.just(true));
+    given(readItemService.processRequest(Mockito.eq(readItemDTO), Mockito.anyString())).willReturn(Mono.empty());
 
     webClient.post().uri("/api/v1/items/mark")
         .contentType(MediaType.APPLICATION_JSON)

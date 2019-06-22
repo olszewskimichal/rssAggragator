@@ -3,6 +3,9 @@ package pl.michal.olszewski.rssaggregator.blog;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Link;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.michal.olszewski.rssaggregator.blog.items.BlogItemsEndPoint;
+import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -33,6 +37,13 @@ class BlogEndPoint {
   }
 
   @GetMapping(value = "/{id}")
+  @ApiOperation(value = "Sluzy do pobierania informacji na temat bloga o podanym id")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Zwraca informacje na temat bloga", response = BlogAggregationDTO.class),
+      @ApiResponse(code = 404, message = "Blog o podanym id nie istnieje"),
+      @ApiResponse(code = 500, message = "Internal server error")
+  })
+  @SwaggerDocumented
   public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
     String correlationID = UUID.randomUUID().toString();
     log.debug("START GET blog by id {} correlationId {}", blogId, correlationID);
@@ -43,6 +54,12 @@ class BlogEndPoint {
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @ApiOperation(value = "Sluzy do pobierania informacji na temat wszystkich blogow")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "Zwraca informacje na temat blogow", response = BlogAggregationDTO.class),
+      @ApiResponse(code = 500, message = "Internal server error")
+  })
+  @SwaggerDocumented
   public Flux<BlogAggregationDTO> getBlogs() {
     String correlationID = UUID.randomUUID().toString();
     log.debug("START GET blogs correlationId {}", correlationID);
@@ -55,7 +72,14 @@ class BlogEndPoint {
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public Mono<Blog> updateBlog(@RequestBody BlogDTO blogDTO) {
+  @ApiOperation(value = "Sluzy do aktualizacji bloga o podanym id")
+  @ApiResponses(value = {
+      @ApiResponse(code = 201, message = "Zwraca informacje na temat bloga", response = BlogDTO.class),
+      @ApiResponse(code = 404, message = "Blog o podanym id nie istnieje"),
+      @ApiResponse(code = 500, message = "Internal server error")
+  })
+  @SwaggerDocumented
+  public Mono<BlogDTO> updateBlog(@RequestBody BlogDTO blogDTO) {
     String correlationId = UUID.randomUUID().toString();
     log.debug("PUT - updateBlog {} correlationId {}", blogDTO.getName(), correlationId);
     log.trace("PUT - updateBlog {} correlationId {}", blogDTO, correlationId);
@@ -66,7 +90,13 @@ class BlogEndPoint {
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public Mono<Blog> addBlog(@RequestBody BlogDTO blogDTO) {
+  @ApiOperation(value = "Sluzy do dodawania nowego bloga")
+  @ApiResponses(value = {
+      @ApiResponse(code = 201, message = "Zwraca informacje na temat bloga", response = BlogDTO.class),
+      @ApiResponse(code = 500, message = "Internal server error")
+  })
+  @SwaggerDocumented
+  public Mono<BlogDTO> addBlog(@RequestBody BlogDTO blogDTO) {
     String correlationId = UUID.randomUUID().toString();
     log.debug("POST - addBlog {} correlationId {}", blogDTO.getName(), correlationId);
     log.trace("POST - addBlog {} correlationId {}", blogDTO, correlationId);
@@ -77,6 +107,8 @@ class BlogEndPoint {
 
   @DeleteMapping(value = "/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ApiOperation(value = "Sluzy do usuwania bloga o podanym id")
+  @SwaggerDocumented
   public Mono<Void> deleteBlog(@PathVariable("id") String blogId) {
     String correlationId = UUID.randomUUID().toString();
     log.debug("DELETE - deleteBlog id {} correlationId {}", blogId, correlationId);
