@@ -23,6 +23,6 @@ public class BlogTextSearchRepositoryImpl implements BlogTextSearchRepository {
     Query query = TextQuery.queryText(textCriteria)
         .sortByScore()
         .with(PageRequest.of(0, limit));
-    return mongoTemplate.find(query, BlogSearchResult.class, "blog").doOnNext(System.err::println);
+    return mongoTemplate.find(query, BlogSearchResult.class, "blog");
   }
 }

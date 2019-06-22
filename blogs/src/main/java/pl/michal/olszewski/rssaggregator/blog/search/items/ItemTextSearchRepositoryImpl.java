@@ -19,11 +19,10 @@ public class ItemTextSearchRepositoryImpl implements ItemTextSearchRepository {
 
   @Override
   public Flux<ItemSearchResult> findMatching(String searchValue, int limit) {
-    TextCriteria textCriteria = TextCriteria.forDefaultLanguage().caseSensitive(false).matching(searchValue);
+    TextCriteria textCriteria = TextCriteria.forDefaultLanguage().matching(searchValue);
     Query query = TextQuery.queryText(textCriteria)
         .sortByScore()
         .with(PageRequest.of(0, limit));
-    return mongoTemplate.find(query, ItemSearchResult.class, "item")
-        .doOnNext(System.err::println);
+    return mongoTemplate.find(query, ItemSearchResult.class, "item");
   }
 }
