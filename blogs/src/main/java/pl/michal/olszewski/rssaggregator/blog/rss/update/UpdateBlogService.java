@@ -2,12 +2,12 @@ package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
 
+import brave.Tracer;
 import com.rometools.fetcher.FeedFetcher;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +34,7 @@ class UpdateBlogService {
   private final RssExtractorService rssExtractorService;
   private final BlogService blogService;
   private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
+  private final Tracer tracer;
 
   public UpdateBlogService(
       BlogReactiveRepository repository,
@@ -41,11 +42,12 @@ class UpdateBlogService {
       MeterRegistry registry,
       BlogService blogService,
       BlogUpdateFailedEventProducer blogUpdateFailedEventProducer,
-      FeedFetcher feedFetcher
-  ) {
+      FeedFetcher feedFetcher,
+      Tracer tracer) {
     this.repository = repository;
     this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
-    this.rssExtractorService = new RssExtractorService(feedFetcher, blogUpdateFailedEventProducer);
+    this.tracer = tracer;
+    this.rssExtractorService = new RssExtractorService(feedFetcher, blogUpdateFailedEventProducer, this.tracer);
     this.blogService = blogService;
     if (registry != null) {
       this.executor = monitor(registry, executor, "prod_pool");
@@ -72,27 +74,26 @@ class UpdateBlogService {
   }
 
   Mono<Boolean> updateRssBlogItems(Blog blog) {
-    String correlationId = UUID.randomUUID().toString();
-    log.debug("Pobieranie nowych danych dla bloga {} correlationId {}", blog.getName(), correlationId);
-    return Mono.fromCallable(() -> updateRssBlogItems(blog, correlationId))
+    log.debug("Pobieranie nowych danych dla bloga {}", blog.getName());
+    return Mono.fromCallable(() -> extractBlogFromRssAndUpdateBlog(blog))
         .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
         .doOnError(ex -> {
               if (ex instanceof UpdateTimeoutException) {
-                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationId, blog.getFeedURL(), blog.getId(), ex.getMessage()));
+                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().toString(), blog.getFeedURL(), blog.getId(), ex.getMessage()));
               }
-              log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {} correlation Id {}", blog.getName(), correlationId, ex);
+          log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {} correlation Id {}", blog.getName(), ex);
             }
         )
         .subscribeOn(Schedulers.fromExecutor(executor))
         .onErrorReturn(false);
   }
 
-  private Boolean updateRssBlogItems(Blog blog, String correlationID) {
-    log.trace("START updateRssBlogItems dla blog {} correlationID {}", blog.getName(), correlationID);
-    var blogDTO = rssExtractorService.getBlog(blog.getRssInfo(), correlationID);
+  private Boolean extractBlogFromRssAndUpdateBlog(Blog blog) {
+    log.trace("START updateRssBlogItems dla blog {}", blog.getName());
+    var blogDTO = rssExtractorService.getBlog(blog.getRssInfo());
     blogService.updateBlog(blog, blogDTO)
         .subscribeOn(SCHEDULER)
-        .doOnSuccess(v -> log.trace("STOP updateRssBlogItems dla blog {} correlationID {}", v.getName(), correlationID))
+        .doOnSuccess(v -> log.trace("STOP updateRssBlogItems dla blog {}", v.getName()))
         .block();
     return true;
   }

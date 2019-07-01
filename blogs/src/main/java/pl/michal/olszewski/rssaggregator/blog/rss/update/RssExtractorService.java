@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static pl.michal.olszewski.rssaggregator.blog.rss.update.BlogItemsFromFeedExtractor.getItemsForBlog;
 
+import brave.Tracer;
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -29,10 +30,12 @@ class RssExtractorService {
 
   private final FeedFetcher feedFetcher;
   private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
+  private final Tracer tracer;
 
-  RssExtractorService(FeedFetcher feedFetcher, BlogUpdateFailedEventProducer blogUpdateFailedEventProducer) {
+  RssExtractorService(FeedFetcher feedFetcher, BlogUpdateFailedEventProducer blogUpdateFailedEventProducer, Tracer tracer) {
     this.feedFetcher = feedFetcher;
     this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
+    this.tracer = tracer;
   }
 
   private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
@@ -46,8 +49,8 @@ class RssExtractorService {
         new ArrayList<>());
   }
 
-  BlogDTO getBlog(RssInfo info, String correlationID) {
-    log.trace("getBlog START {} correlationID {}", info, correlationID);
+  BlogDTO getBlog(RssInfo info) {
+    log.trace("getBlog START {}", info);
     try {
       SSLContext ctx = SSLContext.getInstance("TLS");
       ctx.init(new KeyManager[0], new TrustManager[]{new DefaultTrustManager()}, new SecureRandom());
@@ -62,10 +65,10 @@ class RssExtractorService {
       BlogDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
       getItemsForBlog(feed, info.getLastUpdateDate())
           .forEach(blogInfo::addNewItem);
-      log.trace("getBlog STOP {} correlationID {}", info, correlationID);
+      log.trace("getBlog STOP {}", info);
       return blogInfo;
     } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException ex) {
-      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), correlationID, info.getFeedURL(), info.getBlogId(), ex.getMessage()));
+      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().toString(), info.getFeedURL(), info.getBlogId(), ex.getMessage()));
       throw new RssException(info.getFeedURL(), ex);
     }
   }

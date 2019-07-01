@@ -44,7 +44,7 @@ class ReadItemServiceTest {
   void shouldMarkItemAsRead() {
     var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(true).build();
 
-    Mono<Void> result = readItemService.processRequest(readItemDTO, "correlationId");
+    Mono<Void> result = readItemService.processRequest(readItemDTO);
 
     StepVerifier.create(result)
         .expectComplete()
@@ -56,7 +56,7 @@ class ReadItemServiceTest {
   void shouldMarkItemAsUnread() {
     var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(false).build();
 
-    Mono<Void> result = readItemService.processRequest(readItemDTO, "correlationId");
+    Mono<Void> result = readItemService.processRequest(readItemDTO);
 
     StepVerifier.create(result)
         .expectComplete()
@@ -69,7 +69,7 @@ class ReadItemServiceTest {
   void shouldThrowExceptionWhenItemByIdNotExists() {
     var readItemDTO = ReadItemDTO.builder().itemId("itemId2").read(false).build();
 
-    Mono<Void> result = readItemService.processRequest(readItemDTO, "correlationId");
+    Mono<Void> result = readItemService.processRequest(readItemDTO);
 
     StepVerifier.create(result)
         .expectError(ItemNotFoundException.class)

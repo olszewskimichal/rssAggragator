@@ -22,7 +22,7 @@ class ScheduledBlogUpdate {
   @Timed(longTask = true, value = "scheduledUpdate")
   @RegistryTimed
   void runScheduledUpdate() {
-    log.debug("Rozpoczynam aktualizacje correlationId");
+    log.debug("Rozpoczynam aktualizacje");
     updateBlogService.updateAllActiveBlogsByRss().collectList().block();
   }
 

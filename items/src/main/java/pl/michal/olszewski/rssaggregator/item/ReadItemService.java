@@ -26,9 +26,9 @@ class ReadItemService {
         .then();
   }
 
-  Mono<Void> processRequest(ReadItemDTO readItemDTO, String correlationId) {
+  Mono<Void> processRequest(ReadItemDTO readItemDTO) {
     return itemRepository.findById(readItemDTO.getItemId())
-        .switchIfEmpty(Mono.error(new ItemNotFoundException(readItemDTO.getItemId(), correlationId)))
+        .switchIfEmpty(Mono.error(new ItemNotFoundException(readItemDTO.getItemId())))
         .flatMap(item -> {
           if (readItemDTO.isRead()) {
             return markItemAsRead(item);

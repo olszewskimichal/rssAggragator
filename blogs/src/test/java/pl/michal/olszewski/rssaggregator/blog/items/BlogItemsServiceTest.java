@@ -37,8 +37,8 @@ class BlogItemsServiceTest {
     given(blogRepository.findById("id")).willReturn(Mono.empty());
 
     //when
-    StepVerifier.create(blogService.getBlogItemsForBlog("id", "correlationID"))
-        .expectErrorMessage("Nie znaleziono bloga = id correlationID = correlationID")
+    StepVerifier.create(blogService.getBlogItemsForBlog("id"))
+        .expectErrorMessage("Nie znaleziono bloga = id")
         .verify();
   }
 
@@ -54,7 +54,7 @@ class BlogItemsServiceTest {
     given(blogRepository.findById("id")).willReturn(Mono.just(blog));
 
     //when
-    StepVerifier.create(blogService.getBlogItemsForBlog("id", "correlationID"))
+    StepVerifier.create(blogService.getBlogItemsForBlog("id"))
         .expectNextCount(1)
         .verifyComplete();
   }

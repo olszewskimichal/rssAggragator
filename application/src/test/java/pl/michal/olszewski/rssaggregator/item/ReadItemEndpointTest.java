@@ -25,7 +25,7 @@ class ReadItemEndpointTest {
   void shouldReturnNoContentWhenMarkItemSuccess() {
     var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(true).build();
 
-    given(readItemService.processRequest(Mockito.eq(readItemDTO), Mockito.anyString())).willReturn(Mono.empty());
+    given(readItemService.processRequest(Mockito.eq(readItemDTO))).willReturn(Mono.empty());
 
     webClient.post().uri("/api/v1/items/mark")
         .contentType(MediaType.APPLICATION_JSON)
@@ -39,7 +39,7 @@ class ReadItemEndpointTest {
   void shouldReturnNotFoundWhenMarkItemThatNotExists() {
     var readItemDTO = ReadItemDTO.builder().itemId("itemId2").read(true).build();
 
-    given(readItemService.processRequest(Mockito.eq(readItemDTO), Mockito.anyString())).willReturn(Mono.error(new ItemNotFoundException("", "")));
+    given(readItemService.processRequest(Mockito.eq(readItemDTO))).willReturn(Mono.error(new ItemNotFoundException("")));
 
     webClient.post().uri("/api/v1/items/mark")
         .contentType(MediaType.APPLICATION_JSON)
@@ -48,6 +48,5 @@ class ReadItemEndpointTest {
         .expectStatus()
         .isNotFound();
   }
-
 
 }

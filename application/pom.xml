@@ -46,22 +46,7 @@
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>
-    <dependency>
-      <artifactId>spring-cloud-starter-sleuth</artifactId>
-      <groupId>org.springframework.cloud</groupId>
-    </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <artifactId>spring-cloud-sleuth</artifactId>
-        <groupId>org.springframework.cloud</groupId>
-        <scope>import</scope>
-        <type>pom</type>
-        <version>2.1.2.RELEASE</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <modelVersion>4.0.0</modelVersion>
   <parent>
