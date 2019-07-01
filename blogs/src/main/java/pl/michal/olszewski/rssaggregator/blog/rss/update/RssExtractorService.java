@@ -68,7 +68,7 @@ class RssExtractorService {
       log.trace("getBlog STOP {}", info);
       return blogInfo;
     } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException ex) {
-      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().toString(), info.getFeedURL(), info.getBlogId(), ex.getMessage()));
+      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().context().toString(), info.getFeedURL(), info.getBlogId(), ex.getMessage()));
       throw new RssException(info.getFeedURL(), ex);
     }
   }

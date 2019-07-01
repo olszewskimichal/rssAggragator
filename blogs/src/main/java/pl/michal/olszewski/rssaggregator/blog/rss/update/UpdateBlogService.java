@@ -43,7 +43,8 @@ class UpdateBlogService {
       BlogService blogService,
       BlogUpdateFailedEventProducer blogUpdateFailedEventProducer,
       FeedFetcher feedFetcher,
-      Tracer tracer) {
+      Tracer tracer
+  ) {
     this.repository = repository;
     this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
     this.tracer = tracer;
@@ -79,7 +80,7 @@ class UpdateBlogService {
         .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
         .doOnError(ex -> {
               if (ex instanceof UpdateTimeoutException) {
-                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().toString(), blog.getFeedURL(), blog.getId(), ex.getMessage()));
+                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().context().toString(), blog.getFeedURL(), blog.getId(), ex.getMessage()));
               }
           log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {} correlation Id {}", blog.getName(), ex);
             }
