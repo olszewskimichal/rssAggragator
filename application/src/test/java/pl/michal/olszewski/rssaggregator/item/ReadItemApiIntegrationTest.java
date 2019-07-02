@@ -13,7 +13,6 @@ import reactor.test.StepVerifier;
 
 class ReadItemApiIntegrationTest extends IntegrationTestBase {
 
-
   @Autowired
   private MongoTemplate mongoTemplate;
 
