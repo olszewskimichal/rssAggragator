@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog.search.items;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,12 @@ class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
 
   @Test
   void shouldReturnSearchResultByMatchingTextWithoutLimit() {
-    mongoTemplate.save(new Item(ItemDTO.builder().link("link1").title("AAA").build()));
-    mongoTemplate.save(new Item(ItemDTO.builder().link("link2").title("BBB").build()));
-    mongoTemplate.save(new Item(ItemDTO.builder().link("link3").title("CCC").build()));
+    List<Item> itemList = List.of(
+        new Item(ItemDTO.builder().link("link1").title("AAA").build()),
+        new Item(ItemDTO.builder().link("link1").title("AAA").build()),
+        new Item(ItemDTO.builder().link("link3").title("CCC").build())
+    );
+    mongoTemplate.insert(itemList, Item.class);
 
     ListBodySpec<ItemSearchResult> result = thenGetSearchResultFromAPI("AAA", null);
 
@@ -33,9 +37,12 @@ class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
 
   @Test
   void shouldReturnSearchResultByMatchingTextWithLimit() {
-    mongoTemplate.save(new Item(ItemDTO.builder().link("link1").title("BBB").build()));
-    mongoTemplate.save(new Item(ItemDTO.builder().link("link2").title("BBB").build()));
-    mongoTemplate.save(new Item(ItemDTO.builder().link("link3").title("CCC").build()));
+    List<Item> itemList = List.of(
+        new Item(ItemDTO.builder().link("link1").title("BBB").build()),
+        new Item(ItemDTO.builder().link("link1").title("BBB").build()),
+        new Item(ItemDTO.builder().link("link3").title("CCC").build())
+    );
+    mongoTemplate.insert(itemList, Item.class);
 
     ListBodySpec<ItemSearchResult> result = thenGetSearchResultFromAPI("BBB", 1);
 
