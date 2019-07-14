@@ -25,10 +25,10 @@ class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
   void shouldReturnSearchResultByMatchingTextWithoutLimit() {
     List<Item> itemList = List.of(
         new Item(ItemDTO.builder().link("link1").title("AAA").build()),
-        new Item(ItemDTO.builder().link("link1").title("AAA").build()),
+        new Item(ItemDTO.builder().link("link2").title("BBB").build()),
         new Item(ItemDTO.builder().link("link3").title("CCC").build())
     );
-    mongoTemplate.insert(itemList, Item.class);
+    mongoTemplate.insertAll(itemList);
 
     ListBodySpec<ItemSearchResult> result = thenGetSearchResultFromAPI("AAA", null);
 
@@ -39,10 +39,10 @@ class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
   void shouldReturnSearchResultByMatchingTextWithLimit() {
     List<Item> itemList = List.of(
         new Item(ItemDTO.builder().link("link1").title("BBB").build()),
-        new Item(ItemDTO.builder().link("link1").title("BBB").build()),
+        new Item(ItemDTO.builder().link("link2").title("BBB").build()),
         new Item(ItemDTO.builder().link("link3").title("CCC").build())
     );
-    mongoTemplate.insert(itemList, Item.class);
+    mongoTemplate.insertAll(itemList);
 
     ListBodySpec<ItemSearchResult> result = thenGetSearchResultFromAPI("BBB", 1);
 
