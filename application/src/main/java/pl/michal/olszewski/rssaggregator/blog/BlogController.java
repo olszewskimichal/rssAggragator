@@ -117,13 +117,6 @@ class BlogController {
         .doOnError(error -> log.error("ERROR deleteBlog id {} - correlationId {}", blogId, correlationId, error));
   }
 
-  @PostMapping(value = "/evictCache")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void evictCache() {
-    log.debug("POST - evict Cache");
-    blogService.evictBlogCache();
-  }
-
   private BlogAggregationDTO addLinkToSelf(BlogAggregationDTO blog) {
     if (blog.getLink("self") == null) {
       Link link = linkTo(methodOn(BlogController.class)
