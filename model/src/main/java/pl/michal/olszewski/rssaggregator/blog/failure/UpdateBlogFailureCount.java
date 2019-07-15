@@ -1,22 +1,15 @@
 package pl.michal.olszewski.rssaggregator.blog.failure;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@ToString
-@EqualsAndHashCode
-final class UpdateBlogFailureCount {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class UpdateBlogFailureCount {
 
-  private final String blogId;
-  private final String errorMsg;
-  private final Long total;
-
-  UpdateBlogFailureCount(String blogId, String errorMsg, Long total) {
-    this.blogId = blogId;
-    this.errorMsg = errorMsg;
-    this.total = total;
-  }
-
+  private String blogId;
+  private String errorMsg;
+  private Long total;
 }

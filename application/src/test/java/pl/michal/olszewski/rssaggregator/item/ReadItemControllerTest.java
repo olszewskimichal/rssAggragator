@@ -12,8 +12,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
-@WebFluxTest(ReadItemEndpoint.class)
-class ReadItemEndpointTest {
+@WebFluxTest(ReadItemController.class)
+class ReadItemControllerTest {
 
   @MockBean
   private ReadItemService readItemService;

@@ -13,11 +13,11 @@ import reactor.core.publisher.Mono;
 
 @RestController()
 @Slf4j
-class ReadItemEndpoint {
+class ReadItemController {
 
   private final ReadItemService readItemService;
 
-  ReadItemEndpoint(ReadItemService readItemService) {
+  ReadItemController(ReadItemService readItemService) {
     this.readItemService = readItemService;
   }
 

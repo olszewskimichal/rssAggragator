@@ -108,14 +108,14 @@
           </execution>
           <execution>
             <goals>
-              <goal>report</goal>
+              <goal>report-aggregate</goal>
             </goals>
             <id>report</id>
             <phase>test</phase>
           </execution>
         </executions>
         <groupId>org.jacoco</groupId>
-        <version>0.8.3</version>
+        <version>0.8.4</version>
       </plugin>
       <plugin>
         <artifactId>git-commit-id-plugin</artifactId>
@@ -131,5 +131,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

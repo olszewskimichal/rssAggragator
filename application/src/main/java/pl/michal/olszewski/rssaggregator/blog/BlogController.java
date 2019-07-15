@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import pl.michal.olszewski.rssaggregator.blog.items.BlogItemsEndPoint;
+import pl.michal.olszewski.rssaggregator.blog.items.BlogItemsController;
 import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,11 +27,11 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/v1/blogs")
 @Slf4j
-class BlogEndPoint {
+class BlogController {
 
   private final BlogService blogService;
 
-  public BlogEndPoint(BlogService blogService) {
+  public BlogController(BlogService blogService) {
     this.blogService = blogService;
   }
 
@@ -111,16 +111,9 @@ class BlogEndPoint {
         .doOnError(error -> log.error("ERROR deleteBlog id {}", blogId, error));
   }
 
-  @PostMapping(value = "/evictCache")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void evictCache() {
-    log.debug("POST - evict Cache");
-    blogService.evictBlogCache();
-  }
-
   private BlogAggregationDTO addLinkToSelf(BlogAggregationDTO blog) {
     if (blog.getLink("self") == null) {
-      Link link = linkTo(methodOn(BlogEndPoint.class)
+      Link link = linkTo(methodOn(BlogController.class)
           .getBlog(blog.getBlogId())).withSelfRel();
       blog.add(link);
     }
@@ -129,7 +122,7 @@ class BlogEndPoint {
 
   private BlogAggregationDTO addLinkToBlogItems(BlogAggregationDTO blog) {
     if (blog.getLink("items") == null) {
-      Link link = linkTo(methodOn(BlogItemsEndPoint.class)
+      Link link = linkTo(methodOn(BlogItemsController.class)
           .getBlogItems(blog.getBlogId())).withRel("items");
       blog.add(link);
     }

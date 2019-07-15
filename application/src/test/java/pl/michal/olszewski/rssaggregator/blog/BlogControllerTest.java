@@ -16,7 +16,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.test.StepVerifier;
 
-class BlogApiTest extends IntegrationTestBase {
+class BlogControllerTest extends IntegrationTestBase {
 
   @Autowired
   private BlogReactiveRepository blogRepository;

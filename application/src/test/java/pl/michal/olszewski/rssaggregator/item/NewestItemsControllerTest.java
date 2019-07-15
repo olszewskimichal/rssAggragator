@@ -7,8 +7,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
-class NewestItemsApiTest extends IntegrationTestBase {
-
+class NewestItemsControllerTest extends IntegrationTestBase {
 
   @Autowired
   private ItemRepository itemRepository;

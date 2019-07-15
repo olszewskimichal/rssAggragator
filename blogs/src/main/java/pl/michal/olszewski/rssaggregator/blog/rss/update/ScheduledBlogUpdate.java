@@ -23,7 +23,9 @@ class ScheduledBlogUpdate {
   @RegistryTimed
   void runScheduledUpdate() {
     log.debug("Rozpoczynam aktualizacje");
-    updateBlogService.updateAllActiveBlogsByRss().collectList().block();
+    updateBlogService.updateAllActiveBlogsByRss()
+        .then()
+        .block();
   }
 
 }
