@@ -59,7 +59,7 @@ class UpdateBlogService {
     return Flux.merge(getUpdateBlogByRssList())
         .collectList()
         .flatMapMany(Flux::fromIterable)
-        .flatMapIterable(v -> v)
+        .flatMapIterable(list -> list)
         .doOnError(ex ->
             log.error("Aktualizacja zakonczona bledem ", ex)
         );
