@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import io.swagger.annotations.ApiOperation;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,10 +26,9 @@ class ReadItemController {
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, value = "/api/v1/items/mark")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public Mono<Void> markItem(@RequestBody ReadItemDTO readItemDTO) {
-    String correlationId = UUID.randomUUID().toString();
-    log.debug("START markItem id {} read {} correlationId {}", readItemDTO.getItemId(), readItemDTO.isRead(), correlationId);
-    return readItemService.processRequest(readItemDTO, correlationId)
-        .doOnSuccess(result -> log.debug("END markItem {} result {} - correlationId {}", readItemDTO.getItemId(), result, correlationId))
-        .doOnError(error -> log.error("ERROR markItem {} - correlationId {}", readItemDTO.getItemId(), correlationId, error));
+    log.debug("START markItem id {} read {}", readItemDTO.getItemId(), readItemDTO.isRead());
+    return readItemService.processRequest(readItemDTO)
+        .doOnSuccess(result -> log.debug("END markItem {} result {}", readItemDTO.getItemId(), result))
+        .doOnError(error -> log.error("ERROR markItem {}", readItemDTO.getItemId(), error));
   }
 }

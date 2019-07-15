@@ -20,10 +20,10 @@ class BlogItemsService {
     this.blogRepository = blogRepository;
   }
 
-  Flux<BlogItemDTO> getBlogItemsForBlog(String blogId, String correlationId) {
-    log.debug("getBlogItemsForBlog {} correlationId {}", blogId, correlationId);
+  Flux<BlogItemDTO> getBlogItemsForBlog(String blogId) {
+    log.debug("getBlogItemsForBlog {}", blogId);
     return blogRepository.findById(blogId)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId, correlationId)))
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId)))
         .flatMapIterable(this::extractItems);
   }
 

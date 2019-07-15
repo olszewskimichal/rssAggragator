@@ -6,7 +6,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
@@ -45,12 +44,11 @@ class BlogController {
   })
   @SwaggerDocumented
   public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
-    String correlationID = UUID.randomUUID().toString();
-    log.debug("START GET blog by id {} correlationId {}", blogId, correlationID);
-    return blogService.getBlogDTOById(blogId, correlationID)
+    log.debug("START GET blog by id {}", blogId);
+    return blogService.getBlogDTOById(blogId)
         .map(this::addLinkToBlogItems)
-        .doOnSuccess(result -> log.trace("END GET blog by id {} correlationId {}", blogId, correlationID))
-        .doOnError(error -> log.error("ERROR GET blog by id {} correlationId {}", blogId, correlationID, error));
+        .doOnSuccess(result -> log.trace("END GET blog by id {}", blogId))
+        .doOnError(error -> log.error("ERROR GET blog by id {}", blogId, error));
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -61,13 +59,12 @@ class BlogController {
   })
   @SwaggerDocumented
   public Flux<BlogAggregationDTO> getBlogs() {
-    String correlationID = UUID.randomUUID().toString();
-    log.debug("START GET blogs correlationId {}", correlationID);
-    return blogService.getAllBlogDTOs(correlationID)
+    log.debug("START GET blogs");
+    return blogService.getAllBlogDTOs()
         .map(this::addLinkToSelf)
         .map(this::addLinkToBlogItems)
-        .doOnComplete(() -> log.debug("END GET blogs - correlationId {}", correlationID))
-        .doOnError(error -> log.error("ERROR GET blogs - correlationId {}", correlationID, error));
+        .doOnComplete(() -> log.debug("END GET blogs"))
+        .doOnError(error -> log.error("ERROR GET blogs", error));
   }
 
   @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -80,12 +77,11 @@ class BlogController {
   })
   @SwaggerDocumented
   public Mono<BlogDTO> updateBlog(@RequestBody BlogDTO blogDTO) {
-    String correlationId = UUID.randomUUID().toString();
-    log.debug("PUT - updateBlog {} correlationId {}", blogDTO.getName(), correlationId);
-    log.trace("PUT - updateBlog {} correlationId {}", blogDTO, correlationId);
-    return blogService.updateBlog(blogDTO, correlationId)
-        .doOnSuccess(blog -> log.debug("END updateBlog - correlationId {}", correlationId))
-        .doOnError(error -> log.error("ERROR updateBlog - correlationId {}", correlationId, error));
+    log.debug("PUT - updateBlog {}", blogDTO.getName());
+    log.trace("PUT - updateBlog {}", blogDTO);
+    return blogService.updateBlog(blogDTO)
+        .doOnSuccess(blog -> log.debug("END updateBlog"))
+        .doOnError(error -> log.error("ERROR updateBlog", error));
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -97,12 +93,11 @@ class BlogController {
   })
   @SwaggerDocumented
   public Mono<BlogDTO> addBlog(@RequestBody BlogDTO blogDTO) {
-    String correlationId = UUID.randomUUID().toString();
-    log.debug("POST - addBlog {} correlationId {}", blogDTO.getName(), correlationId);
-    log.trace("POST - addBlog {} correlationId {}", blogDTO, correlationId);
-    return blogService.getBlogOrCreate(blogDTO, correlationId)
-        .doOnSuccess(blog -> log.debug("END addBlog {} - correlationId {}", blogDTO.getName(), correlationId))
-        .doOnError(error -> log.error("ERROR addBlog {} - correlationId {}", blogDTO.getName(), correlationId, error));
+    log.debug("POST - addBlog {}", blogDTO.getName());
+    log.trace("POST - addBlog {}", blogDTO);
+    return blogService.getBlogOrCreate(blogDTO)
+        .doOnSuccess(blog -> log.debug("END addBlog {}", blogDTO.getName()))
+        .doOnError(error -> log.error("ERROR addBlog {}", blogDTO.getName(), error));
   }
 
   @DeleteMapping(value = "/{id}")
@@ -110,11 +105,10 @@ class BlogController {
   @ApiOperation(value = "Sluzy do usuwania bloga o podanym id")
   @SwaggerDocumented
   public Mono<Void> deleteBlog(@PathVariable("id") String blogId) {
-    String correlationId = UUID.randomUUID().toString();
-    log.debug("DELETE - deleteBlog id {} correlationId {}", blogId, correlationId);
-    return blogService.deleteBlog(blogId, correlationId)
-        .doOnSuccess(blog -> log.debug("END deleteBlog id {} - correlationId {}", blogId, correlationId))
-        .doOnError(error -> log.error("ERROR deleteBlog id {} - correlationId {}", blogId, correlationId, error));
+    log.debug("DELETE - deleteBlog id {}", blogId);
+    return blogService.deleteBlog(blogId)
+        .doOnSuccess(blog -> log.debug("END deleteBlog id {}", blogId))
+        .doOnError(error -> log.error("ERROR deleteBlog id {}", blogId, error));
   }
 
   private BlogAggregationDTO addLinkToSelf(BlogAggregationDTO blog) {

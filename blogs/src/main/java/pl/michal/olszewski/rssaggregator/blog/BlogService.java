@@ -38,15 +38,15 @@ class BlogService {
     this.producer = producer;
   }
 
-  Mono<BlogDTO> getBlogOrCreate(BlogDTO blogDTO, String correlationId) {
-    log.debug("Tworzenie nowego bloga {} correlationId {}", blogDTO.getFeedURL(), correlationId);
+  Mono<BlogDTO> getBlogOrCreate(BlogDTO blogDTO) {
+    log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
     return blogRepository.findByFeedURL(blogDTO.getFeedURL())
-        .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO, correlationId)))
+        .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO)))
         .map(BlogDTO::new);
   }
 
-  private Mono<Blog> createBlog(BlogDTO blogDTO, String correlationId) {
-    log.debug("Dodaje nowy blog o nazwie {} correlationId {}", blogDTO.getName(), correlationId);
+  private Mono<Blog> createBlog(BlogDTO blogDTO) {
+    log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     var blog = new Blog(blogDTO);
     blogDTO.getItemsList().stream()
         .map(Item::new)
@@ -55,10 +55,10 @@ class BlogService {
         .doOnNext(createdBlog -> cache.put(createdBlog.getId(), new BlogAggregationDTO(createdBlog)));
   }
 
-  private Mono<Blog> getBlogByFeedUrl(String feedUrl, String correlationId) {
-    log.debug("getBlogByFeedUrl feedUrl {} correlationId {}", feedUrl, correlationId);
+  private Mono<Blog> getBlogByFeedUrl(String feedUrl) {
+    log.debug("getBlogByFeedUrl feedUrl {}", feedUrl);
     return blogRepository.findByFeedURL(feedUrl)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(feedUrl, correlationId)));
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(feedUrl)));
   }
 
   @Transactional
@@ -82,10 +82,10 @@ class BlogService {
         );
   }
 
-  Mono<Void> deleteBlog(String id, String correlationId) {
-    log.debug("Usuwam bloga o id {} correlationId {}", id, correlationId);
+  Mono<Void> deleteBlog(String id) {
+    log.debug("Usuwam bloga o id {}", id);
     return blogRepository.findById(id)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(id, correlationId)))
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
         .flatMap(blog -> {
           if (blog.getItems().isEmpty()) {
             return blogRepository.delete(blog)
@@ -97,25 +97,25 @@ class BlogService {
   }
 
   @Transactional(readOnly = true)
-  public Mono<BlogAggregationDTO> getBlogDTOById(String id, String correlationId) {
-    log.debug("pobieram bloga w postaci DTO o id {} correlationId {}", id, correlationId);
+  public Mono<BlogAggregationDTO> getBlogDTOById(String id) {
+    log.debug("pobieram bloga w postaci DTO o id {}", id);
     return Mono.justOrEmpty(cache.getIfPresent(id))
         .switchIfEmpty(Mono.defer(() -> blogRepository.findById(id).cache()
-            .switchIfEmpty(Mono.error(new BlogNotFoundException(id, correlationId)))
+            .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
             .map(BlogAggregationDTO::new)
-            .doOnEach(blogDTO -> log.trace("getBlogDTObyId {} correlationId {}", id, correlationId))
+            .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id))
             .doOnSuccess(v -> cache.put(id, v))));
   }
 
   @Transactional(readOnly = true)
-  public Flux<BlogAggregationDTO> getAllBlogDTOs(String correlationId) {
-    log.debug("pobieram wszystkie blogi w postaci DTO correlationId {}", correlationId);
+  public Flux<BlogAggregationDTO> getAllBlogDTOs() {
+    log.debug("pobieram wszystkie blogi w postaci DTO");
     var dtoFlux = Flux.fromIterable(cache.asMap().values())
         .switchIfEmpty(Flux.defer(() -> blogRepository.getBlogsWithCount()
             .doOnNext(blog -> cache.put(blog.getBlogId(), blog)))
             .cache());
     return dtoFlux
-        .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {} correlationId {}", blogDTO, correlationId));
+        .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }
 
   void evictBlogCache() {
@@ -123,9 +123,9 @@ class BlogService {
     cache.invalidateAll();
   }
 
-  Mono<BlogDTO> updateBlog(BlogDTO blogDTO, String correlationId) {
-    log.debug("Aktualizacja bloga {} correlationId {}", blogDTO.getLink(), correlationId);
-    return getBlogByFeedUrl(blogDTO.getFeedURL(), correlationId)
+  Mono<BlogDTO> updateBlog(BlogDTO blogDTO) {
+    log.debug("Aktualizacja bloga {}", blogDTO.getLink());
+    return getBlogByFeedUrl(blogDTO.getFeedURL())
         .flatMap(blog -> updateBlog(blog, blogDTO))
         .map(BlogDTO::new);
   }

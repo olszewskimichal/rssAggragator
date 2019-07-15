@@ -145,7 +145,26 @@
       <groupId>com.google.guava</groupId>
       <version>22.0</version>
     </dependency>
+    <dependency>
+      <artifactId>spring-cloud-starter-sleuth</artifactId>
+      <groupId>org.springframework.cloud</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-cloud-starter-zipkin</artifactId>
+      <groupId>org.springframework.cloud</groupId>
+    </dependency>
   </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <artifactId>spring-cloud-sleuth</artifactId>
+        <groupId>org.springframework.cloud</groupId>
+        <scope>import</scope>
+        <type>pom</type>
+        <version>2.1.2.RELEASE</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <description>Agregator RSS</description>
   <groupId>pl.michal.olszewski</groupId>
   <modelVersion>4.0.0</modelVersion>
