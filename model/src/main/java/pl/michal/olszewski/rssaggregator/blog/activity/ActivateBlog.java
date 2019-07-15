@@ -1,4 +1,5 @@
 package pl.michal.olszewski.rssaggregator.blog.activity;
+
 import java.time.Instant;
 import lombok.Builder;
 import lombok.Getter;

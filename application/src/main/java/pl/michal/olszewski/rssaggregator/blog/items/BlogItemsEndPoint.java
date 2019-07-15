@@ -3,7 +3,6 @@ package pl.michal.olszewski.rssaggregator.blog.items;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,9 +31,8 @@ public class BlogItemsEndPoint {
   })
   @SwaggerDocumented
   public Flux<BlogItemDTO> getBlogItems(@PathVariable("id") String blogId) {
-    String correlationId = UUID.randomUUID().toString();
-    log.debug("START GET blogItems for id {} correlationId {}", blogId, correlationId);
-    return blogService.getBlogItemsForBlog(blogId, correlationId)
-        .doOnComplete(() -> log.debug("END GET blogItems for id {} correlationId {}", blogId, correlationId));
+    log.debug("START GET blogItems for id {}", blogId);
+    return blogService.getBlogItemsForBlog(blogId)
+        .doOnComplete(() -> log.debug("END GET blogItems for id {}", blogId));
   }
 }
