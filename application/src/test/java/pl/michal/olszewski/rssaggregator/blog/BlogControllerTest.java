@@ -14,8 +14,8 @@ import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@WebFluxTest(BlogEndPoint.class)
-class BlogEndPointTest {
+@WebFluxTest(BlogController.class)
+class BlogControllerTest {
 
   @MockBean
   private BlogService blogService;

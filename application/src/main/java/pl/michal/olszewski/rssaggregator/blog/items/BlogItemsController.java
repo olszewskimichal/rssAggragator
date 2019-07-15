@@ -15,11 +15,11 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/api/v1/blogs")
 @Slf4j
-public class BlogItemsEndPoint {
+public class BlogItemsController {
 
   private final BlogItemsService blogService;
 
-  public BlogItemsEndPoint(BlogItemsService blogService) {
+  public BlogItemsController(BlogItemsService blogService) {
     this.blogService = blogService;
   }
 

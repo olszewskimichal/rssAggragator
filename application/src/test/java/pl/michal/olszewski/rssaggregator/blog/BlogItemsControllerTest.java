@@ -7,7 +7,7 @@ import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
-class BlogItemsEndpointTest extends IntegrationTestBase {
+class BlogItemsControllerTest extends IntegrationTestBase {
 
   @Autowired
   private BlogReactiveRepository blogRepository;
