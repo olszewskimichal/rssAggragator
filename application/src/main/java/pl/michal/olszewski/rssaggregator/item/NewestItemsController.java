@@ -15,11 +15,11 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("/api/v1/items")
 @Slf4j
-class NewestItemsEndPoint {
+class NewestItemsController {
 
   private final NewestItemService itemService;
 
-  public NewestItemsEndPoint(NewestItemService itemService) {
+  public NewestItemsController(NewestItemService itemService) {
     this.itemService = itemService;
   }
 
