@@ -101,12 +101,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.platform</groupId>
-      <artifactId>junit-platform-launcher</artifactId>
-      <version>1.4.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <artifactId>mockito-junit-jupiter</artifactId>
       <groupId>org.mockito</groupId>
       <scope>test</scope>
@@ -177,7 +171,7 @@
 
   <properties>
     <java.version>12</java.version>
-    <junit.jupiter.version>5.4.0</junit.jupiter.version>
+    <junit.jupiter.version>5.5.0</junit.jupiter.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
