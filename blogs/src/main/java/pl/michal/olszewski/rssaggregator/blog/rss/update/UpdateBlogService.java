@@ -9,7 +9,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,6 @@ import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEventProducer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 @Service
@@ -28,7 +26,6 @@ import reactor.core.scheduler.Schedulers;
 @Transactional
 class UpdateBlogService {
 
-  private static final Scheduler SCHEDULER = Schedulers.fromExecutor(Executors.newFixedThreadPool(16));
   private final BlogReactiveRepository repository;
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
@@ -93,7 +90,6 @@ class UpdateBlogService {
     log.trace("START updateRssBlogItems dla blog {}", blog.getName());
     var blogDTO = rssExtractorService.getBlog(blog.getRssInfo());
     blogService.updateBlog(blog, blogDTO)
-        .subscribeOn(SCHEDULER)
         .doOnSuccess(v -> log.trace("STOP updateRssBlogItems dla blog {}", v.getName()))
         .block();
     return true;
