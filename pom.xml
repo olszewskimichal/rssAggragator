@@ -60,7 +60,7 @@
     <dependency>
       <artifactId>logstash-logback-encoder</artifactId>
       <groupId>net.logstash.logback</groupId>
-      <version>5.3</version>
+      <version>6.1</version>
     </dependency>
 
     <dependency>
@@ -116,7 +116,7 @@
       <artifactId>assertj-core</artifactId>
       <groupId>org.assertj</groupId>
       <scope>test</scope>
-      <version>3.12.1</version>
+      <version>3.12.2</version>
     </dependency>
     <dependency>
       <artifactId>equalsverifier</artifactId>
@@ -132,7 +132,7 @@
     <dependency>
       <artifactId>guava</artifactId>
       <groupId>com.google.guava</groupId>
-      <version>22.0</version>
+      <version>23.0</version>
     </dependency>
     <dependency>
       <artifactId>spring-cloud-starter-sleuth</artifactId>
