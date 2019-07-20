@@ -78,9 +78,9 @@ public class Blog {
     return Collections.unmodifiableSet(items);
   }
 
-  public void addItem(Item item, MongoTemplate repository) {
+  public void addItem(Item item, MongoTemplate mongoTemplate) {
     if (items.add(item)) {
-      repository.save(item);
+      mongoTemplate.save(item);
       log.trace("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
     }
   }
