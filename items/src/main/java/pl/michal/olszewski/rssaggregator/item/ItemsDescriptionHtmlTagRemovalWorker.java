@@ -2,9 +2,8 @@ package pl.michal.olszewski.rssaggregator.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.ParallelFlux;
-import reactor.core.scheduler.Schedulers;
 
 @Service
 @Slf4j
@@ -16,11 +15,9 @@ public class ItemsDescriptionHtmlTagRemovalWorker {
     this.itemRepository = itemRepository;
   }
 
-  ParallelFlux<Item> processAllItemsAndRemoveHtmlTagsFromDescription() {
+  Flux<Item> processAllItemsAndRemoveHtmlTagsFromDescription() {
     log.info("Remove html tags from items descriptions");
     return itemRepository.findAll()
-        .parallel()
-        .runOn(Schedulers.parallel())
         .flatMap(this::updateItemDescription);
   }
 

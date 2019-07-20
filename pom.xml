@@ -163,6 +163,7 @@
     <module>failureAggregator</module>
     <module>blogs</module>
     <module>model</module>
+    <module>search</module>
   </modules>
   <name>rss-aggregator</name>
 

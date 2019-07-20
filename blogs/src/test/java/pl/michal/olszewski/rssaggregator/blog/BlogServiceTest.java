@@ -27,9 +27,11 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
+import pl.michal.olszewski.rssaggregator.blog.search.NewItemForSearchEventProducer;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEvent;
+import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -58,7 +60,7 @@ class BlogServiceTest {
         }
     );
     given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build(), new NewItemInBlogEventProducer(jmsTemplate));
+    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build(), new NewItemInBlogEventProducer(jmsTemplate), new NewItemForSearchEventProducer(jmsTemplate));
     blogService.evictBlogCache();
   }
 
@@ -179,6 +181,8 @@ class BlogServiceTest {
         .expectComplete()
         .verify();
     verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
+    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
+
   }
 
   @Test
@@ -207,6 +211,7 @@ class BlogServiceTest {
         .expectComplete()
         .verify();
     verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
+    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
 
   @Test
@@ -236,6 +241,7 @@ class BlogServiceTest {
         .expectComplete()
         .verify();
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
 
   @Test
@@ -267,6 +273,7 @@ class BlogServiceTest {
         .expectComplete()
         .verify();
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
 
   @Test

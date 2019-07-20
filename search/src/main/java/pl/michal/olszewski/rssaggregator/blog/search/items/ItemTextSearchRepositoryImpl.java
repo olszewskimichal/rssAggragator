@@ -23,6 +23,6 @@ public class ItemTextSearchRepositoryImpl implements ItemTextSearchRepository {
     Query query = TextQuery.queryText(textCriteria)
         .sortByScore()
         .with(PageRequest.of(0, limit));
-    return mongoTemplate.find(query, ItemSearchResult.class, "item");
+    return mongoTemplate.find(query, ItemSearchResult.class, "itemsSearch");
   }
 }
