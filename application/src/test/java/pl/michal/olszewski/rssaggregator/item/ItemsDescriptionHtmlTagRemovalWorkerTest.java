@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import reactor.core.publisher.ParallelFlux;
+import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 class ItemsDescriptionHtmlTagRemovalWorkerTest extends IntegrationTestBase {
@@ -46,7 +46,7 @@ class ItemsDescriptionHtmlTagRemovalWorkerTest extends IntegrationTestBase {
         .build());
     mongoTemplate.save(item2);
     //when
-    ParallelFlux<Item> items = worker.processAllItemsAndRemoveHtmlTagsFromDescription();
+    Flux<Item> items = worker.processAllItemsAndRemoveHtmlTagsFromDescription();
     //then
     StepVerifier.create(items)
         .assertNext(v -> assertThat(v.getDescription()).isEqualTo("test test."))
