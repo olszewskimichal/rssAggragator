@@ -42,7 +42,7 @@ class RssExtractorService {
     log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
     return new BlogDTO(
         syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
-        syndFeed.getDescription(),
+        HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()),
         syndFeed.getTitle(),
         feedURL,
         syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
