@@ -42,7 +42,7 @@ class RssExtractorService {
     log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
     return new BlogDTO(
         syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
-        syndFeed.getDescription(),
+        HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()),
         syndFeed.getTitle(),
         feedURL,
         syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
@@ -60,8 +60,8 @@ class RssExtractorService {
       feed.setEncoding("UTF-8");
       feed.getEntries()
           .parallelStream()
-          .filter(v -> v.getPublishedDate() == null && v.getUpdatedDate() != null)
-          .forEach(v -> v.setPublishedDate(v.getUpdatedDate()));
+          .filter(entry -> entry.getPublishedDate() == null && entry.getUpdatedDate() != null)
+          .forEach(entry -> entry.setPublishedDate(entry.getUpdatedDate()));
       BlogDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
       getItemsForBlog(feed, info.getLastUpdateDate())
           .forEach(blogInfo::addNewItem);

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.config.RegistryTimed;
 
 @Service
-@Profile("prod")
+@Profile({"prod", "development"})
 @Slf4j
 class ScheduledBlogUpdate {
 
