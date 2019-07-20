@@ -17,7 +17,6 @@ class ItemsDescriptionHtmlTagRemovalWorkerTest extends IntegrationTestBase {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-
   @Autowired
   private ItemsDescriptionHtmlTagRemovalWorker worker;
 

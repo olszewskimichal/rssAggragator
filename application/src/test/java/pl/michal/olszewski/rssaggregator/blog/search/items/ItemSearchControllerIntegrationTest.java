@@ -8,8 +8,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import pl.michal.olszewski.rssaggregator.item.Item;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
 
@@ -18,15 +16,15 @@ class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    mongoTemplate.remove(new Query(), "item");
+    mongoTemplate.remove(new Query(), "itemsSearch");
   }
 
   @Test
   void shouldReturnSearchResultByMatchingTextWithoutLimit() {
-    List<Item> itemList = List.of(
-        new Item(ItemDTO.builder().link("link1").title("AAA").build()),
-        new Item(ItemDTO.builder().link("link2").title("BBB").build()),
-        new Item(ItemDTO.builder().link("link3").title("CCC").build())
+    List<ItemForSearch> itemList = List.of(
+        ItemForSearch.builder().link("link1").title("AAA").build(),
+        ItemForSearch.builder().link("link2").title("BBB").build(),
+        ItemForSearch.builder().link("link3").title("CCC").build()
     );
     mongoTemplate.insertAll(itemList);
 
@@ -37,10 +35,10 @@ class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
 
   @Test
   void shouldReturnSearchResultByMatchingTextWithLimit() {
-    List<Item> itemList = List.of(
-        new Item(ItemDTO.builder().link("link1").title("BBB").build()),
-        new Item(ItemDTO.builder().link("link2").title("BBB").build()),
-        new Item(ItemDTO.builder().link("link3").title("CCC").build())
+    List<ItemForSearch> itemList = List.of(
+        ItemForSearch.builder().link("link1").title("BBB").build(),
+        ItemForSearch.builder().link("link2").title("BBB").build(),
+        ItemForSearch.builder().link("link3").title("CCC").build()
     );
     mongoTemplate.insertAll(itemList);
 
