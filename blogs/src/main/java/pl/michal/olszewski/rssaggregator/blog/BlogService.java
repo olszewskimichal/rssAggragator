@@ -10,8 +10,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
+import pl.michal.olszewski.rssaggregator.blog.search.NewItemForSearchEventProducer;
 import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEvent;
+import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -25,17 +27,19 @@ class BlogService {
   private final MongoTemplate mongoTemplate;
   private final Cache<String, BlogAggregationDTO> cache;
   private final NewItemInBlogEventProducer producer;
+  private final NewItemForSearchEventProducer itemForSearchEventProducer;
 
   public BlogService(
       BlogReactiveRepository blogRepository,
       MongoTemplate mongoTemplate,
       @Qualifier("blogCache") Cache<String, BlogAggregationDTO> cache,
-      NewItemInBlogEventProducer producer
-  ) {
+      NewItemInBlogEventProducer producer,
+      NewItemForSearchEventProducer itemForSearchEventProducer) {
     this.blogRepository = blogRepository;
     this.mongoTemplate = mongoTemplate;
     this.cache = cache;
     this.producer = producer;
+    this.itemForSearchEventProducer = itemForSearchEventProducer;
   }
 
   Mono<BlogDTO> getBlogOrCreate(BlogDTO blogDTO) {
@@ -133,5 +137,6 @@ class BlogService {
   private void addItemToBlog(Blog blog, Item item) {
     blog.addItem(item, mongoTemplate);
     producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item.getLink(), item.getTitle(), blog.getId()));
+    itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(Instant.now(), item.getLink(), item.getTitle(), item.getDescription()));
   }
 }
