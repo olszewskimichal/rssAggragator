@@ -27,7 +27,7 @@ class BlogItemsFromFeedExtractor {
         .filter(entry -> entry.getPublishedDate().toInstant().isAfter(lastUpdatedDate))
         .map(entry -> new ItemDTO(
             entry.getTitle(),
-            entry.getDescription() != null ? entry.getDescription().getValue() : "",
+            entry.getDescription() != null ? HtmlTagRemover.removeHtmlTagFromDescription(entry.getDescription().getValue()) : "",
             getFinalURL(convertURLToAscii(entry.getLink())),
             entry.getPublishedDate().toInstant(),
             entry.getAuthor()))
