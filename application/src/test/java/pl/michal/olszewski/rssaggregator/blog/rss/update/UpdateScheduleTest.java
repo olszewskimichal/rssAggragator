@@ -8,13 +8,17 @@ import static org.mockito.Mockito.verify;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
+import com.rometools.rome.feed.synd.SyndContentImpl;
 import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.io.FeedException;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,6 +33,7 @@ import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import pl.michal.olszewski.rssaggregator.item.Item;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -85,7 +90,12 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
     StepVerifier
         .create(updatedBlog)
-        .assertNext(v -> assertThat(v.getItems()).isNotNull().isNotEmpty())
+        .assertNext(blogWithItems -> {
+          assertThat(blogWithItems.getItems()).isNotNull().isNotEmpty();
+          List<Item> items = blogWithItems.getItems().stream().sorted(Comparator.comparing(Item::getDate)).collect(Collectors.toList());
+          assertThat(items.get(0).getDescription()).isEqualTo("tekst");
+          assertThat(items.get(1).getDescription()).isNullOrEmpty();
+        })
         .expectComplete()
         .verify();
   }
@@ -119,25 +129,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .expectComplete()
         .verify();
   }
-
- /* @Test
-  void shouldUpdateBlogWithNotValidCertification() {
-    Blog blog = Blog.builder()
-        .blogURL("https://koziolekweb.pl")
-        .name("koziolekweb.pl")
-        .feedURL("https://koziolekweb.pl/feed/")
-        .lastUpdateDate(Instant.now())
-        .build();
-    blogRepository.save(blog).block();
-
-    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
-
-    StepVerifier
-        .create(result)
-        .expectNext(true)
-        .expectComplete()
-        .verify();
-  }*/
 
   @Test
   void shouldReturnFalseOnTimeoutAndWriteNewEventToDB() {
@@ -179,10 +170,17 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   private SyndFeedImpl buildSyndFeed() {
     SyndFeedImpl syndFeed = new SyndFeedImpl();
-    SyndEntryImpl syndEntry = new SyndEntryImpl();
-    syndEntry.setPublishedDate(new Date());
-    syndEntry.setLink("link");
-    syndFeed.getEntries().add(syndEntry);
+    SyndEntryImpl syndEntryWithDescription = new SyndEntryImpl();
+    SyndContentImpl syndContent = new SyndContentImpl();
+    syndContent.setValue("<html>tekst</html>");
+    syndEntryWithDescription.setDescription(syndContent);
+    syndEntryWithDescription.setPublishedDate(new Date());
+    syndEntryWithDescription.setLink("link");
+    SyndEntryImpl syndEntryWithoutDescription = new SyndEntryImpl();
+    syndEntryWithoutDescription.setPublishedDate(new Date());
+    syndEntryWithoutDescription.setLink("link2");
+    syndFeed.getEntries().add(syndEntryWithDescription);
+    syndFeed.getEntries().add(syndEntryWithoutDescription);
     return syndFeed;
   }
 
