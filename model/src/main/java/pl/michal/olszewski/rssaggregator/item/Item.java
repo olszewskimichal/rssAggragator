@@ -30,6 +30,7 @@ public final class Item {
 
   @CreatedDate
   private Instant createdAt;
+  private String blogId;
 
   public Item(ItemDTO itemDTO) {
     this.title = itemDTO.getTitle();
@@ -38,6 +39,7 @@ public final class Item {
     this.date = itemDTO.getDate();
     this.author = itemDTO.getAuthor();
     this.read = false;
+    this.blogId = itemDTO.getBlogId();
   }
 
   @Override
@@ -54,12 +56,13 @@ public final class Item {
             Objects.equals(description, item.description) &&
             Objects.equals(link, item.link) &&
             Objects.equals(date, item.date) &&
+            Objects.equals(blogId, item.blogId) &&
             Objects.equals(author, item.author);
   }
 
   @Override
   public final int hashCode() {
-    return Objects.hash(title, description, link, date, author);
+    return Objects.hash(title, description, link, date, author, blogId);
   }
 
   Item markAsRead() {
