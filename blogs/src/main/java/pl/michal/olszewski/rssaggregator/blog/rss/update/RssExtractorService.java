@@ -63,7 +63,7 @@ class RssExtractorService {
           .filter(entry -> entry.getPublishedDate() == null && entry.getUpdatedDate() != null)
           .forEach(entry -> entry.setPublishedDate(entry.getUpdatedDate()));
       BlogDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
-      getItemsForBlog(feed, info.getLastUpdateDate())
+      getItemsForBlog(feed, info)
           .forEach(blogInfo::addNewItem);
       log.trace("getBlog STOP {}", info);
       return blogInfo;

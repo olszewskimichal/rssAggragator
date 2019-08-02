@@ -12,16 +12,13 @@ import lombok.Getter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemDTO {
 
-  @JsonProperty("title")
   private final String title;
-  @JsonProperty("description")
   private final String description;
-  @JsonProperty("link")
   private final String link;
-  @JsonProperty("date")
   private final Instant date;
-  @JsonProperty("author")
   private final String author;
+  private final String blogId;
+
 
   @JsonCreator
   public ItemDTO(
@@ -29,12 +26,14 @@ public class ItemDTO {
       @JsonProperty("description") String description,
       @JsonProperty("link") String link,
       @JsonProperty("date") Instant date,
-      @JsonProperty("author") String author) {
+      @JsonProperty("author") String author,
+      @JsonProperty("blogId") String blogId) {
     this.title = title;
     this.description = description;
     this.link = link;
     this.date = date;
     this.author = author;
+    this.blogId = blogId;
   }
 
   public ItemDTO(Item item) {
@@ -43,5 +42,6 @@ public class ItemDTO {
     this.link = item.getLink();
     this.date = item.getDate();
     this.author = item.getAuthor();
+    this.blogId = item.getBlogId();
   }
 }

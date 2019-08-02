@@ -7,12 +7,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.Instant;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.util.UriUtils;
+import pl.michal.olszewski.rssaggregator.blog.Blog.RssInfo;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Slf4j
@@ -21,16 +21,17 @@ class BlogItemsFromFeedExtractor {
   private BlogItemsFromFeedExtractor() {
   }
 
-  static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, Instant lastUpdatedDate) {
-    log.trace("getItemsForBlog lastUpdatedDate {}", lastUpdatedDate);
+  static Set<ItemDTO> getItemsForBlog(SyndFeed syndFeed, RssInfo rssInfo) {
+    log.trace("getItemsForBlog {} lastUpdatedDate {}", rssInfo.getBlogId(), rssInfo.getLastUpdateDate());
     return syndFeed.getEntries().parallelStream()
-        .filter(entry -> entry.getPublishedDate().toInstant().isAfter(lastUpdatedDate))
+        .filter(entry -> entry.getPublishedDate().toInstant().isAfter(rssInfo.getLastUpdateDate()))
         .map(entry -> new ItemDTO(
             entry.getTitle(),
             entry.getDescription() != null ? HtmlTagRemover.removeHtmlTagFromDescription(entry.getDescription().getValue()) : "",
             getFinalURL(convertURLToAscii(entry.getLink())),
             entry.getPublishedDate().toInstant(),
-            entry.getAuthor()))
+            entry.getAuthor(),
+            rssInfo.getBlogId()))
         .collect(Collectors.toSet());
   }
 
