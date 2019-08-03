@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import pl.michal.olszewski.rssaggregator.blog.items.BlogItemsController;
 import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
+import pl.michal.olszewski.rssaggregator.item.BlogItemsController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

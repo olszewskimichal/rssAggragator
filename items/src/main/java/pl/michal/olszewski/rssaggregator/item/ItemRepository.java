@@ -15,6 +15,8 @@ interface ItemRepository extends ReactiveMongoRepository<Item, String> {
 
   Flux<Item> findAllBy(Pageable pageable);
 
+  Flux<Item> findAllByBlogId(String blogId); //TODO test
+
   default Flux<Item> findAllOrderByPublishedDate(Integer limit, Integer page) {
     return findAllBy(PageRequest.of(page, limit, new Sort(Sort.Direction.DESC, DATE)));
   }
@@ -22,5 +24,6 @@ interface ItemRepository extends ReactiveMongoRepository<Item, String> {
   default Flux<Item> findAllOrderByCreatedAt(Integer limit, Integer page) {
     return findAllBy(PageRequest.of(page, limit, new Sort(Sort.Direction.DESC, CREATED_AT)));
   }
+
 
 }

@@ -2,8 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import java.time.Instant;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,6 +24,7 @@ class BlogService {
   private final BlogReactiveRepository blogRepository;
   private final MongoTemplate mongoTemplate;
   private final Cache<String, BlogAggregationDTO> cache;
+  private final Cache<String, Item> itemCache;
   private final NewItemInBlogEventProducer producer;
   private final NewItemForSearchEventProducer itemForSearchEventProducer;
 
@@ -33,11 +32,13 @@ class BlogService {
       BlogReactiveRepository blogRepository,
       MongoTemplate mongoTemplate,
       @Qualifier("blogCache") Cache<String, BlogAggregationDTO> cache,
+      @Qualifier("itemCache") Cache<String, Item> itemCache,
       NewItemInBlogEventProducer producer,
       NewItemForSearchEventProducer itemForSearchEventProducer) {
     this.blogRepository = blogRepository;
     this.mongoTemplate = mongoTemplate;
     this.cache = cache;
+    this.itemCache = itemCache;
     this.producer = producer;
     this.itemForSearchEventProducer = itemForSearchEventProducer;
   }
@@ -56,7 +57,7 @@ class BlogService {
         .map(Item::new)
         .forEach(item -> addItemToBlog(blog, item));
     return blogRepository.save(blog)
-        .doOnNext(createdBlog -> cache.put(createdBlog.getId(), new BlogAggregationDTO(createdBlog)));
+        .doOnNext(createdBlog -> cache.put(createdBlog.getId(), new BlogAggregationDTO(createdBlog.getId(), blogDTO)));
   }
 
   private Mono<Blog> getBlogByFeedUrl(String feedUrl) {
@@ -71,32 +72,30 @@ class BlogService {
         flatMap(
             blog -> {
               log.debug("aktualizuje bloga {}", blog.getName());
-              Set<String> linkSet = blog.getItems().stream()
-                  .parallel()
-                  .map(Item::getLink)
-                  .collect(Collectors.toSet());
               blogInfoFromRSS.getItemsList().stream()
                   .map(Item::new)
-                  .filter(item -> !linkSet.contains(item.getLink()))
                   .forEach(item -> addItemToBlog(blog, item));
               blog.updateFromDto(blogInfoFromRSS);
               return blogRepository.save(blog)
-                  .doOnNext(updatedBlog -> cache.put(updatedBlog.getId(), new BlogAggregationDTO(updatedBlog)));
+                  .doOnNext(updatedBlog -> cache.put(updatedBlog.getId(), new BlogAggregationDTO(blog.getId(), new BlogDTO(updatedBlog))));
             }
         );
   }
 
   Mono<Void> deleteBlog(String id) {
     log.debug("Usuwam bloga o id {}", id);
-    return blogRepository.findById(id)
+    return blogRepository.getBlogWithCount(id)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
         .flatMap(blog -> {
-          if (blog.getItems().isEmpty()) {
-            return blogRepository.delete(blog)
+          if (blog.getBlogItemsCount() == 0) {
+            return blogRepository.deleteById(blog.getBlogId())
                 .doOnSuccess(v -> cache.invalidate(id));
           }
-          blog.deactivate();
-          return Mono.empty();
+          return blogRepository.findById(id)
+              .flatMap(blogById -> {
+                blogById.deactivate();
+                return Mono.empty();
+              });
         });
   }
 
@@ -106,7 +105,7 @@ class BlogService {
     return Mono.justOrEmpty(cache.getIfPresent(id))
         .switchIfEmpty(Mono.defer(() -> blogRepository.findById(id).cache()
             .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-            .map(BlogAggregationDTO::new)
+            .map(blog -> new BlogAggregationDTO(id, new BlogDTO(blog)))
             .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id))
             .doOnSuccess(v -> cache.put(id, v))));
   }
@@ -135,8 +134,11 @@ class BlogService {
   }
 
   private void addItemToBlog(Blog blog, Item item) {
-    blog.addItem(item, mongoTemplate);
-    producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item.getLink(), item.getTitle(), blog.getId()));
-    itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(Instant.now(), item.getLink(), item.getTitle(), item.getDescription()));
+    if (itemCache.getIfPresent(item.getLink()) == null) {
+      mongoTemplate.save(item);
+      itemCache.put(item.getLink(), item);
+      producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item.getLink(), item.getTitle(), blog.getId()));
+      itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(Instant.now(), item.getLink(), item.getTitle(), item.getDescription()));
+    }
   }
 }

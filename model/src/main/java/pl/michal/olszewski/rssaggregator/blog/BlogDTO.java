@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,9 +37,6 @@ class BlogDTO {
     this.name = blog.getName();
     this.feedURL = blog.getFeedURL();
     this.publishedDate = blog.getPublishedDate();
-    this.itemsList = blog.getItems().stream()
-        .map(ItemDTO::new)
-        .collect(Collectors.toList());
   }
 
   List<ItemDTO> getItemsList() {

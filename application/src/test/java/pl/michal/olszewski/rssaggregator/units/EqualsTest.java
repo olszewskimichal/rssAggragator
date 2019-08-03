@@ -17,7 +17,6 @@ class EqualsTest {
         .withPrefabValues(Item.class, item1, item2)
         .withIgnoredFields("id")
         .suppress(Warning.NONFINAL_FIELDS)
-        .withNonnullFields("items")
         .verify();
   }
 

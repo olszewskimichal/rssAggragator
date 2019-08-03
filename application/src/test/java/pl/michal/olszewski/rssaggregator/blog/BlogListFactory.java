@@ -27,10 +27,6 @@ class BlogListFactory {
         .mapToObj(number -> Blog.builder().blogURL("blog" + number).build())
         .map(repository::save)
         .forEach(Mono::block);
-    repository.findAll()
-        .map(BlogDTO::new)
-        .collectList()
-        .block();
   }
 
   Blog buildBlogWithItemsAndSave(int numberOfItems) {
@@ -40,8 +36,8 @@ class BlogListFactory {
         .build();
     IntStream.rangeClosed(1, numberOfItems)
         .parallel()
-        .forEachOrdered(v -> blog.addItem(new Item(ItemDTO.builder().blogId(blog.getId()).link("link" + new Random().nextInt(1000000) + v).title("title" + v).build()), itemRepository));
-    log.debug("Zapisuje do bazy blog {} {}", blog, blog.getItems().size());
+        .forEachOrdered(v -> itemRepository.save(new Item(ItemDTO.builder().blogId(blog.getId()).link("link" + new Random().nextInt(1000000) + v).title("title" + v).build())));
+    log.debug("Zapisuje do bazy blog {} {}", blog, numberOfItems);
     return repository.save(blog).block();
   }
 

@@ -15,10 +15,7 @@ import com.rometools.rome.io.FeedException;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,11 +26,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
+import pl.michal.olszewski.rssaggregator.blog.BlogAggregationDTO;
 import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import pl.michal.olszewski.rssaggregator.item.Item;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -87,14 +84,11 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .expectComplete()
         .verify();
 
-    Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
+    Mono<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
     StepVerifier
         .create(updatedBlog)
         .assertNext(blogWithItems -> {
-          assertThat(blogWithItems.getItems()).isNotNull().isNotEmpty();
-          List<Item> items = blogWithItems.getItems().stream().sorted(Comparator.comparing(Item::getDate)).collect(Collectors.toList());
-          assertThat(items.get(0).getDescription()).isEqualTo("tekst");
-          assertThat(items.get(1).getDescription()).isNullOrEmpty();
+          assertThat(blogWithItems.getBlogItemsCount()).isNotNull().isEqualTo(2);
         })
         .expectComplete()
         .verify();
@@ -122,10 +116,10 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .expectComplete()
         .verify();
 
-    Mono<Blog> updatedBlog = blogRepository.findById(blog.getId());
+    Mono<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
     StepVerifier
         .create(updatedBlog)
-        .assertNext(v -> assertThat(v.getItems()).hasSize(0))
+        .assertNext(aggregationDTO -> assertThat(aggregationDTO.getBlogItemsCount()).isEqualTo(0))
         .expectComplete()
         .verify();
   }

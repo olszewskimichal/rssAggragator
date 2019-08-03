@@ -19,8 +19,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.blog.Blog.RssInfo;
 import pl.michal.olszewski.rssaggregator.blog.BlogDTO;
+import pl.michal.olszewski.rssaggregator.blog.RssInfo;
 import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEventProducer;
 

@@ -60,7 +60,14 @@ class BlogServiceTest {
         }
     );
     given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
-    blogService = new BlogService(blogRepository, mongoTemplate, Caffeine.newBuilder().build(), new NewItemInBlogEventProducer(jmsTemplate), new NewItemForSearchEventProducer(jmsTemplate));
+    blogService = new BlogService(
+        blogRepository,
+        mongoTemplate,
+        Caffeine.newBuilder().build(),
+        Caffeine.newBuilder().build(),
+        new NewItemInBlogEventProducer(jmsTemplate),
+        new NewItemForSearchEventProducer(jmsTemplate)
+    );
     blogService.evictBlogCache();
   }
 
@@ -165,8 +172,8 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("feedUrl2")).willReturn(Mono.empty());
     BlogDTO blogDTO = BlogDTO.builder()
         .feedURL("feedUrl2")
-        .item(ItemDTO.builder().title("title1").build())
-        .item(ItemDTO.builder().title("title2").build())
+        .item(ItemDTO.builder().link("link1").title("title1").build())
+        .item(ItemDTO.builder().link("link2").title("title2").build())
         .build();
 
     //when
@@ -174,10 +181,7 @@ class BlogServiceTest {
 
     //then
     StepVerifier.create(blog)
-        .assertNext(v -> {
-          assertThat(v).isNotNull();
-          assertThat(v.getItemsList()).isNotEmpty().hasSize(2);
-        })
+        .assertNext(v -> assertThat(v).isNotNull())
         .expectComplete()
         .verify();
     verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
@@ -199,15 +203,7 @@ class BlogServiceTest {
 
     //then
     StepVerifier.create(blog)
-        .assertNext(v -> {
-          assertThat(v.getItemsList()).isNotEmpty().hasSize(2);
-          for (ItemDTO item : v.getItemsList()) {
-            assertThat(item.getAuthor()).isEqualTo("autor");
-            assertThat(item.getDate()).isBeforeOrEqualTo(now).isAfterOrEqualTo(now);
-            assertThat(item.getTitle()).isNotNull().isNotEmpty();
-            assertThat(item.getLink()).isEqualTo("link" + item.getTitle());
-          }
-        })
+        .expectNextCount(1L)
         .expectComplete()
         .verify();
     verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
@@ -235,8 +231,7 @@ class BlogServiceTest {
     //then
     StepVerifier.create(updateBlog)
         .assertNext(v -> assertAll(
-            () -> assertThat(v).isEqualToIgnoringGivenFields(blogDTO, "itemsList"),
-            () -> assertThat(v.getItemsList()).isNotEmpty().hasSize(1)
+            () -> assertThat(v).isEqualToIgnoringGivenFields(blogDTO, "itemsList")
         ))
         .expectComplete()
         .verify();
@@ -251,8 +246,8 @@ class BlogServiceTest {
         .id(UUID.randomUUID().toString())
         .feedURL("url")
         .name("url")
-        .item(new Item(ItemDTO.builder().title("title").build()))
         .build();
+    mongoTemplate.save(new Item(ItemDTO.builder().blogId(blog.getId()).title("title").build()));
 
     BlogDTO blogDTO = BlogDTO.builder()
         .name("url")
@@ -266,28 +261,27 @@ class BlogServiceTest {
 
     //then
     StepVerifier.create(updateBlog)
-        .assertNext(v -> assertAll(
-            () -> assertThat(v).isEqualToIgnoringGivenFields(blogDTO, "itemsList"),
-            () -> assertThat(v.getItemsList()).isNotEmpty().hasSize(2)
-        ))
+        .assertNext(dto -> assertThat(dto).isEqualToIgnoringGivenFields(blogDTO, "itemsList"))
         .expectComplete()
         .verify();
+    //and
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
 
   @Test
-  void shouldNotAddItemWhenIsTheSame() {
+  void shouldAddItemToBlogOnlyOnce() {
     //given
     ItemDTO itemDTO = ItemDTO.builder()
         .title("title")
+        .link("url")
         .date(Instant.now())
         .build();
+
     Blog blog = Blog.builder()
         .id(UUID.randomUUID().toString())
         .feedURL("url")
         .name("url")
-        .item(new Item(itemDTO))
         .build();
 
     BlogDTO blogDTO = BlogDTO.builder()
@@ -302,9 +296,11 @@ class BlogServiceTest {
 
     //then
     StepVerifier.create(updateBlog)
-        .assertNext(result -> assertThat(result.getItemsList()).hasSize(1))
+        .expectNextCount(1)
         .expectComplete()
         .verify();
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
+    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
 
   @Test
@@ -355,8 +351,8 @@ class BlogServiceTest {
 
   @Test
   void shouldDeleteBlogById() {
-    given(blogRepository.delete(any())).willReturn(Mono.empty());
-    given(blogRepository.findById("1")).willReturn(Mono.just(Blog.builder().build()));
+    given(blogRepository.deleteById("1")).willReturn(Mono.empty());
+    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(new BlogAggregationDTO("1", new BlogDTO())));
 
     StepVerifier.create(blogService.deleteBlog("1"))
         .expectComplete()
@@ -365,7 +361,7 @@ class BlogServiceTest {
 
   @Test
   void shouldThrowExceptionOnDeleteWhenBlogNotExist() {
-    given(blogRepository.findById("1")).willReturn(Mono.empty());
+    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.empty());
 
     assertThatThrownBy(() -> blogService.deleteBlog("1").block()).isNotNull().hasMessage("Nie znaleziono bloga = 1");
   }
@@ -413,7 +409,7 @@ class BlogServiceTest {
     //given
     Blog blog = Blog.builder().id("id").build();
 
-    given(blogRepository.getBlogsWithCount()).willReturn(Flux.just(new BlogAggregationDTO(blog)));
+    given(blogRepository.getBlogsWithCount()).willReturn(Flux.just(new BlogAggregationDTO("id", new BlogDTO(blog))));
 
     //when
     Flux<BlogAggregationDTO> blogs = blogService.getAllBlogDTOs();
@@ -428,9 +424,13 @@ class BlogServiceTest {
   @Test
   void shouldChangeActivityBlogWhenWeTryDeleteBlogWithItems() {
     Blog blog = Blog.builder()
-        .item(new Item(ItemDTO.builder().link("test").build()))
         .build();
     given(blogRepository.findById("1")).willReturn(Mono.just(blog));
+    BlogDTO blogDTO = BlogDTO.builder()
+        .item(ItemDTO.builder().link("test").blogId("1").build())
+        .build();
+    BlogAggregationDTO aggregationDTO = new BlogAggregationDTO("1", blogDTO);
+    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(aggregationDTO));
 
     //when
     blogService.deleteBlog("1").block();

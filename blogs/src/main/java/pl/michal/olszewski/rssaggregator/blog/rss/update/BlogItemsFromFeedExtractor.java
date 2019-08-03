@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.util.UriUtils;
-import pl.michal.olszewski.rssaggregator.blog.Blog.RssInfo;
+import pl.michal.olszewski.rssaggregator.blog.RssInfo;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Slf4j
