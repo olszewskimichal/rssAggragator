@@ -1,0 +1,44 @@
+{
+  "addons": [
+    "bonsai",
+    "logdna",
+    "logentries",
+    "newrelic",
+    "sentry",
+    "timber-logging"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/java"
+    }
+  ],
+  "env": {
+    "JAVA_OPTS": {
+      "required": true
+    },
+    "JAVA_TOOL_OPTIONS": {
+      "required": true
+    },
+    "LOGDNA_KEY": {
+      "required": true
+    },
+    "MONGO_PASSWORD": {
+      "required": true
+    },
+    "NEW_RELIC_LICENSE_KEY": {
+      "required": true
+    },
+    "NEW_RELIC_LOG": {
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "name": "rssAggragator",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
