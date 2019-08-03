@@ -4,6 +4,7 @@ import io.micrometer.core.annotation.Timed;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.stereotype.Repository;
 import pl.michal.olszewski.rssaggregator.config.RegistryTimed;
 import reactor.core.publisher.Flux;
@@ -32,18 +33,21 @@ class ReactiveAggregationBlogRepositoryImpl implements ReactiveAggregationBlogRe
   @RegistryTimed
   @Timed
   public Flux<BlogAggregationDTO> getBlogsWithCount() {
+    LookupOperation lookupOperation = LookupOperation.newLookup()
+        .from("item")
+        .localField(BLOG_ID)
+        .foreignField(ID).as(ITEMS);
+
     return reactiveMongoTemplate.aggregate(Aggregation.newAggregation(
-        Aggregation.unwind(ITEMS, true),
-        Aggregation.group(ID, NAME, DESCRIPTION, FEED_URL, PUBLISHED_DATE, BLOG_URL)
-            .addToSet(ITEMS).as(ITEMS),
+        lookupOperation,
         Aggregation.project()
             .and(ITEMS).project(SIZE).as(BLOG_ITEMS_COUNT)
-            .and("_id." + ID).as(BLOG_ID)
-            .and("_id." + NAME).as(NAME)
-            .and("_id." + DESCRIPTION).as(DESCRIPTION)
-            .and("_id." + FEED_URL).as(FEED_URL)
-            .and("_id." + PUBLISHED_DATE).as(PUBLISHED_DATE)
-            .and("_id." + BLOG_URL).as(LINK),
+            .and(ID).as(BLOG_ID)
+            .and(NAME).as(NAME)
+            .and(DESCRIPTION).as(DESCRIPTION)
+            .and(FEED_URL).as(FEED_URL)
+            .and(PUBLISHED_DATE).as(PUBLISHED_DATE)
+            .and(BLOG_URL).as(LINK),
         Aggregation.sort(Direction.DESC, BLOG_ITEMS_COUNT)
     ), Blog.class, BlogAggregationDTO.class);
   }

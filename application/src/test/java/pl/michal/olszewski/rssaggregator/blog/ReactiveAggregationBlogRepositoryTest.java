@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -20,6 +21,7 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
+    mongoTemplate.remove(new Query(), "item");
     blogRepository.deleteAll().block();
   }
 
