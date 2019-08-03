@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Setter
 @ToString
 @NoArgsConstructor
-public final class Item {
+final class Item {
 
   @Id
   private String id;

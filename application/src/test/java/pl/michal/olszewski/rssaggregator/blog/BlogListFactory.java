@@ -1,24 +1,18 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import pl.michal.olszewski.rssaggregator.item.Item;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import reactor.core.publisher.Mono;
 
 @Slf4j
 class BlogListFactory {
 
   private final BlogReactiveRepository repository;
-  private final MongoTemplate itemRepository;
 
-  BlogListFactory(BlogReactiveRepository repository, MongoTemplate itemRepository) {
+  BlogListFactory(BlogReactiveRepository repository) {
     this.repository = repository;
-    this.itemRepository = itemRepository;
   }
 
   void buildNumberOfBlogsDTOAndSave(int numberOfBlogs) {
@@ -29,15 +23,11 @@ class BlogListFactory {
         .forEach(Mono::block);
   }
 
-  Blog buildBlogWithItemsAndSave(int numberOfItems) {
+  Blog createAndSaveNewBlog() {
     Blog blog = Blog.builder()
         .id(UUID.randomUUID().toString())
         .name(UUID.randomUUID().toString())
         .build();
-    IntStream.rangeClosed(1, numberOfItems)
-        .parallel()
-        .forEachOrdered(v -> itemRepository.save(new Item(ItemDTO.builder().blogId(blog.getId()).link("link" + new Random().nextInt(1000000) + v).title("title" + v).build())));
-    log.debug("Zapisuje do bazy blog {} {}", blog, numberOfItems);
     return repository.save(blog).block();
   }
 

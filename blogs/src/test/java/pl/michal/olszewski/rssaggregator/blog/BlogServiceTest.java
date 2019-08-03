@@ -28,9 +28,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.blog.search.NewItemForSearchEventProducer;
-import pl.michal.olszewski.rssaggregator.item.Item;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
-import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEvent;
+import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -59,10 +58,8 @@ class BlogServiceTest {
           return Mono.just(argument);
         }
     );
-    given(mongoTemplate.save(any(Item.class))).willAnswer(i -> Mono.just(i.getArgument(0)));
     blogService = new BlogService(
         blogRepository,
-        mongoTemplate,
         Caffeine.newBuilder().build(),
         Caffeine.newBuilder().build(),
         new NewItemInBlogEventProducer(jmsTemplate),
@@ -240,14 +237,13 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldAddItemForBlogWhichHaveOneItem() {
+  void shouldAddItemForBlogWhichHaveOneItem() { //TODO chyba ten test juz nie potrzebny albo powinien byc gdzies indziej
     //given
     Blog blog = Blog.builder()
         .id(UUID.randomUUID().toString())
         .feedURL("url")
         .name("url")
         .build();
-    mongoTemplate.save(new Item(ItemDTO.builder().blogId(blog.getId()).title("title").build()));
 
     BlogDTO blogDTO = BlogDTO.builder()
         .name("url")

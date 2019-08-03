@@ -160,7 +160,7 @@ class BlogRepositoryTest {
   }
 
   private BlogListFactory givenBlog() {
-    return new BlogListFactory(blogRepository, entityManager);
+    return new BlogListFactory(blogRepository);
   }
 
 }

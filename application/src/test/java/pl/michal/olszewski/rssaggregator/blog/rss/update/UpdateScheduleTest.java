@@ -31,6 +31,8 @@ import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
+import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -87,11 +89,12 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     Mono<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
     StepVerifier
         .create(updatedBlog)
-        .assertNext(blogWithItems -> {
-          assertThat(blogWithItems.getBlogItemsCount()).isNotNull().isEqualTo(2);
-        })
+        .expectNextCount(1L)
         .expectComplete()
         .verify();
+    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
+    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
+
   }
 
   @Test
@@ -122,6 +125,9 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .assertNext(aggregationDTO -> assertThat(aggregationDTO.getBlogItemsCount()).isEqualTo(0))
         .expectComplete()
         .verify();
+    verify(jmsTemplate, times(0)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
+    verify(jmsTemplate, times(0)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
+
   }
 
   @Test

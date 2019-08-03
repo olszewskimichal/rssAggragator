@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import pl.michal.olszewski.rssaggregator.item.ItemListFactory;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -27,7 +28,10 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
 
   @Test
   void shouldAggregateBlogPosts() {
-    givenBlog().buildBlogWithItemsAndSave(2);
+    Blog blog = givenBlog()
+        .createAndSaveNewBlog();
+    givenItems()
+        .buildNumberOfItemsAndSave(2, blog.getId());
 
     Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
 
@@ -37,8 +41,9 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
   }
 
   @Test
-  void shouldAggregateBlogPosts2() {
-    givenBlog().buildBlogWithItemsAndSave(0);
+  void shouldAggregateBlogPosts2() { //TODO lepsza nazwa
+    givenBlog()
+        .createAndSaveNewBlog();
 
     Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
 
@@ -48,7 +53,11 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
   }
 
   private BlogListFactory givenBlog() {
-    return new BlogListFactory(blogRepository, mongoTemplate);
+    return new BlogListFactory(blogRepository);
+  }
+
+  private ItemListFactory givenItems() {
+    return new ItemListFactory(mongoTemplate);
   }
 
 }

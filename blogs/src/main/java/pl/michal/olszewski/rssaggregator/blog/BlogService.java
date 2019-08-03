@@ -4,13 +4,12 @@ import com.github.benmanes.caffeine.cache.Cache;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.blog.search.NewItemForSearchEventProducer;
-import pl.michal.olszewski.rssaggregator.item.Item;
-import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEvent;
+import pl.michal.olszewski.rssaggregator.item.ItemDTO;
+import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,21 +21,18 @@ public
 class BlogService {
 
   private final BlogReactiveRepository blogRepository;
-  private final MongoTemplate mongoTemplate;
   private final Cache<String, BlogAggregationDTO> cache;
-  private final Cache<String, Item> itemCache;
+  private final Cache<String, ItemDTO> itemCache;
   private final NewItemInBlogEventProducer producer;
   private final NewItemForSearchEventProducer itemForSearchEventProducer;
 
   public BlogService(
       BlogReactiveRepository blogRepository,
-      MongoTemplate mongoTemplate,
       @Qualifier("blogCache") Cache<String, BlogAggregationDTO> cache,
-      @Qualifier("itemCache") Cache<String, Item> itemCache,
+      @Qualifier("itemCache") Cache<String, ItemDTO> itemCache,
       NewItemInBlogEventProducer producer,
       NewItemForSearchEventProducer itemForSearchEventProducer) {
     this.blogRepository = blogRepository;
-    this.mongoTemplate = mongoTemplate;
     this.cache = cache;
     this.itemCache = itemCache;
     this.producer = producer;
@@ -53,8 +49,7 @@ class BlogService {
   private Mono<Blog> createBlog(BlogDTO blogDTO) {
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     var blog = new Blog(blogDTO);
-    blogDTO.getItemsList().stream()
-        .map(Item::new)
+    blogDTO.getItemsList()
         .forEach(item -> addItemToBlog(blog, item));
     return blogRepository.save(blog)
         .doOnNext(createdBlog -> cache.put(createdBlog.getId(), new BlogAggregationDTO(createdBlog.getId(), blogDTO)));
@@ -66,14 +61,13 @@ class BlogService {
         .switchIfEmpty(Mono.error(new BlogNotFoundException(feedUrl)));
   }
 
-  @Transactional
+  @Transactional //TODO wyjebac
   public Mono<Blog> updateBlog(Blog blogFromDb, BlogDTO blogInfoFromRSS) {
     return Mono.just(blogFromDb).
         flatMap(
             blog -> {
               log.debug("aktualizuje bloga {}", blog.getName());
-              blogInfoFromRSS.getItemsList().stream()
-                  .map(Item::new)
+              blogInfoFromRSS.getItemsList()
                   .forEach(item -> addItemToBlog(blog, item));
               blog.updateFromDto(blogInfoFromRSS);
               return blogRepository.save(blog)
@@ -133,11 +127,10 @@ class BlogService {
         .map(BlogDTO::new);
   }
 
-  private void addItemToBlog(Blog blog, Item item) {
+  private void addItemToBlog(Blog blog, ItemDTO item) {
     if (itemCache.getIfPresent(item.getLink()) == null) {
-      mongoTemplate.save(item);
       itemCache.put(item.getLink(), item);
-      producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item.getLink(), item.getTitle(), blog.getId()));
+      producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item, blog.getId()));
       itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(Instant.now(), item.getLink(), item.getTitle(), item.getDescription()));
     }
   }

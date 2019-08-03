@@ -2,7 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog.newitem;
 
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.newitem.NewItemInBlogEvent;
+import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 
 @Service
 public class NewItemInBlogEventProducer {

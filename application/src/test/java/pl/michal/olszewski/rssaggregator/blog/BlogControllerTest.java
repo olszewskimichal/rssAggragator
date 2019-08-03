@@ -14,6 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import org.springframework.web.reactive.function.BodyInserters;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import pl.michal.olszewski.rssaggregator.item.ItemListFactory;
 import reactor.test.StepVerifier;
 
 class BlogControllerTest extends IntegrationTestBase {
@@ -115,7 +116,10 @@ class BlogControllerTest extends IntegrationTestBase {
   void should_get_one_blogWith2Items() {
     //given
     Blog blog = givenBlog()
-        .buildBlogWithItemsAndSave(2);
+        .createAndSaveNewBlog();
+    givenItems()
+        .buildNumberOfItemsAndSave(2, blog.getId());
+
     //when
     BodySpec<BlogAggregationDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
     //then
@@ -123,8 +127,13 @@ class BlogControllerTest extends IntegrationTestBase {
   }
 
   private BlogListFactory givenBlog() {
-    return new BlogListFactory(blogRepository, mongoTemplate);
+    return new BlogListFactory(blogRepository);
   }
+
+  private ItemListFactory givenItems() {
+    return new ItemListFactory(mongoTemplate);
+  }
+
 
   private ListBodySpec<BlogAggregationDTO> thenGetBlogsFromApi() {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs", port)

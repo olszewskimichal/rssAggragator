@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.item;
 
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_empty_list_of_items() {
     givenItem()
-        .buildNumberOfItemsAndSave(0);
+        .buildNumberOfItemsAndSave(0, UUID.randomUUID().toString());
 
     ListBodySpec<ItemDTO> items = thenGetItemsFromApi();
 
@@ -33,7 +34,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_all_items() {
     givenItem()
-        .buildNumberOfItemsAndSave(3);
+        .buildNumberOfItemsAndSave(3, UUID.randomUUID().toString());
 
     ListBodySpec<ItemDTO> items = thenGetItemsFromApi();
 
@@ -43,7 +44,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_limit_three_items() {
     givenItem()
-        .buildNumberOfItemsAndSave(6);
+        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
 
     ListBodySpec<ItemDTO> itemDTOS = thenGetNumberItemsFromApiWithLimit(3);
 
@@ -53,7 +54,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_second_page_of_items() {
     givenItem()
-        .buildNumberOfItemsAndSave(6);
+        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
 
     ListBodySpec<ItemDTO> itemDTOS = thenGetNumberItemsFromApiWithLimitAndPage(3, 2);
 
@@ -63,7 +64,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_empty_list_of_items_sorted_by_createdAt() {
     givenItem()
-        .buildNumberOfItemsAndSave(0);
+        .buildNumberOfItemsAndSave(0, UUID.randomUUID().toString());
 
     ListBodySpec<ItemDTO> items = thenGetItemsSortedByCreatedAtFromApi();
 
@@ -73,7 +74,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_all_items_sorted_by_createdAt() {
     givenItem()
-        .buildNumberOfItemsAndSave(3);
+        .buildNumberOfItemsAndSave(3, UUID.randomUUID().toString());
 
     ListBodySpec<ItemDTO> items = thenGetItemsSortedByCreatedAtFromApi();
 
@@ -83,7 +84,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_limit_three_items_sorted_by_createdAt() {
     givenItem()
-        .buildNumberOfItemsAndSave(6);
+        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
 
     ListBodySpec<ItemDTO> itemDTOS = thenGetItemsSortedByCreatedAtWithLimitFromApi(3);
 
@@ -93,7 +94,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_second_page_of_items_sorted_by_createdAt() {
     givenItem()
-        .buildNumberOfItemsAndSave(6);
+        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
 
     ListBodySpec<ItemDTO> itemDTOS = thenGetItemsSortedByCreatedAtForPageAndLimitFromApi(3, 2);
 
