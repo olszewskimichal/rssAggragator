@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.blog.BlogService;
@@ -23,7 +22,6 @@ import reactor.core.scheduler.Schedulers;
 
 @Service
 @Slf4j
-@Transactional
 class UpdateBlogService {
 
   private final BlogReactiveRepository repository;

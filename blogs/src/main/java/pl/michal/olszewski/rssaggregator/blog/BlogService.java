@@ -5,7 +5,6 @@ import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.blog.search.NewItemForSearchEventProducer;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
@@ -15,7 +14,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-@Transactional
 @Slf4j
 public
 class BlogService {
@@ -61,7 +59,6 @@ class BlogService {
         .switchIfEmpty(Mono.error(new BlogNotFoundException(feedUrl)));
   }
 
-  @Transactional //TODO wyjebac
   public Mono<Blog> updateBlog(Blog blogFromDb, BlogDTO blogInfoFromRSS) {
     return Mono.just(blogFromDb).
         flatMap(
@@ -93,7 +90,6 @@ class BlogService {
         });
   }
 
-  @Transactional(readOnly = true)
   public Mono<BlogAggregationDTO> getBlogDTOById(String id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
     return Mono.justOrEmpty(cache.getIfPresent(id))
@@ -104,7 +100,6 @@ class BlogService {
             .doOnSuccess(v -> cache.put(id, v))));
   }
 
-  @Transactional(readOnly = true)
   public Flux<BlogAggregationDTO> getAllBlogDTOs() {
     log.debug("pobieram wszystkie blogi w postaci DTO");
     var dtoFlux = Flux.fromIterable(cache.asMap().values())
