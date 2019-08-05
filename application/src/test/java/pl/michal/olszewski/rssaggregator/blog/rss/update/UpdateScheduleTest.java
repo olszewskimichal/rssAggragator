@@ -1,6 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -18,7 +20,6 @@ import java.time.Instant;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -69,7 +70,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   @Test
   void shouldUpdateBlog() throws IOException, FetcherException, FeedException {
     SyndFeedImpl syndFeed = buildSyndFeed();
-    given(feedFetcher.retrieveFeed(Mockito.anyString(), Mockito.any())).willReturn(syndFeed);
+    given(feedFetcher.retrieveFeed(anyString(), any())).willReturn(syndFeed);
 
     Blog blog = Blog.builder()
         .blogURL("https://spring.io/")
@@ -92,8 +93,8 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .expectNextCount(1L)
         .expectComplete()
         .verify();
-    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
-    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
+    verify(jmsTemplate, times(2)).convertAndSend(anyString(), any(NewItemForSearchEvent.class));
+    verify(jmsTemplate, times(2)).convertAndSend(anyString(), any(NewItemInBlogEvent.class));
 
   }
 
@@ -101,7 +102,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   void shouldNotUpdateBlogWhenLastUpdatedDateIsAfterPublishedItems() throws IOException, FetcherException, FeedException {
     SyndFeedImpl syndFeed = buildSyndFeed();
 
-    given(feedFetcher.retrieveFeed(Mockito.anyString(), Mockito.any())).willReturn(syndFeed);
+    given(feedFetcher.retrieveFeed(anyString(), any())).willReturn(syndFeed);
 
     Blog blog = Blog.builder()
         .blogURL("https://devstyle.pl")
@@ -125,8 +126,8 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .assertNext(aggregationDTO -> assertThat(aggregationDTO.getBlogItemsCount()).isEqualTo(0))
         .expectComplete()
         .verify();
-    verify(jmsTemplate, times(0)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
-    verify(jmsTemplate, times(0)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
+    verify(jmsTemplate, times(0)).convertAndSend(anyString(), any(NewItemForSearchEvent.class));
+    verify(jmsTemplate, times(0)).convertAndSend(anyString(), any(NewItemInBlogEvent.class));
 
   }
 
@@ -144,12 +145,12 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .thenAwait(Duration.ofSeconds(5))
         .expectNext(false)
         .verifyComplete();
-    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(BlogUpdateFailedEvent.class));
+    verify(jmsTemplate, times(1)).convertAndSend(anyString(), any(BlogUpdateFailedEvent.class));
   }
 
   @Test
   void shouldWriteNewEventToDBWhenFetcherFailed() throws FetcherException, IOException, FeedException {
-    given(feedFetcher.retrieveFeed(Mockito.anyString(), Mockito.any())).willThrow(new FeedException("some exception"));
+    given(feedFetcher.retrieveFeed(anyString(), any())).willThrow(new FeedException("some exception"));
 
     Blog blog = Blog.builder()
         .blogURL("https://devstyle.pl")
@@ -165,7 +166,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .create(result)
         .expectNext(false)
         .verifyComplete();
-    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(BlogUpdateFailedEvent.class));
+    verify(jmsTemplate, times(1)).convertAndSend(anyString(), any(BlogUpdateFailedEvent.class));
   }
 
   private SyndFeedImpl buildSyndFeed() {

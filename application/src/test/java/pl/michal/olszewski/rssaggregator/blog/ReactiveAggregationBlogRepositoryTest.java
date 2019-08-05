@@ -27,7 +27,7 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
   }
 
   @Test
-  void shouldAggregateBlogPosts() {
+  void shouldAggregateBlogWithItems() {
     Blog blog = givenBlog()
         .createAndSaveNewBlog();
     givenItems()
@@ -36,19 +36,19 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
     Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
 
     StepVerifier.create(blogsWithCount)
-        .assertNext(v -> assertThat(v.getBlogItemsCount()).isEqualTo(2))
+        .assertNext(aggregationDTO -> assertThat(aggregationDTO.getBlogItemsCount()).isEqualTo(2))
         .verifyComplete();
   }
 
   @Test
-  void shouldAggregateBlogPosts2() { //TODO lepsza nazwa
+  void shouldAggregateBlogWithoutItems() {
     givenBlog()
         .createAndSaveNewBlog();
 
     Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
 
     StepVerifier.create(blogsWithCount)
-        .assertNext(v -> assertThat(v.getBlogItemsCount()).isEqualTo(0))
+        .assertNext(aggregationDTO -> assertThat(aggregationDTO.getBlogItemsCount()).isEqualTo(0))
         .verifyComplete();
   }
 

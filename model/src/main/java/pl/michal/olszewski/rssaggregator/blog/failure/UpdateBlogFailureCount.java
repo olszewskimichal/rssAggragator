@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateBlogFailureCount {
+class UpdateBlogFailureCount {
 
   private String blogId;
   private String errorMsg;

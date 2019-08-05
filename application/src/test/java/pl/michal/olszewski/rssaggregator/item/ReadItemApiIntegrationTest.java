@@ -1,13 +1,14 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.web.reactive.function.BodyInserters.fromObject;
+import static pl.michal.olszewski.rssaggregator.item.ItemDTO.builder;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.web.reactive.function.BodyInserters;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.test.StepVerifier;
 
@@ -26,7 +27,7 @@ class ReadItemApiIntegrationTest extends IntegrationTestBase {
 
   @Test
   void should_mark_item_as_read() {
-    Item link = itemRepository.save(new Item(ItemDTO.builder().link("link").build())).block();
+    Item link = itemRepository.save(new Item(builder().link("link").build())).block();
 
     thenMarkItemAsRead(link.getId());
 
@@ -37,7 +38,7 @@ class ReadItemApiIntegrationTest extends IntegrationTestBase {
 
   @Test
   void should_mark_item_as_unread() {
-    Item item = new Item(ItemDTO.builder().link("link").build());
+    Item item = new Item(builder().link("link").build());
     item.setRead(true);
     itemRepository.save(item).block();
 
@@ -62,7 +63,7 @@ class ReadItemApiIntegrationTest extends IntegrationTestBase {
   private void post(ReadItemDTO itemDTO) {
     webTestClient.post()
         .uri("http://localhost:{port}/api/v1/items/mark", port)
-        .body(BodyInserters.fromObject(itemDTO))
+        .body(fromObject(itemDTO))
         .exchange()
         .expectStatus().isNoContent();
   }

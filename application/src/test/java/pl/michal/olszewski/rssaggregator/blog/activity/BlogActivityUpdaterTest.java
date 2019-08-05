@@ -33,7 +33,7 @@ class BlogActivityUpdaterTest extends IntegrationTestBase {
     //when
     //then
     StepVerifier.create(blogActivityUpdater.activateBlog(saved.getId()))
-        .assertNext(v -> assertThat(v.isActive()).isTrue())
+        .assertNext(updatedBlog -> assertThat(updatedBlog.isActive()).isTrue())
         .expectComplete()
         .verify();
   }
@@ -46,7 +46,7 @@ class BlogActivityUpdaterTest extends IntegrationTestBase {
     //when
     //then
     StepVerifier.create(blogActivityUpdater.deactivateBlog(saved.getId()))
-        .assertNext(v -> assertThat(v.isActive()).isFalse())
+        .assertNext(updatedBlog -> assertThat(updatedBlog.isActive()).isFalse())
         .expectComplete()
         .verify();
   }

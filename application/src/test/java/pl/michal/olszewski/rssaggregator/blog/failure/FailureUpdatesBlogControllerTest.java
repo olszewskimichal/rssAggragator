@@ -1,6 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog.failure;
 
-import java.time.Instant;
+import static java.time.Instant.now;
+import static java.time.temporal.ChronoUnit.DAYS;
+
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,11 +24,11 @@ class FailureUpdatesBlogControllerTest extends IntegrationTestBase {
   @Test
   void shouldReturnAllFailureCountByAPI() {
     List<BlogUpdateFailedEvent> eventList = List.of(
-        new BlogUpdateFailedEvent(Instant.now(), "id", "blogURL", "blogId", "error"),
-        new BlogUpdateFailedEvent(Instant.now(), "id", "blogURL", "blogId", "error"),
-        new BlogUpdateFailedEvent(Instant.now(), "id", "blogURL", "blogId", "error"),
-        new BlogUpdateFailedEvent(Instant.now(), "id", "blogURL2", "blogId2", "error"),
-        new BlogUpdateFailedEvent(Instant.now(), "id", "blogURL2", "blogId2", "error")
+        new BlogUpdateFailedEvent(now(), "id", "blogURL", "blogId", "error"),
+        new BlogUpdateFailedEvent(now(), "id", "blogURL", "blogId", "error"),
+        new BlogUpdateFailedEvent(now(), "id", "blogURL", "blogId", "error"),
+        new BlogUpdateFailedEvent(now(), "id", "blogURL2", "blogId2", "error"),
+        new BlogUpdateFailedEvent(now(), "id", "blogURL2", "blogId2", "error")
     );
 
     failedEventRepository.saveAll(eventList);
@@ -38,11 +40,11 @@ class FailureUpdatesBlogControllerTest extends IntegrationTestBase {
   @Test
   void shouldReturnFailureFromLast24h() {
     List<BlogUpdateFailedEvent> eventList = List.of(
-        new BlogUpdateFailedEvent(Instant.now().minus(2, ChronoUnit.DAYS), "id", "blogURL", "blogId", "error"),
-        new BlogUpdateFailedEvent(Instant.now(), "id", "blogURL", "blogId", "error"),
-        new BlogUpdateFailedEvent(Instant.now().minus(12, ChronoUnit.HOURS), "id", "blogURL", "blogId", "error"),
-        new BlogUpdateFailedEvent(Instant.now().minus(1, ChronoUnit.DAYS), "id", "blogURL2", "blogId2", "error"),
-        new BlogUpdateFailedEvent(Instant.now(), "id", "blogURL2", "blogId2", "error")
+        new BlogUpdateFailedEvent(now().minus(2, DAYS), "id", "blogURL", "blogId", "error"),
+        new BlogUpdateFailedEvent(now(), "id", "blogURL", "blogId", "error"),
+        new BlogUpdateFailedEvent(now().minus(12, ChronoUnit.HOURS), "id", "blogURL", "blogId", "error"),
+        new BlogUpdateFailedEvent(now().minus(1, DAYS), "id", "blogURL2", "blogId2", "error"),
+        new BlogUpdateFailedEvent(now(), "id", "blogURL2", "blogId2", "error")
     );
 
     failedEventRepository.saveAll(eventList);

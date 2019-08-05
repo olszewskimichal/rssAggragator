@@ -1,7 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import static nl.jqno.equalsverifier.Warning.NONFINAL_FIELDS;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
 class EqualsTest {
@@ -10,7 +11,7 @@ class EqualsTest {
   void blogEqualsContractTest() {
     EqualsVerifier.forClass(Blog.class)
         .withIgnoredFields("id")
-        .suppress(Warning.NONFINAL_FIELDS)
+        .suppress(NONFINAL_FIELDS)
         .verify();
   }
 

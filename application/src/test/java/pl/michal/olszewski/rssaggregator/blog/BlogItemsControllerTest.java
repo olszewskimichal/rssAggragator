@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import java.util.UUID;
+import static java.util.UUID.randomUUID;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -12,16 +13,12 @@ import pl.michal.olszewski.rssaggregator.item.ItemListFactory;
 class BlogItemsControllerTest extends IntegrationTestBase {
 
   @Autowired
-  private BlogReactiveRepository blogRepository;
-
-  @Autowired
   private MongoTemplate mongoTemplate;
-
 
   @Test
   void should_get_all_items_for_blog() {
     //given
-    String id = UUID.randomUUID().toString();
+    String id = randomUUID().toString();
     givenItems()
         .buildNumberOfItemsAndSave(2, id);
     //when

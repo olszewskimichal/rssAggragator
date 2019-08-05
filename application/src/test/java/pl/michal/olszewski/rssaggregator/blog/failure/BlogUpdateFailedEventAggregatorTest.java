@@ -1,7 +1,10 @@
 package pl.michal.olszewski.rssaggregator.blog.failure;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import static java.time.Instant.now;
+import static java.time.temporal.ChronoUnit.DAYS;
+import static java.time.temporal.ChronoUnit.HOURS;
+import static pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent.builder;
+
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,18 +31,18 @@ class BlogUpdateFailedEventAggregatorTest extends IntegrationTestBase {
   void shouldAggregateEventsByBlogId() {
     //given
     List<BlogUpdateFailedEvent> events = Arrays.asList(
-        BlogUpdateFailedEvent.builder().blogId("id1").errorMsg("msg1").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id1").errorMsg("msg1").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id1").errorMsg("msg1").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id1").errorMsg("msg1").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id1").errorMsg("msg2").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("msg1").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("msg1").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("msg2").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("msg2").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("msg2").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id3").errorMsg("msg1").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id4").errorMsg("msg1").occurredAt(Instant.now()).build()
+        builder().blogId("id1").errorMsg("msg1").occurredAt(now()).build(),
+        builder().blogId("id1").errorMsg("msg1").occurredAt(now()).build(),
+        builder().blogId("id1").errorMsg("msg1").occurredAt(now()).build(),
+        builder().blogId("id1").errorMsg("msg1").occurredAt(now()).build(),
+        builder().blogId("id1").errorMsg("msg2").occurredAt(now()).build(),
+        builder().blogId("id2").errorMsg("msg1").occurredAt(now()).build(),
+        builder().blogId("id2").errorMsg("msg1").occurredAt(now()).build(),
+        builder().blogId("id2").errorMsg("msg2").occurredAt(now()).build(),
+        builder().blogId("id2").errorMsg("msg2").occurredAt(now()).build(),
+        builder().blogId("id2").errorMsg("msg2").occurredAt(now()).build(),
+        builder().blogId("id3").errorMsg("msg1").occurredAt(now()).build(),
+        builder().blogId("id4").errorMsg("msg1").occurredAt(now()).build()
     );
     eventRepository.saveAll(events);
     //when
@@ -57,15 +60,15 @@ class BlogUpdateFailedEventAggregatorTest extends IntegrationTestBase {
   void shouldAggregateEventsByBlogIdForLast24hours() {
     //given
     List<BlogUpdateFailedEvent> eventList = Arrays.asList(
-        BlogUpdateFailedEvent.builder().blogId("id1").errorMsg("error").occurredAt(Instant.now().minus(2, ChronoUnit.DAYS)).build(),
-        BlogUpdateFailedEvent.builder().blogId("id1").errorMsg("error").occurredAt(Instant.now().minus(2, ChronoUnit.DAYS)).build(),
-        BlogUpdateFailedEvent.builder().blogId("id1").errorMsg("error").occurredAt(Instant.now().minus(23, ChronoUnit.HOURS)).build(),
-        BlogUpdateFailedEvent.builder().blogId("id1").errorMsg("error").occurredAt(Instant.now().minus(23, ChronoUnit.HOURS)).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("error").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("error").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("error").occurredAt(Instant.now()).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("error").occurredAt(Instant.now().plusSeconds(100)).build(),
-        BlogUpdateFailedEvent.builder().blogId("id2").errorMsg("error").occurredAt(Instant.now().plusSeconds(100)).build()
+        builder().blogId("id1").errorMsg("error").occurredAt(now().minus(2, DAYS)).build(),
+        builder().blogId("id1").errorMsg("error").occurredAt(now().minus(2, DAYS)).build(),
+        builder().blogId("id1").errorMsg("error").occurredAt(now().minus(23, HOURS)).build(),
+        builder().blogId("id1").errorMsg("error").occurredAt(now().minus(23, HOURS)).build(),
+        builder().blogId("id2").errorMsg("error").occurredAt(now()).build(),
+        builder().blogId("id2").errorMsg("error").occurredAt(now()).build(),
+        builder().blogId("id2").errorMsg("error").occurredAt(now()).build(),
+        builder().blogId("id2").errorMsg("error").occurredAt(now().plusSeconds(100)).build(),
+        builder().blogId("id2").errorMsg("error").occurredAt(now().plusSeconds(100)).build()
     );
     eventRepository.saveAll(eventList);
 

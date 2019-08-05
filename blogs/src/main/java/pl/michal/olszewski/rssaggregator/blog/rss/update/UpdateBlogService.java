@@ -88,9 +88,9 @@ class UpdateBlogService {
     log.trace("START updateRssBlogItems dla blog {}", blog.getName());
     var blogDTO = rssExtractorService.getBlog(blog.getRssInfo());
     blogService.updateBlog(blog, blogDTO)
-        .doOnSuccess(v -> log.trace("STOP updateRssBlogItems dla blog {}", v.getName()))
+        .doOnSuccess(updatedBlog -> log.trace("STOP updateRssBlogItems dla blog {}", updatedBlog.getName()))
         .block();
-    return true;
+    return true; //TODO pozbyc się block?
   }
 
 

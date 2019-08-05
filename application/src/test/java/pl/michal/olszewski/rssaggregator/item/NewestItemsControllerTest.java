@@ -14,7 +14,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   private ItemRepository itemRepository;
 
   @Autowired
-  private MongoTemplate entityManager;
+  private MongoTemplate mongoTemplate;
 
   @BeforeEach
   void setUp() {
@@ -102,7 +102,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   }
 
   private ItemListFactory givenItem() {
-    return new ItemListFactory(entityManager);
+    return new ItemListFactory(mongoTemplate);
   }
 
   private ListBodySpec<ItemDTO> thenGetItemsFromApi() {
