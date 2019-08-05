@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.mongodb.MongoWriteException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,5 +107,22 @@ class ItemRepositoryTest {
     Item save = mongoTemplate.save(item);
 
     assertThat(save.getCreatedAt()).isNotNull();
+  }
+
+  @Test
+  void shouldFindByBlogId() {
+    //given
+    Item item1 = new Item(ItemDTO.builder().blogId("id1").link("link1").build());
+    Item item2 = new Item(ItemDTO.builder().blogId("id1").link("link2").build());
+    Item item3 = new Item(ItemDTO.builder().blogId("id2").link("link3").build());
+    mongoTemplate.insertAll(Arrays.asList(item1, item2, item3));
+
+    //when
+    Flux<Item> byBlogId = itemRepository.findAllByBlogId("id1");
+    //then
+    StepVerifier.create(byBlogId)
+        .expectNextCount(2L)
+        .expectComplete()
+        .verify();
   }
 }
