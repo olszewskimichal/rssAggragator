@@ -139,6 +139,15 @@ class BlogControllerTest extends IntegrationTestBase {
     blogDTO.value(v -> assertThat(v).isNotNull());
   }
 
+  @Test
+  void shouldThrowExceptionOnDuplicateKey() {
+    //given
+    givenBlog()
+        .withURL("test");
+    //when
+    thenThrowExceptionOnCreateBlogByApi("test");
+  }
+
   private BlogListFactory givenBlog() {
     return new BlogListFactory(blogRepository);
   }
@@ -169,6 +178,14 @@ class BlogControllerTest extends IntegrationTestBase {
         .body(BodyInserters.fromObject(BlogDTO.builder().link(link).build()))
         .exchange()
         .expectStatus().isNoContent();
+  }
+
+  private void thenThrowExceptionOnCreateBlogByApi(String link) {
+    webTestClient.post()
+        .uri("http://localhost:{port}/api/v1/blogs", port)
+        .body(BodyInserters.fromObject(BlogDTO.builder().link(link).build()))
+        .exchange()
+        .expectStatus().is5xxServerError();
   }
 
   private void thenUpdateBlogByApi(BlogDTO blogDTO) {
