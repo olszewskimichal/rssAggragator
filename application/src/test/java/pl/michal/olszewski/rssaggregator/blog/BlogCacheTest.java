@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
 
@@ -22,7 +23,7 @@ class BlogCacheTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    mongoTemplate.dropCollection(Blog.class);
+    mongoTemplate.remove(new Query(), "blog");
     blog = mongoTemplate.save(builder().blogURL("nazwa").feedURL("nazwa").name("nazwa").build());
     service.evictBlogCache();
   }

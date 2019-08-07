@@ -93,8 +93,7 @@ class BlogController {
   })
   @SwaggerDocumented
   public Mono<BlogDTO> addBlog(@RequestBody BlogDTO blogDTO) {
-    log.debug("POST - addBlog {}", blogDTO.getName());
-    log.trace("POST - addBlog {}", blogDTO);
+    log.debug("POST - addBlog {}", blogDTO);
     return blogService.getBlogOrCreate(blogDTO)
         .doOnSuccess(blog -> log.debug("END addBlog {}", blogDTO.getName()))
         .doOnError(error -> log.error("ERROR addBlog {}", blogDTO.getName(), error));

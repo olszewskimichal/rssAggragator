@@ -33,7 +33,6 @@ class ItemRepositoryTest {
   @BeforeEach
   void setUp() {
     mongoTemplate.remove(new Query(), "item");
-    mongoTemplate.remove(new Query(), "blog");
   }
 
   @Test

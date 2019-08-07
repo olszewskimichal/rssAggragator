@@ -17,8 +17,6 @@ import pl.michal.olszewski.rssaggregator.item.ItemListFactory;
 import reactor.test.StepVerifier;
 
 class BlogControllerTest extends IntegrationTestBase {
-  //TODO dodać test integracyjny na duplicateKey
-
   @Autowired
   private BlogReactiveRepository blogRepository;
 

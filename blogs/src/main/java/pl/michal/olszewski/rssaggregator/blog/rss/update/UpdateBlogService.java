@@ -71,7 +71,7 @@ class UpdateBlogService {
 
   Mono<Boolean> updateRssBlogItems(Blog blog) {
     log.debug("Pobieranie nowych danych dla bloga {}", blog.getName());
-    return Mono.fromCallable(() -> extractBlogFromRssAndUpdateBlog(blog))
+    return Mono.defer(() -> extractBlogFromRssAndUpdateBlog(blog))
         .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
         .doOnError(ex -> {
               if (ex instanceof UpdateTimeoutException) {
@@ -84,13 +84,13 @@ class UpdateBlogService {
         .onErrorReturn(false);
   }
 
-  private Boolean extractBlogFromRssAndUpdateBlog(Blog blog) {
+  private Mono<Boolean> extractBlogFromRssAndUpdateBlog(Blog blog) {
     log.trace("START updateRssBlogItems dla blog {}", blog.getName());
     var blogDTO = rssExtractorService.getBlog(blog.getRssInfo());
-    blogService.updateBlog(blog, blogDTO)
+    return blogService.updateBlog(blog, blogDTO)
         .doOnSuccess(updatedBlog -> log.trace("STOP updateRssBlogItems dla blog {}", updatedBlog.getName()))
-        .block();
-    return true; //TODO pozbyc się block?
+        .map(v -> true)
+        .onErrorReturn(false);
   }
 
 

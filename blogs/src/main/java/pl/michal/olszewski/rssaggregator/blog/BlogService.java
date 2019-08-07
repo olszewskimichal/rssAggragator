@@ -60,17 +60,12 @@ class BlogService {
   }
 
   public Mono<Blog> updateBlog(Blog blogFromDb, BlogDTO blogInfoFromRSS) {
-    return Mono.just(blogFromDb).
-        flatMap(
-            blog -> {
-              log.debug("aktualizuje bloga {}", blog.getName());
-              blogInfoFromRSS.getItemsList()
-                  .forEach(item -> addItemToBlog(blog, item));
-              blog.updateFromDto(blogInfoFromRSS);
-              return blogRepository.save(blog)
-                  .doOnNext(updatedBlog -> cache.put(updatedBlog.getId(), new BlogAggregationDTO(blog.getId(), new BlogDTO(updatedBlog))));
-            }
-        );
+    log.debug("aktualizuje bloga {}", blogFromDb.getName());
+    blogInfoFromRSS.getItemsList()
+        .forEach(item -> addItemToBlog(blogFromDb, item));
+    blogFromDb.updateFromDto(blogInfoFromRSS);
+    return blogRepository.save(blogFromDb)
+        .doOnNext(updatedBlog -> cache.put(updatedBlog.getId(), new BlogAggregationDTO(blogFromDb.getId(), new BlogDTO(updatedBlog))));
   }
 
   Mono<Void> deleteBlog(String id) {
