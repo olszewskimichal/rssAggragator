@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/api/v1/blogs")
 @Slf4j
-@Api(value = "/api/v1/blogs", description = "Endpoint do zmiany aktywnosci blogow")
+@Api(value = "/api/v1/blogs")
 public class ActivityBlogController {
 
   private final BlogActivityEventProducer eventProducer;
