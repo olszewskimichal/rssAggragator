@@ -10,6 +10,12 @@
       <version>0.0.11-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>pl.michal.olszewski</groupId>
+      <artifactId>cache</artifactId>
+      <version>0.0.11-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
 
     <dependency>
       <artifactId>rome</artifactId>
