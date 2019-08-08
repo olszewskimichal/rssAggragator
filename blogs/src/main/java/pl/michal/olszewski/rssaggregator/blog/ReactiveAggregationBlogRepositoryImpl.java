@@ -1,13 +1,11 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import io.micrometer.core.annotation.Timed;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
-import pl.michal.olszewski.rssaggregator.config.RegistryTimed;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,8 +30,6 @@ class ReactiveAggregationBlogRepositoryImpl implements ReactiveAggregationBlogRe
   }
 
   @Override
-  @RegistryTimed
-  @Timed
   public Flux<BlogAggregationDTO> getBlogsWithCount() {
     LookupOperation lookupOperation = LookupOperation.newLookup()
         .from("item")

@@ -27,10 +27,6 @@
       <version>${micrometer.version}</version>
     </dependency>
     <dependency>
-      <artifactId>spring-aspects</artifactId>
-      <groupId>org.springframework</groupId>
-    </dependency>
-    <dependency>
       <artifactId>spring-boot-devtools</artifactId>
       <groupId>org.springframework.boot</groupId>
       <scope>runtime</scope>
