@@ -12,7 +12,7 @@ import org.springframework.hateoas.ResourceSupport;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class BlogAggregationDTO extends ResourceSupport {
+public final class BlogAggregationDTO extends ResourceSupport {
 
   private String blogId;
   private String link;

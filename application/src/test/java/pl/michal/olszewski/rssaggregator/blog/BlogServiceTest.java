@@ -239,7 +239,7 @@ class BlogServiceTest {
   @Test
   void shouldDeleteBlogById() {
     given(blogRepository.deleteById("1")).willReturn(Mono.empty());
-    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(new BlogAggregationDTO("1", new BlogDTO())));
+    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(new BlogAggregationDTO("1", BlogDTO.builder().build())));
 
     StepVerifier.create(blogService.deleteBlog("1"))
         .expectComplete()

@@ -5,14 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @Getter
-class ReadItemDTO {
+final class ReadItemDTO {
 
-  private String itemId;
-  private boolean read;
+  private final String itemId;
+  private final boolean read;
 
   @Builder
   @JsonCreator
