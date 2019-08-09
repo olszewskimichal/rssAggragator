@@ -198,10 +198,6 @@
         <version>2.22.2</version>
       </plugin>
       <plugin>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-        <groupId>org.springframework.boot</groupId>
-      </plugin>
-      <plugin>
         <artifactId>jacoco-maven-plugin</artifactId>
         <configuration>
           <excludes>
