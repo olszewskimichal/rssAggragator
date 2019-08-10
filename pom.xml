@@ -4,10 +4,6 @@
   <artifactId>rss-aggregator</artifactId>
   <dependencies>
     <dependency>
-      <artifactId>spring-boot-starter-webflux</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
       <artifactId>reactor-test</artifactId>
       <groupId>io.projectreactor</groupId>
       <scope>test</scope>
@@ -25,11 +21,6 @@
       <artifactId>micrometer-registry-prometheus</artifactId>
       <groupId>io.micrometer</groupId>
       <version>${micrometer.version}</version>
-    </dependency>
-    <dependency>
-      <artifactId>spring-boot-devtools</artifactId>
-      <groupId>org.springframework.boot</groupId>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
@@ -50,15 +41,8 @@
       <groupId>net.logstash.logback</groupId>
       <version>6.1</version>
     </dependency>
-    <dependency>
-      <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>de.flapdoodle.embed.mongo</artifactId>
-      <groupId>de.flapdoodle.embed</groupId>
-      <scope>test</scope>
-    </dependency>
+
+
     <dependency>
       <artifactId>activemq-broker</artifactId>
       <groupId>org.apache.activemq</groupId>
@@ -125,10 +109,6 @@
       <artifactId>spring-cloud-starter-sleuth</artifactId>
       <groupId>org.springframework.cloud</groupId>
     </dependency>
-    <dependency>
-      <artifactId>spring-cloud-starter-zipkin</artifactId>
-      <groupId>org.springframework.cloud</groupId>
-    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>
@@ -174,20 +154,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <release>${java.version}</release>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <artifactId>asm</artifactId>
-            <groupId>org.ow2.asm</groupId>
-            <version>7.0</version>
-          </dependency>
-        </dependencies>
-        <version>3.8.1</version>
-      </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>

@@ -5,6 +5,13 @@
   <artifactId>model</artifactId>
   <modelVersion>4.0.0</modelVersion>
 
+  <dependencies>
+    <dependency>
+      <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+  </dependencies>
+
   <parent>
     <artifactId>rss-aggregator</artifactId>
     <groupId>pl.michal.olszewski</groupId>

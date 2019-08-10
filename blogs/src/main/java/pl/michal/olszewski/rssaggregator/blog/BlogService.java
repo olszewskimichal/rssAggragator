@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import java.time.Instant;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -19,19 +20,19 @@ public
 class BlogService {
 
   private final BlogReactiveRepository blogRepository;
-  private final Cache<String, BlogAggregationDTO> cache;
+  private final Cache<String, BlogAggregationDTO> blogAggregationCache;
   private final Cache<String, ItemDTO> itemCache;
   private final NewItemInBlogEventProducer producer;
   private final NewItemForSearchEventProducer itemForSearchEventProducer;
 
   public BlogService(
       BlogReactiveRepository blogRepository,
-      @Qualifier("blogCache") Cache<String, BlogAggregationDTO> cache,
+      @Qualifier("blogCache") Cache<String, BlogAggregationDTO> blogAggregationCache,
       @Qualifier("itemCache") Cache<String, ItemDTO> itemCache,
       NewItemInBlogEventProducer producer,
       NewItemForSearchEventProducer itemForSearchEventProducer) {
     this.blogRepository = blogRepository;
-    this.cache = cache;
+    this.blogAggregationCache = blogAggregationCache;
     this.itemCache = itemCache;
     this.producer = producer;
     this.itemForSearchEventProducer = itemForSearchEventProducer;
@@ -41,7 +42,14 @@ class BlogService {
     log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
     return blogRepository.findByFeedURL(blogDTO.getFeedURL())
         .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO)))
-        .map(BlogDTO::new);
+        .map(blog -> new BlogDTO(
+            blog.getBlogURL(),
+            blog.getDescription(),
+            blog.getName(),
+            blog.getFeedURL(),
+            blog.getPublishedDate(),
+            List.of()
+        ));
   }
 
   private Mono<Blog> createBlog(BlogDTO blogDTO) {
@@ -50,7 +58,7 @@ class BlogService {
     blogDTO.getItemsList()
         .forEach(item -> addItemToBlog(blog, item));
     return blogRepository.save(blog)
-        .doOnNext(createdBlog -> cache.put(createdBlog.getId(), new BlogAggregationDTO(createdBlog.getId(), blogDTO)));
+        .doOnNext(createdBlog -> blogAggregationCache.put(createdBlog.getId(), new BlogAggregationDTO(createdBlog.getId(), blogDTO)));
   }
 
   private Mono<Blog> getBlogByFeedUrl(String feedUrl) {
@@ -65,7 +73,22 @@ class BlogService {
         .forEach(item -> addItemToBlog(blogFromDb, item));
     blogFromDb.updateFromDto(blogInfoFromRSS);
     return blogRepository.save(blogFromDb)
-        .doOnNext(updatedBlog -> cache.put(updatedBlog.getId(), new BlogAggregationDTO(blogFromDb.getId(), new BlogDTO(updatedBlog))));
+        .doOnNext(this::putToCache);
+  }
+
+  private void putToCache(Blog updatedBlog) {
+    blogAggregationCache.put(updatedBlog.getId(),
+        new BlogAggregationDTO(
+            updatedBlog.getId(),
+            new BlogDTO(
+                updatedBlog.getBlogURL(),
+                updatedBlog.getDescription(),
+                updatedBlog.getName(),
+                updatedBlog.getFeedURL(),
+                updatedBlog.getPublishedDate(),
+                List.of())
+        )
+    );
   }
 
   Mono<Void> deleteBlog(String id) {
@@ -75,7 +98,7 @@ class BlogService {
         .flatMap(blog -> {
           if (blog.getBlogItemsCount() == 0) {
             return blogRepository.deleteById(blog.getBlogId())
-                .doOnSuccess(v -> cache.invalidate(id));
+                .doOnSuccess(v -> blogAggregationCache.invalidate(id));
           }
           return blogRepository.findById(id)
               .flatMap(blogById -> {
@@ -87,19 +110,32 @@ class BlogService {
 
   public Mono<BlogAggregationDTO> getBlogDTOById(String id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
-    return Mono.justOrEmpty(cache.getIfPresent(id))
+    return Mono.justOrEmpty(blogAggregationCache.getIfPresent(id))
         .switchIfEmpty(Mono.defer(() -> blogRepository.findById(id).cache()
             .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-            .map(blog -> new BlogAggregationDTO(id, new BlogDTO(blog)))
+            .map(this::mapToBlogAggregationDto)
             .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id))
-            .doOnSuccess(v -> cache.put(id, v))));
+            .doOnSuccess(result -> blogAggregationCache.put(result.getBlogId(), result))));
+  }
+
+  private BlogAggregationDTO mapToBlogAggregationDto(Blog blog) {
+    return new BlogAggregationDTO(
+        blog.getId(),
+        new BlogDTO(
+            blog.getBlogURL(),
+            blog.getDescription(),
+            blog.getName(),
+            blog.getFeedURL(),
+            blog.getPublishedDate(),
+            List.of()
+        ));
   }
 
   public Flux<BlogAggregationDTO> getAllBlogDTOs() {
     log.debug("pobieram wszystkie blogi w postaci DTO");
-    var dtoFlux = Flux.fromIterable(cache.asMap().values())
+    var dtoFlux = Flux.fromIterable(blogAggregationCache.asMap().values())
         .switchIfEmpty(Flux.defer(() -> blogRepository.getBlogsWithCount()
-            .doOnNext(blog -> cache.put(blog.getBlogId(), blog)))
+            .doOnNext(blog -> blogAggregationCache.put(blog.getBlogId(), blog)))
             .cache());
     return dtoFlux
         .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
@@ -107,14 +143,21 @@ class BlogService {
 
   void evictBlogCache() {
     log.debug("Czyszcze cache dla blogów");
-    cache.invalidateAll();
+    blogAggregationCache.invalidateAll();
   }
 
   Mono<BlogDTO> updateBlog(BlogDTO blogDTO) {
     log.debug("Aktualizacja bloga {}", blogDTO.getLink());
     return getBlogByFeedUrl(blogDTO.getFeedURL())
         .flatMap(blog -> updateBlog(blog, blogDTO))
-        .map(BlogDTO::new);
+        .map(blog -> new BlogDTO(
+            blog.getBlogURL(),
+            blog.getDescription(),
+            blog.getName(),
+            blog.getFeedURL(),
+            blog.getPublishedDate(),
+            List.of()
+        ));
   }
 
   private void addItemToBlog(Blog blog, ItemDTO item) {

@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -38,15 +37,6 @@ public final class BlogDTO {
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
     this.itemsList = Optional.ofNullable(itemsList).orElse(List.of());
-  }
-
-  public BlogDTO(Blog blog) {
-    this.link = blog.getBlogURL();
-    this.description = blog.getDescription();
-    this.name = blog.getName();
-    this.feedURL = blog.getFeedURL();
-    this.publishedDate = blog.getPublishedDate();
-    this.itemsList = new ArrayList<>();
   }
 
   List<ItemDTO> getItemsList() {

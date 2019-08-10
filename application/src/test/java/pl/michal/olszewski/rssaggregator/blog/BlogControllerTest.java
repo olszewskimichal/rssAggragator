@@ -61,7 +61,15 @@ class BlogControllerTest extends IntegrationTestBase {
   void should_get_one_blog() {
     //given
     Blog blog = givenBlog().createAndSaveNewBlog();
-    BlogAggregationDTO expected = new BlogAggregationDTO(blog.getId(), new BlogDTO(blog));
+    BlogAggregationDTO expected = new BlogAggregationDTO(
+        blog.getId(),
+        BlogDTO.builder()
+            .feedURL(blog.getFeedURL())
+            .publishedDate(blog.getPublishedDate())
+            .name(blog.getName())
+            .description(blog.getDescription())
+            .link(blog.getBlogURL())
+            .build());
 
     BodySpec<BlogAggregationDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
 

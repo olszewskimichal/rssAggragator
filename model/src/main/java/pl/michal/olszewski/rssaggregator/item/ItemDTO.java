@@ -20,7 +20,6 @@ public class ItemDTO implements Serializable {
   private final String author;
   private final String blogId;
 
-
   @JsonCreator
   public ItemDTO(
       @JsonProperty("title") String title,
