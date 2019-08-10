@@ -9,18 +9,15 @@ import org.springframework.stereotype.Component;
 class BlogActivityEventConsumer {
 
   private final BlogActivityUpdater activityUpdater;
-  private final ChangeActivityBlogEventRepository activityBlogEventRepository;
 
-  BlogActivityEventConsumer(BlogActivityUpdater activityUpdater, ChangeActivityBlogEventRepository activityBlogEventRepository) {
+  BlogActivityEventConsumer(BlogActivityUpdater activityUpdater) {
     this.activityUpdater = activityUpdater;
-    this.activityBlogEventRepository = activityBlogEventRepository;
   }
 
   @JmsListener(destination = "activateBlogEvent")
   public void receiveActivateMessage(ActivateBlog event) {
     log.info("Received <{}>", event);
-    activityBlogEventRepository.save(event)
-        .flatMap(activateBlog -> activityUpdater.activateBlog(event.getBlogId()))
+    activityUpdater.activateBlog(event.getBlogId())
         .doOnSuccess(blog -> log.debug("Blog {} activated", blog.getId()))
         .block();
   }
@@ -28,8 +25,7 @@ class BlogActivityEventConsumer {
   @JmsListener(destination = "deactivateBlogEvent")
   public void receiveDeactivateMessage(DeactivateBlog event) {
     log.info("Received <{}>", event);
-    activityBlogEventRepository.save(event)
-        .flatMap(deactivateBlog -> activityUpdater.deactivateBlog(event.getBlogId()))
+    activityUpdater.deactivateBlog(event.getBlogId())
         .doOnSuccess(blog -> log.debug("Blog {} deactivated", blog.getId()))
         .block();
   }

@@ -29,7 +29,6 @@ import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogAggregationDTO;
 import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
@@ -132,7 +131,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   }
 
   @Test
-  void shouldReturnFalseOnTimeoutAndWriteNewEventToDB() {
+  void shouldReturnFalseOnTimeout() {
     Blog blog = Blog.builder()
         .blogURL("https://spring.io/")
         .name("spring")
@@ -145,11 +144,10 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .thenAwait(Duration.ofSeconds(5))
         .expectNext(false)
         .verifyComplete();
-    verify(jmsTemplate, times(1)).convertAndSend(anyString(), any(BlogUpdateFailedEvent.class));
   }
 
   @Test
-  void shouldWriteNewEventToDBWhenFetcherFailed() throws FetcherException, IOException, FeedException {
+  void shouldReturnFalseWhenFetcherFailed() throws FetcherException, IOException, FeedException {
     given(feedFetcher.retrieveFeed(anyString(), any())).willThrow(new FeedException("some exception"));
 
     Blog blog = Blog.builder()
@@ -166,7 +164,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .create(result)
         .expectNext(false)
         .verifyComplete();
-    verify(jmsTemplate, times(1)).convertAndSend(anyString(), any(BlogUpdateFailedEvent.class));
   }
 
   private SyndFeedImpl buildSyndFeed() {

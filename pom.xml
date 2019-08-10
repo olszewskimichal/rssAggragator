@@ -127,7 +127,6 @@
   <modules>
     <module>items</module>
     <module>application</module>
-    <module>failureAggregator</module>
     <module>blogs</module>
     <module>model</module>
     <module>search</module>

@@ -20,13 +20,10 @@ class BlogActivityEventConsumerTest extends IntegrationTestBase {
   @Autowired
   private BlogReactiveRepository repository;
 
-  @Autowired
-  private ChangeActivityBlogEventRepository activityBlogEventRepository;
 
   @BeforeEach
   void setUp() {
     repository.deleteAll().block();
-    activityBlogEventRepository.deleteAll().block();
   }
 
   @Test
@@ -36,10 +33,6 @@ class BlogActivityEventConsumerTest extends IntegrationTestBase {
     //then
     StepVerifier.create(repository.findById(blog.getId()))
         .assertNext(blogFromDB -> assertThat(blogFromDB.isActive()).isTrue())
-        .expectComplete()
-        .verify();
-    StepVerifier.create(activityBlogEventRepository.count())
-        .expectNext(1L)
         .expectComplete()
         .verify();
   }
@@ -52,10 +45,6 @@ class BlogActivityEventConsumerTest extends IntegrationTestBase {
     //then
     StepVerifier.create(repository.findById(blog.getId()))
         .assertNext(blogFromDb -> assertThat(blogFromDb.isActive()).isFalse())
-        .expectComplete()
-        .verify();
-    StepVerifier.create(activityBlogEventRepository.count())
-        .expectNext(1L)
         .expectComplete()
         .verify();
   }

@@ -21,20 +21,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.BlogDTO;
 import pl.michal.olszewski.rssaggregator.blog.RssInfo;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEventProducer;
 
 @Service
 @Slf4j
 class RssExtractorService {
 
   private final FeedFetcher feedFetcher;
-  private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
   private final Tracer tracer;
 
-  RssExtractorService(FeedFetcher feedFetcher, BlogUpdateFailedEventProducer blogUpdateFailedEventProducer, Tracer tracer) {
+  RssExtractorService(FeedFetcher feedFetcher, Tracer tracer) {
     this.feedFetcher = feedFetcher;
-    this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
     this.tracer = tracer;
   }
 
@@ -68,7 +64,6 @@ class RssExtractorService {
       log.trace("getBlog STOP {}", info);
       return blogInfo;
     } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException ex) {
-      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().context().toString(), info.getFeedURL(), info.getBlogId(), ex.getMessage()));
       throw new RssException(info.getFeedURL(), ex);
     }
   }

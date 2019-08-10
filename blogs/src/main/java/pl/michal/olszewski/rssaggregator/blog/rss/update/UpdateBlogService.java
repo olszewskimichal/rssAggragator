@@ -6,7 +6,6 @@ import brave.Tracer;
 import com.rometools.fetcher.FeedFetcher;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +13,6 @@ import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.blog.BlogService;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEventProducer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -28,7 +25,6 @@ class UpdateBlogService {
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
   private final BlogService blogService;
-  private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
   private final Tracer tracer;
 
   public UpdateBlogService(
@@ -36,14 +32,12 @@ class UpdateBlogService {
       Executor executor,
       MeterRegistry registry,
       BlogService blogService,
-      BlogUpdateFailedEventProducer blogUpdateFailedEventProducer,
       FeedFetcher feedFetcher,
       Tracer tracer
   ) {
     this.repository = repository;
-    this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
     this.tracer = tracer;
-    this.rssExtractorService = new RssExtractorService(feedFetcher, blogUpdateFailedEventProducer, this.tracer);
+    this.rssExtractorService = new RssExtractorService(feedFetcher, this.tracer);
     this.blogService = blogService;
     if (registry != null) {
       this.executor = monitor(registry, executor, "prod_pool");
@@ -73,13 +67,7 @@ class UpdateBlogService {
     log.debug("Pobieranie nowych danych dla bloga {}", blog.getName());
     return Mono.defer(() -> extractBlogFromRssAndUpdateBlog(blog))
         .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
-        .doOnError(ex -> {
-              if (ex instanceof UpdateTimeoutException) {
-                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().context().toString(), blog.getFeedURL(), blog.getId(), ex.getMessage()));
-              }
-          log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {}", blog.getName(), ex);
-            }
-        )
+        .doOnError(ex -> log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {}", blog.getName(), ex))
         .subscribeOn(Schedulers.fromExecutor(executor))
         .onErrorReturn(false);
   }
