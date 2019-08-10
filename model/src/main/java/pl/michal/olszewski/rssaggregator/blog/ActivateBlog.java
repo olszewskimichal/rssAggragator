@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.activity;
+package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import lombok.ToString;
 
 @ToString
 @Getter
-class ActivateBlog extends ChangeActivityBlogEvent {
+final class ActivateBlog extends ChangeActivityBlogEvent {
 
   @Builder
   public ActivateBlog(String blogId, Instant occurredAt) {

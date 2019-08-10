@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.activity;
+package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
-public class BlogUpdater {
+class BlogUpdater {
 
   private final BlogReactiveRepository repository;
 

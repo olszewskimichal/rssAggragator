@@ -17,6 +17,7 @@ import pl.michal.olszewski.rssaggregator.item.ItemListFactory;
 import reactor.test.StepVerifier;
 
 class BlogControllerTest extends IntegrationTestBase {
+
   @Autowired
   private BlogReactiveRepository blogRepository;
 

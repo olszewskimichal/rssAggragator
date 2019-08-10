@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.activity;
+package pl.michal.olszewski.rssaggregator.blog;
 
 import static java.time.Instant.now;
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -7,9 +7,6 @@ import static pl.michal.olszewski.rssaggregator.blog.BlogDTO.builder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
-import pl.michal.olszewski.rssaggregator.blog.BlogUpdater;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.test.StepVerifier;
 

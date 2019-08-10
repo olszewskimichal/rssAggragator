@@ -1,19 +1,15 @@
-package pl.michal.olszewski.rssaggregator.blog.activity;
+package pl.michal.olszewski.rssaggregator.blog;
 
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
-import pl.michal.olszewski.rssaggregator.blog.BlogNotFoundException;
-import pl.michal.olszewski.rssaggregator.blog.BlogUpdater;
 import reactor.core.publisher.Mono;
 
 @Service
-public class BlogActivityUpdater {
+class BlogActivityUpdater {
 
   private final BlogFinder blogReactiveRepository;
   private final BlogUpdater blogUpdater;
 
-  public BlogActivityUpdater(BlogFinder blogReactiveRepository, BlogUpdater blogUpdater) {
+  BlogActivityUpdater(BlogFinder blogReactiveRepository, BlogUpdater blogUpdater) {
     this.blogReactiveRepository = blogReactiveRepository;
     this.blogUpdater = blogUpdater;
   }

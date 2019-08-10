@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.activity;
+package pl.michal.olszewski.rssaggregator.blog;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

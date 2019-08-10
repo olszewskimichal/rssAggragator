@@ -13,27 +13,23 @@ public class BlogFinder {
     this.blogReactiveRepository = blogReactiveRepository;
   }
 
-  public Mono<Blog> findByFeedURL(String url) {
-    return blogReactiveRepository.findByFeedURL(url);
-  }
-
-  public Mono<Blog> findByName(String name) {
-    return blogReactiveRepository.findByName(name);
-  }
-
-  public Mono<Blog> findById(String id) {
-    return blogReactiveRepository.findById(id);
-  }
-
   public Flux<Blog> findAll() {
     return blogReactiveRepository.findAll();
   }
 
-  Flux<BlogAggregationDTO> getBlogsWithCount() {
-    return blogReactiveRepository.getBlogsWithCount();
-  }
-
   public Mono<BlogAggregationDTO> getBlogWithCount(String id) {
     return blogReactiveRepository.getBlogWithCount(id);
+  }
+
+  Mono<Blog> findByFeedURL(String url) {
+    return blogReactiveRepository.findByFeedURL(url);
+  }
+
+  Mono<Blog> findById(String id) {
+    return blogReactiveRepository.findById(id);
+  }
+
+  Flux<BlogAggregationDTO> getBlogsWithCount() {
+    return blogReactiveRepository.getBlogsWithCount();
   }
 }

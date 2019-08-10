@@ -29,7 +29,6 @@ import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogAggregationDTO;
 import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
-import pl.michal.olszewski.rssaggregator.blog.BlogUpdater;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
@@ -48,9 +47,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   private BlogFinder blogRepository;
 
   @Autowired
-  private BlogUpdater blogUpdater;
-
-  @Autowired
   @Qualifier(value = "blogCache")
   private Cache blogCache;
 
@@ -65,8 +61,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @BeforeEach
   void setUp() {
-    mongoTemplate.remove(new Query(), "item"); //TODO czy to potrzebne
-    blogUpdater.deleteAll().block();
+    mongoTemplate.remove(new Query(), "blog");
     blogCache.invalidateAll();
   }
 

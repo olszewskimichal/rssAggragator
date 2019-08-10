@@ -16,8 +16,7 @@ import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
-public
-class BlogService {
+public class BlogService {
 
   private final BlogFinder blogFinder;
   private final BlogUpdater blogUpdater;
