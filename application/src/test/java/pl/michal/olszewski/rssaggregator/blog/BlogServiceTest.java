@@ -25,10 +25,10 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
-import pl.michal.olszewski.rssaggregator.blog.search.NewItemForSearchEventProducer;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
+import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEventProducer;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -39,10 +39,16 @@ class BlogServiceTest {
   private BlogService blogService;
 
   @Mock
-  private BlogReactiveRepository blogRepository;
+  private BlogFinder blogFinder;
+
+  @Mock
+  private BlogUpdater blogUpdater;
 
   @Mock
   private JmsTemplate jmsTemplate;
+
+  @Mock
+  private BlogReactiveRepository blogRepository;
 
   @BeforeEach
   void setUp() {
@@ -53,7 +59,8 @@ class BlogServiceTest {
         }
     );
     blogService = new BlogService(
-        blogRepository,
+        new BlogFinder(blogRepository),
+        new BlogUpdater(blogRepository),
         Caffeine.newBuilder().build(),
         Caffeine.newBuilder().build(),
         new NewItemInBlogEventProducer(jmsTemplate),
@@ -127,36 +134,13 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldCreateBlogWith2Items() {
-    //given
-    given(blogRepository.findByFeedURL("feedUrl2")).willReturn(Mono.empty());
-    BlogDTO blogDTO = BlogDTO.builder()
-        .feedURL("feedUrl2")
-        .item(ItemDTO.builder().link("link1").title("title1").build())
-        .item(ItemDTO.builder().link("link2").title("title2").build())
-        .build();
-
-    //when
-    Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO);
-
-    //then
-    StepVerifier.create(blog)
-        .assertNext(dto -> assertThat(dto).isNotNull())
-        .expectComplete()
-        .verify();
-    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
-    verify(jmsTemplate, times(2)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
-
-  }
-
-  @Test
   void shouldUpdateBlogWhenNewItemAdd() {
     //given
     Blog blog = Blog.builder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
 
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1)
-        .mapToObj(v -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(v + "").link("link" + v).build()) //przerobic linie
+        .mapToObj(number -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(number + "").link("link" + number).build()) //TODO
         .collect(Collectors.toList());
 
     BlogDTO blogDTO = BlogDTO.builder()

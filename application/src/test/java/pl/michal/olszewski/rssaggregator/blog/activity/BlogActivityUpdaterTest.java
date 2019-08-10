@@ -5,22 +5,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.test.StepVerifier;
 
 class BlogActivityUpdaterTest extends IntegrationTestBase {
 
   @Autowired
-  private BlogReactiveRepository reactiveRepository;
+  private MongoTemplate mongoTemplate;
 
   @Autowired
   private BlogActivityUpdater blogActivityUpdater;
 
   @BeforeEach
   void setUp() {
-    reactiveRepository.deleteAll().block();
+    mongoTemplate.remove(new Query(), "blog");
   }
 
   @Test
@@ -28,7 +29,7 @@ class BlogActivityUpdaterTest extends IntegrationTestBase {
     //given
     Blog blog = Blog.builder().build();
     blog.deactivate();
-    Blog saved = reactiveRepository.save(blog).block();
+    Blog saved = mongoTemplate.save(blog);
 
     //when
     //then
@@ -41,7 +42,7 @@ class BlogActivityUpdaterTest extends IntegrationTestBase {
   @Test
   void shouldDeactivateBlog() {
     //given
-    Blog saved = reactiveRepository.save(Blog.builder().build()).block();
+    Blog saved = mongoTemplate.save(Blog.builder().build());
 
     //when
     //then

@@ -35,13 +35,4 @@ public class ItemDTO implements Serializable {
     this.author = author;
     this.blogId = blogId;
   }
-
-  public ItemDTO(Item item) {
-    this.title = item.getTitle();
-    this.description = item.getDescription();
-    this.link = item.getLink();
-    this.date = item.getDate();
-    this.author = item.getAuthor();
-    this.blogId = item.getBlogId();
-  }
 }

@@ -131,6 +131,7 @@
     <module>model</module>
     <module>search</module>
     <module>cache</module>
+    <module>modelPersistance</module>
   </modules>
   <name>rss-aggregator</name>
 

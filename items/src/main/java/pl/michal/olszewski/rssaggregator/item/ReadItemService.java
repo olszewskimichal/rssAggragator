@@ -8,26 +8,28 @@ import reactor.core.publisher.Mono;
 @Slf4j
 class ReadItemService {
 
-  private final ItemRepository itemRepository;
+  private final ItemFinder itemFinder;
+  private final ItemUpdater itemUpdater;
 
-  ReadItemService(ItemRepository itemRepository) {
-    this.itemRepository = itemRepository;
+  ReadItemService(ItemFinder itemFinder, ItemUpdater itemUpdater) {
+    this.itemFinder = itemFinder;
+    this.itemUpdater = itemUpdater;
   }
 
   private Mono<Void> markItemAsRead(Item item) {
     return Mono.fromCallable(item::markAsRead)
-        .flatMap(itemRepository::save)
+        .flatMap(itemUpdater::updateItem)
         .then();
   }
 
   private Mono<Void> markItemAsUnread(Item item) {
     return Mono.fromCallable(item::markAsUnread)
-        .flatMap(itemRepository::save)
+        .flatMap(itemUpdater::updateItem)
         .then();
   }
 
   Mono<Void> processRequest(ReadItemDTO readItemDTO) {
-    return itemRepository.findById(readItemDTO.getItemId())
+    return itemFinder.findItemById(readItemDTO.getItemId())
         .switchIfEmpty(Mono.error(new ItemNotFoundException(readItemDTO.getItemId())))
         .flatMap(item -> {
           if (readItemDTO.isRead()) {

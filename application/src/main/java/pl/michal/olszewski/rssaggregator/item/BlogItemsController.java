@@ -16,10 +16,10 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class BlogItemsController {
 
-  private final BlogItemsService blogService;
+  private final ItemFinder itemFinder;
 
-  public BlogItemsController(BlogItemsService blogService) {
-    this.blogService = blogService;
+  public BlogItemsController(ItemFinder itemFinder) {
+    this.itemFinder = itemFinder;
   }
 
   @GetMapping(value = "/{id}/items")
@@ -32,7 +32,7 @@ public class BlogItemsController {
   @SwaggerDocumented
   public Flux<BlogItemDTO> getBlogItems(@PathVariable("id") String blogId) {
     log.debug("START GET blogItems for id {}", blogId);
-    return blogService.getBlogItemsForBlog(blogId)
+    return itemFinder.getBlogItemsForBlog(blogId)
         .doOnComplete(() -> log.debug("END GET blogItems for id {}", blogId));
   }
 }

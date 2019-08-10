@@ -8,21 +8,23 @@ import reactor.core.publisher.Flux;
 @Slf4j
 class NewestItemService {
 
-  private final ItemRepository itemRepository;
+  private final ItemFinder itemFinder;
 
-  public NewestItemService(ItemRepository itemRepository) {
-    this.itemRepository = itemRepository;
+  public NewestItemService(ItemFinder itemFinder) {
+    this.itemFinder = itemFinder;
   }
 
   Flux<ItemDTO> getNewestItemsOrderByPublishedDate(int size, int page) {
     log.debug("Pobieram wpisy z limitem {} strona {}", size, page);
-    return itemRepository.findAllOrderByPublishedDate(size, page)
-        .map(ItemDTO::new);
+    return itemFinder.findAllOrderByPublishedDate(size, page)
+        .map(ItemToDtoMapper::mapItemToItemDTO);
   }
 
   Flux<ItemDTO> getNewestItemsOrderByCreatedAt(int size, int page) {
     log.debug("Pobieram najnowsze wpisy z limitem {} strona {}", size, page);
-    return itemRepository.findAllOrderByCreatedAt(size, page)
-        .map(ItemDTO::new);
+    return itemFinder.findAllOrderByCreatedAt(size, page)
+        .map(ItemToDtoMapper::mapItemToItemDTO);
   }
+
+
 }

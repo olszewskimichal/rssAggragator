@@ -13,13 +13,15 @@ class ItemCacheConfig {
 
   @Bean(name = "itemCache")
   @Primary
-  public Cache itemCache(MeterRegistry registry, ItemSyncRepository repository) {
+  public Cache itemCache(MeterRegistry registry, ItemFinder finder) {
     Cache<String, ItemDTO> cache = Caffeine.newBuilder()
         .expireAfterAccess(2, TimeUnit.DAYS)
         .maximumSize(30000)
         .build();
-    repository.findAllOrderByPublishedDate(200, 0)
-        .forEach(item -> cache.put(item.getLink(), new ItemDTO(item)));
+    finder.findAllOrderByPublishedDate(200, 0)
+        .doOnNext(item -> cache.put(item.getLink(), ItemToDtoMapper.mapItemToItemDTO(item)))
+        .then()
+        .block();
     registry.gauge("itemCache", cache, Cache::estimatedSize);
     return cache;
   }

@@ -11,7 +11,7 @@ import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
+import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
 import pl.michal.olszewski.rssaggregator.blog.BlogService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,21 +21,21 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 class UpdateBlogService {
 
-  private final BlogReactiveRepository repository;
+  private final BlogFinder blogFinder;
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
   private final BlogService blogService;
   private final Tracer tracer;
 
   public UpdateBlogService(
-      BlogReactiveRepository repository,
+      BlogFinder blogFinder,
       Executor executor,
       MeterRegistry registry,
       BlogService blogService,
       FeedFetcher feedFetcher,
       Tracer tracer
   ) {
-    this.repository = repository;
+    this.blogFinder = blogFinder;
     this.tracer = tracer;
     this.rssExtractorService = new RssExtractorService(feedFetcher, this.tracer);
     this.blogService = blogService;
@@ -58,7 +58,7 @@ class UpdateBlogService {
   }
 
   private Mono<List<Boolean>> getUpdateBlogByRssList() {
-    return repository.findAll()
+    return blogFinder.findAll()
         .flatMap(this::updateRssBlogItems)
         .collectList();
   }

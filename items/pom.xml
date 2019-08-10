@@ -7,7 +7,6 @@
     <dependency>
       <artifactId>model</artifactId>
       <groupId>pl.michal.olszewski</groupId>
-      <scope>compile</scope>
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
     <dependency>
@@ -15,9 +14,11 @@
       <artifactId>jsoup</artifactId>
       <version>1.12.1</version>
     </dependency>
+
     <dependency>
-      <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-      <groupId>org.springframework.boot</groupId>
+      <groupId>pl.michal.olszewski</groupId>
+      <artifactId>modelPersistance</artifactId>
+      <version>0.0.11-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <modelVersion>4.0.0</modelVersion>

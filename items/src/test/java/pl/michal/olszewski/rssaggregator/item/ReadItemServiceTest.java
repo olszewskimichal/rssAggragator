@@ -24,12 +24,15 @@ class ReadItemServiceTest {
   private ReadItemService readItemService;
 
   @Mock
-  private ItemRepository itemRepository;
+  private ItemFinder itemRepository;
+
+  @Mock
+  private ItemUpdater itemUpdater;
 
   @BeforeEach
   void setUp() {
-    readItemService = new ReadItemService(itemRepository);
-    given(itemRepository.save(any(Item.class))).willAnswer(i -> {
+    readItemService = new ReadItemService(itemRepository, itemUpdater);
+    given(itemUpdater.updateItem(any(Item.class))).willAnswer(i -> {
           Item argument = i.getArgument(0);
           argument.setId(UUID.randomUUID().toString());
           return Mono.just(argument);
@@ -39,7 +42,7 @@ class ReadItemServiceTest {
 
   @Test
   void shouldMarkItemAsRead() {
-    given(itemRepository.findById("itemId")).willReturn(Mono.just(new Item()));
+    given(itemRepository.findItemById("itemId")).willReturn(Mono.just(new Item()));
     var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(true).build();
 
     Mono<Void> result = readItemService.processRequest(readItemDTO);
@@ -47,12 +50,12 @@ class ReadItemServiceTest {
     StepVerifier.create(result)
         .expectComplete()
         .verify();
-    verify(itemRepository, times(1)).save(Mockito.any(Item.class));
+    verify(itemUpdater, times(1)).updateItem(Mockito.any(Item.class));
   }
 
   @Test
   void shouldMarkItemAsUnread() {
-    given(itemRepository.findById("itemId")).willReturn(Mono.just(new Item()));
+    given(itemRepository.findItemById("itemId")).willReturn(Mono.just(new Item()));
     var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(false).build();
 
     Mono<Void> result = readItemService.processRequest(readItemDTO);
@@ -60,13 +63,13 @@ class ReadItemServiceTest {
     StepVerifier.create(result)
         .expectComplete()
         .verify();
-    verify(itemRepository, times(1)).save(Mockito.any(Item.class));
+    verify(itemUpdater, times(1)).updateItem(Mockito.any(Item.class));
 
   }
 
   @Test
   void shouldThrowExceptionWhenItemByIdNotExists() {
-    given(itemRepository.findById("itemId2")).willReturn(Mono.empty());
+    given(itemRepository.findItemById("itemId2")).willReturn(Mono.empty());
     var readItemDTO = ReadItemDTO.builder().itemId("itemId2").read(false).build();
 
     Mono<Void> result = readItemService.processRequest(readItemDTO);

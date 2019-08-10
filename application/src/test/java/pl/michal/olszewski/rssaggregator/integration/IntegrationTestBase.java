@@ -17,4 +17,5 @@ public abstract class IntegrationTestBase {
       .bindToServer()
       .baseUrl("http://localhost:" + port)
       .build();
+
 }
