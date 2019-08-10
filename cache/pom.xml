@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>pl.michal.olszewski</groupId>
-      <artifactId>modelPersistance</artifactId>
+      <artifactId>modelPersistence</artifactId>
       <version>0.0.11-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
