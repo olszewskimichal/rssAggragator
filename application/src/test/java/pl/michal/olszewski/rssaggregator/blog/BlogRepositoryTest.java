@@ -12,13 +12,12 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import pl.michal.olszewski.rssaggregator.config.Profiles;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @DataMongoTest
-@ActiveProfiles(Profiles.TEST)
+@ActiveProfiles("test")
 class BlogRepositoryTest {
 
   @Autowired

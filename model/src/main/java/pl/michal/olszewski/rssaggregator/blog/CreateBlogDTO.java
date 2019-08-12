@@ -2,37 +2,30 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.time.Instant;
 import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-final class BlogDTO {
+final class CreateBlogDTO {
 
-  private final String id;
   private final String link;
   private final String description;
   private final String name;
   private final String feedURL;
-  private final Instant publishedDate;
 
   @Builder
   @JsonCreator
-  BlogDTO(
-      @JsonProperty("id") String id,
+  CreateBlogDTO(
       @JsonProperty("link") String link,
       @JsonProperty("description") String description,
       @JsonProperty("name") String name,
-      @JsonProperty("feedURL") String feedURL,
-      @JsonProperty("publishedDate") Instant publishedDate
+      @JsonProperty("feedURL") String feedURL
   ) {
-    this.id = id;
     this.link = link;
     this.description = description;
     this.name = name;
     this.feedURL = feedURL;
-    this.publishedDate = publishedDate;
   }
 
   @Override
@@ -43,29 +36,25 @@ final class BlogDTO {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    BlogDTO blogDTO = (BlogDTO) o;
-    return Objects.equals(id, blogDTO.id) &&
-        Objects.equals(link, blogDTO.link) &&
-        Objects.equals(description, blogDTO.description) &&
-        Objects.equals(name, blogDTO.name) &&
-        Objects.equals(feedURL, blogDTO.feedURL) &&
-        Objects.equals(publishedDate, blogDTO.publishedDate);
+    CreateBlogDTO that = (CreateBlogDTO) o;
+    return Objects.equals(link, that.link) &&
+        Objects.equals(description, that.description) &&
+        Objects.equals(name, that.name) &&
+        Objects.equals(feedURL, that.feedURL);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, link, description, name, feedURL, publishedDate);
+    return Objects.hash(link, description, name, feedURL);
   }
 
   @Override
   public String toString() {
-    return "BlogDTO{" +
-        "id='" + id + '\'' +
-        ", link='" + link + '\'' +
+    return "CreateBlogDTO{" +
+        "link='" + link + '\'' +
         ", description='" + description + '\'' +
         ", name='" + name + '\'' +
         ", feedURL='" + feedURL + '\'' +
-        ", publishedDate=" + publishedDate +
         '}';
   }
 }

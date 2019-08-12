@@ -10,7 +10,7 @@ class NewestItemService {
 
   private final ItemFinder itemFinder;
 
-  public NewestItemService(ItemFinder itemFinder) {
+  NewestItemService(ItemFinder itemFinder) {
     this.itemFinder = itemFinder;
   }
 

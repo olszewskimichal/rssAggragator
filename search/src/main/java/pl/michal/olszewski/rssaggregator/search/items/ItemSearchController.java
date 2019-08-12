@@ -8,11 +8,11 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/api/v1/items/search")
-public class ItemSearchController {
+class ItemSearchController {
 
   private final ItemTextSearchRepository itemTextSearchRepository;
 
-  public ItemSearchController(ItemTextSearchRepository itemTextSearchRepository) {
+  ItemSearchController(ItemTextSearchRepository itemTextSearchRepository) {
     this.itemTextSearchRepository = itemTextSearchRepository;
   }
 

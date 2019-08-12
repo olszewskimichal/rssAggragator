@@ -31,15 +31,15 @@ class BlogController {
     this.blogService = blogService;
   }
 
-  @GetMapping(value = "/{id}")
+  @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Sluzy do pobierania informacji na temat bloga o podanym id")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Zwraca informacje na temat bloga", response = BlogAggregationDTO.class),
+      @ApiResponse(code = 200, message = "Zwraca informacje na temat bloga", response = BlogDTO.class),
       @ApiResponse(code = 404, message = "Blog o podanym id nie istnieje"),
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
+  public Mono<BlogDTO> getBlog(@PathVariable("id") String blogId) {
     log.debug("START GET blog by id {}", blogId);
     return blogService.getBlogDTOById(blogId)
         .doOnSuccess(result -> log.trace("END GET blog by id {}", blogId))
@@ -49,11 +49,11 @@ class BlogController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @ApiOperation(value = "Sluzy do pobierania informacji na temat wszystkich blogow")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Zwraca informacje na temat blogow", response = BlogAggregationDTO.class),
+      @ApiResponse(code = 200, message = "Zwraca informacje na temat blogow", response = BlogDTO.class),
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Flux<BlogAggregationDTO> getBlogs() {
+  public Flux<BlogDTO> getBlogs() {
     log.debug("START GET blogs");
     return blogService.getAllBlogDTOs()
         .doOnComplete(() -> log.debug("END GET blogs"))
@@ -69,7 +69,7 @@ class BlogController {
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Mono<BlogDTO> updateBlog(@RequestBody BlogDTO blogDTO) {
+  public Mono<BlogDTO> updateBlog(@RequestBody UpdateBlogDTO blogDTO) {
     log.debug("PUT - updateBlog {}", blogDTO.getName());
     log.trace("PUT - updateBlog {}", blogDTO);
     return blogService.updateBlog(blogDTO)
@@ -85,7 +85,7 @@ class BlogController {
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Mono<BlogDTO> addBlog(@RequestBody BlogDTO blogDTO) {
+  public Mono<BlogDTO> addBlog(@RequestBody CreateBlogDTO blogDTO) {
     log.debug("POST - addBlog {}", blogDTO);
     return blogService.getBlogOrCreate(blogDTO)
         .doOnSuccess(blog -> log.debug("END addBlog {}", blogDTO.getName()))

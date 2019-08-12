@@ -27,7 +27,6 @@ import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
-import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEventProducer;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -72,7 +71,7 @@ class BlogServiceTest {
   void shouldCreateBlogFromDTO() {
     //given
     given(blogRepository.findByFeedURL("feedUrl1")).willReturn(Mono.empty());
-    BlogDTO blogDTO = BlogDTO.builder()
+    CreateBlogDTO blogDTO = CreateBlogDTO.builder()
         .feedURL("feedUrl1")
         .name("test")
         .build();
@@ -89,7 +88,7 @@ class BlogServiceTest {
     //given
     given(blogRepository.findByFeedURL("nazwa")).willReturn(Mono.just(new Blog()));
 
-    BlogDTO blogDTO = BlogDTO.builder()
+    CreateBlogDTO blogDTO = CreateBlogDTO.builder()
         .feedURL("nazwa")
         .build();
 
@@ -105,12 +104,11 @@ class BlogServiceTest {
   void shouldCreateBlogWithCorrectProperties() {
     //given
     Instant now = Instant.now();
-    BlogDTO blogDTO = BlogDTO.builder()
+    CreateBlogDTO blogDTO = CreateBlogDTO.builder()
         .name("nazwa1")
         .description("desc")
         .feedURL("feedUrl3")
         .link("blogUrl1")
-        .publishedDate(now)
         .build();
     given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Mono.empty());
 
@@ -124,8 +122,7 @@ class BlogServiceTest {
             () -> assertThat(dto.getDescription()).isEqualTo("desc"),
             () -> assertThat(dto.getName()).isEqualTo("nazwa1"),
             () -> assertThat(dto.getFeedURL()).isEqualTo("feedUrl3"),
-            () -> assertThat(dto.getLink()).isEqualTo("blogUrl1"),
-            () -> assertThat(dto.getPublishedDate()).isAfterOrEqualTo(now).isBeforeOrEqualTo(now)
+            () -> assertThat(dto.getLink()).isEqualTo("blogUrl1")
         ))
         .expectComplete()
         .verify();
@@ -142,18 +139,18 @@ class BlogServiceTest {
         .mapToObj(number -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(number + "").link("link" + number).build()) //TODO
         .collect(Collectors.toList());
 
-    BlogDTO blogDTO = BlogDTO.builder()
+    UpdateBlogWithItemsDTO blogDTO = UpdateBlogWithItemsDTO.builder()
         .name("url")
         .feedURL("url")
         .itemsList(itemsList)
         .build();
 
     //when
-    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO);
+    Mono<Blog> updateBlog = blogService.updateBlog(blog, blogDTO);
 
     //then
     StepVerifier.create(updateBlog)
-        .assertNext(dto -> assertThat(dto).isEqualToIgnoringGivenFields(blogDTO, "itemsList"))
+        .expectNextCount(1L)
         .expectComplete()
         .verify();
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
@@ -175,7 +172,7 @@ class BlogServiceTest {
         .name("url")
         .build();
 
-    BlogDTO blogDTO = BlogDTO.builder()
+    UpdateBlogWithItemsDTO blogDTO = UpdateBlogWithItemsDTO.builder()
         .name("url")
         .feedURL("url")
         .itemsList(Arrays.asList(itemDTO, itemDTO))
@@ -183,7 +180,7 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
 
     //when
-    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO);
+    Mono<Blog> updateBlog = blogService.updateBlog(blog, blogDTO);
 
     //then
     StepVerifier.create(updateBlog)
@@ -199,7 +196,7 @@ class BlogServiceTest {
     //given
     Blog blog = Blog.builder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
 
-    BlogDTO blogDTO = BlogDTO.builder()
+    UpdateBlogDTO blogDTO = UpdateBlogDTO.builder()
         .feedURL("url")
         .description("desc")
         .name("url")
@@ -212,7 +209,8 @@ class BlogServiceTest {
     //then
     StepVerifier.create(updateBlog)
         .assertNext(dto -> assertAll(
-            () -> assertThat(dto).isEqualToIgnoringGivenFields(blogDTO, "description"),
+            () -> assertThat(dto.getName()).isEqualTo("url"),
+            () -> assertThat(dto.getFeedURL()).isEqualTo("url"),
             () -> assertThat(dto.getDescription()).isEqualTo("desc")
         ))
         .expectComplete()
@@ -222,7 +220,7 @@ class BlogServiceTest {
   @Test
   void shouldDeleteBlogById() {
     given(blogRepository.deleteById("1")).willReturn(Mono.empty());
-    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(new BlogAggregationDTO("1", BlogDTO.builder().build())));
+    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(BlogAggregationDTO.builder().blogId("1").blogItemsCount(0L).build()));
 
     StepVerifier.create(blogService.deleteBlog("1"))
         .expectComplete()
@@ -242,10 +240,7 @@ class BlogServiceTest {
     Blog blog = Blog.builder()
         .build();
     given(blogRepository.findById("1")).willReturn(Mono.just(blog));
-    BlogDTO blogDTO = BlogDTO.builder()
-        .item(ItemDTO.builder().link("test").blogId("1").build())
-        .build();
-    BlogAggregationDTO aggregationDTO = new BlogAggregationDTO("1", blogDTO);
+    BlogAggregationDTO aggregationDTO = BlogAggregationDTO.builder().blogItemsCount(1L).build();
     given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(aggregationDTO));
 
     //when

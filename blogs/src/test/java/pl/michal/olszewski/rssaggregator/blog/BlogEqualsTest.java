@@ -30,4 +30,19 @@ class BlogEqualsTest {
         .verify();
   }
 
+  @Test
+  void updateBlogDTOEqualsContractTest() {
+    EqualsVerifier.forClass(UpdateBlogDTO.class)
+        .suppress(NONFINAL_FIELDS)
+        .withRedefinedSuperclass()
+        .verify();
+  }
+
+  @Test
+  void createBlogDtoEqualsContractTest() {
+    EqualsVerifier.forClass(CreateBlogDTO.class)
+        .suppress(NONFINAL_FIELDS)
+        .verify();
+  }
+
 }

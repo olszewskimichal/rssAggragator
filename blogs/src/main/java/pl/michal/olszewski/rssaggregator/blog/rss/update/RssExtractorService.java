@@ -19,8 +19,8 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.blog.BlogDTO;
 import pl.michal.olszewski.rssaggregator.blog.RssInfo;
+import pl.michal.olszewski.rssaggregator.blog.UpdateBlogWithItemsDTO;
 
 @Service
 @Slf4j
@@ -34,9 +34,9 @@ class RssExtractorService {
     this.tracer = tracer;
   }
 
-  private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
+  private UpdateBlogWithItemsDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
     log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
-    return new BlogDTO(
+    return new UpdateBlogWithItemsDTO(
         syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
         HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()),
         syndFeed.getTitle(),
@@ -45,7 +45,7 @@ class RssExtractorService {
         new ArrayList<>());
   }
 
-  BlogDTO getBlog(RssInfo info) {
+  UpdateBlogWithItemsDTO getBlog(RssInfo info) {
     log.trace("getBlog START {}", info);
     try {
       SSLContext ctx = SSLContext.getInstance("TLS");
@@ -58,7 +58,7 @@ class RssExtractorService {
           .parallelStream()
           .filter(entry -> entry.getPublishedDate() == null && entry.getUpdatedDate() != null)
           .forEach(entry -> entry.setPublishedDate(entry.getUpdatedDate()));
-      BlogDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
+      UpdateBlogWithItemsDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
       getItemsForBlog(feed, info)
           .forEach(blogInfo::addNewItem);
       log.trace("getBlog STOP {}", info);

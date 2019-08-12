@@ -10,7 +10,7 @@ class NewItemInBlogEventConsumer {
 
   private final ItemSaver itemSaver;
 
-  public NewItemInBlogEventConsumer(ItemSaver itemSaver) {
+  NewItemInBlogEventConsumer(ItemSaver itemSaver) {
     this.itemSaver = itemSaver;
   }
 

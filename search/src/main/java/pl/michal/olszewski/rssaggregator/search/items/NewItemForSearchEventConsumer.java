@@ -7,11 +7,11 @@ import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 
 @Component
 @Slf4j
-public class NewItemForSearchEventConsumer {
+class NewItemForSearchEventConsumer {
 
   private final ItemSearchService itemSearchService;
 
-  public NewItemForSearchEventConsumer(ItemSearchService itemSearchService) {
+  NewItemForSearchEventConsumer(ItemSearchService itemSearchService) {
     this.itemSearchService = itemSearchService;
   }
 

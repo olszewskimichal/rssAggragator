@@ -39,7 +39,7 @@ class BlogControllerTest extends IntegrationTestBase {
     //given
 
     //when
-    ListBodySpec<BlogAggregationDTO> blogs = thenGetBlogsFromApi();
+    ListBodySpec<BlogDTO> blogs = thenGetBlogsFromApi();
 
     //then
     blogs.hasSize(0);
@@ -52,7 +52,7 @@ class BlogControllerTest extends IntegrationTestBase {
         .buildNumberOfBlogsAndSave(3);
 
     //when
-    ListBodySpec<BlogAggregationDTO> blogs = thenGetBlogsFromApi();
+    ListBodySpec<BlogDTO> blogs = thenGetBlogsFromApi();
 
     //then
     blogs.hasSize(3);
@@ -62,17 +62,17 @@ class BlogControllerTest extends IntegrationTestBase {
   void should_get_one_blog() {
     //given
     Blog blog = givenBlog().createAndSaveNewBlog();
-    BlogAggregationDTO expected = new BlogAggregationDTO(
-        blog.getId(),
+    BlogDTO expected =
         BlogDTO.builder()
+            .id(blog.getId())
             .feedURL(blog.getFeedURL())
             .publishedDate(blog.getPublishedDate())
             .name(blog.getName())
             .description(blog.getDescription())
             .link(blog.getBlogURL())
-            .build());
+            .build();
 
-    BodySpec<BlogAggregationDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
+    BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
 
     blogDTO.value(aggregationDTO -> assertThat(aggregationDTO).isEqualToComparingFieldByField(expected));
   }
@@ -141,9 +141,9 @@ class BlogControllerTest extends IntegrationTestBase {
         .buildNumberOfItemsAndSave(2, blog.getId());
 
     //when
-    BodySpec<BlogAggregationDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
+    BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
     //then
-    blogDTO.value(v -> assertThat(v).isNotNull());
+    blogDTO.value(dto -> assertThat(dto).isNotNull());
   }
 
   @Test
@@ -164,19 +164,19 @@ class BlogControllerTest extends IntegrationTestBase {
   }
 
 
-  private ListBodySpec<BlogAggregationDTO> thenGetBlogsFromApi() {
+  private ListBodySpec<BlogDTO> thenGetBlogsFromApi() {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs", port)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(BlogAggregationDTO.class);
+        .expectBodyList(BlogDTO.class);
   }
 
-  private BodySpec<BlogAggregationDTO, ?> thenGetOneBlogFromApiById(String id) {
+  private BodySpec<BlogDTO, ?> thenGetOneBlogFromApiById(String id) {
     return webTestClient.get()
         .uri("http://localhost:{port}/api/v1/blogs/{id}", port, id)
         .exchange()
         .expectStatus().isOk()
-        .expectBody(BlogAggregationDTO.class);
+        .expectBody(BlogDTO.class);
   }
 
   private void thenCreateBlogByApi(String link) {

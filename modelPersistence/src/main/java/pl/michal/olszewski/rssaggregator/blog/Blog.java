@@ -54,15 +54,14 @@ public class Blog {
     this.lastUpdateDate = lastUpdateDate;
   }
 
-  public Blog(BlogDTO blogDTO) {
+  public Blog(CreateBlogDTO blogDTO) {
     this.blogURL = blogDTO.getLink();
     this.description = blogDTO.getDescription();
     this.name = blogDTO.getName();
     this.feedURL = blogDTO.getFeedURL();
-    this.publishedDate = blogDTO.getPublishedDate();
   }
 
-  void updateFromDto(BlogDTO blogDTO) {
+  void updateFromDto(UpdateBlogDTO blogDTO) {
     this.description = blogDTO.getDescription();
     this.name = blogDTO.getName();
     this.publishedDate = blogDTO.getPublishedDate();

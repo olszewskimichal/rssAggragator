@@ -14,7 +14,6 @@ import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import pl.michal.olszewski.rssaggregator.config.Profiles;
 
 @SpringBootApplication
 @EnableCaching
@@ -31,7 +30,7 @@ public class RssAggregatorApplication {
     SpringApplication.run(RssAggregatorApplication.class, args);
   }
 
-  @Profile({Profiles.PRODUCTION})
+  @Profile({"prod"})
   @Bean
   @Primary
   public Executor threadPoolTaskExecutorProd() {
@@ -41,7 +40,7 @@ public class RssAggregatorApplication {
     return threadPoolTaskExecutor;
   }
 
-  @Profile({Profiles.DEVELOPMENT})
+  @Profile({"development"})
   @Bean
   @Primary
   public Executor threadPoolTaskExecutorDevelopment() {
@@ -51,7 +50,7 @@ public class RssAggregatorApplication {
     return threadPoolTaskExecutor;
   }
 
-  @Profile({Profiles.TEST})
+  @Profile({"test"})
   @Bean
   @Primary
   public Executor testThreadPoolTaskExecutor() {

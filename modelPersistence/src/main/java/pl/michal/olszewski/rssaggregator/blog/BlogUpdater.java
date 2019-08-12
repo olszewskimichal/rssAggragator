@@ -22,12 +22,12 @@ class BlogUpdater {
     return repository.save(blog);
   }
 
-  Mono<Blog> updateBlogFromDTO(Blog blog, BlogDTO blogDTO) {
+  Mono<Blog> updateBlogFromDTO(Blog blog, UpdateBlogDTO blogDTO) {
     blog.updateFromDto(blogDTO);
     return repository.save(blog);
   }
 
-  public Mono<Blog> createNewBlog(BlogDTO blogDTO) {
+  public Mono<Blog> createNewBlog(CreateBlogDTO blogDTO) {
     return repository.save(new Blog(blogDTO));
   }
 

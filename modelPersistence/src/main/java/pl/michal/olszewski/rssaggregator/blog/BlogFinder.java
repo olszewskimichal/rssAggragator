@@ -28,8 +28,4 @@ public class BlogFinder {
   Mono<Blog> findById(String id) {
     return blogReactiveRepository.findById(id);
   }
-
-  Flux<BlogAggregationDTO> getBlogsWithCount() {
-    return blogReactiveRepository.getBlogsWithCount();
-  }
 }

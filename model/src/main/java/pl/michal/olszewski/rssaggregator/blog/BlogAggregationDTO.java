@@ -2,14 +2,13 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
 import java.util.Objects;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@AllArgsConstructor
 @NoArgsConstructor
 public final class BlogAggregationDTO {
 
@@ -21,14 +20,15 @@ public final class BlogAggregationDTO {
   private Instant publishedDate;
   private Long blogItemsCount = 0L;
 
-  BlogAggregationDTO(String blogId, BlogDTO blog) {
+  @Builder
+  public BlogAggregationDTO(String blogId, String link, String description, String name, String feedURL, Instant publishedDate, Long blogItemsCount) {
     this.blogId = blogId;
-    this.link = blog.getLink();
-    this.description = blog.getDescription();
-    this.name = blog.getName();
-    this.feedURL = blog.getFeedURL();
-    this.publishedDate = blog.getPublishedDate();
-    this.blogItemsCount = (long) blog.getItemsList().size();
+    this.link = link;
+    this.description = description;
+    this.name = name;
+    this.feedURL = feedURL;
+    this.publishedDate = publishedDate;
+    this.blogItemsCount = blogItemsCount;
   }
 
   @Override
