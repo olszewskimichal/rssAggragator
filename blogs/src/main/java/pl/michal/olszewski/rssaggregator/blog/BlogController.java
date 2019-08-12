@@ -1,13 +1,10 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -45,7 +42,6 @@ class BlogController {
   public Mono<BlogAggregationDTO> getBlog(@PathVariable("id") String blogId) {
     log.debug("START GET blog by id {}", blogId);
     return blogService.getBlogDTOById(blogId)
-        .map(this::addLinkToBlogItems)
         .doOnSuccess(result -> log.trace("END GET blog by id {}", blogId))
         .doOnError(error -> log.error("ERROR GET blog by id {}", blogId, error));
   }
@@ -60,8 +56,6 @@ class BlogController {
   public Flux<BlogAggregationDTO> getBlogs() {
     log.debug("START GET blogs");
     return blogService.getAllBlogDTOs()
-        .map(this::addLinkToSelf)
-        .map(this::addLinkToBlogItems)
         .doOnComplete(() -> log.debug("END GET blogs"))
         .doOnError(error -> log.error("ERROR GET blogs", error));
   }
@@ -108,22 +102,4 @@ class BlogController {
         .doOnSuccess(blog -> log.debug("END deleteBlog id {}", blogId))
         .doOnError(error -> log.error("ERROR deleteBlog id {}", blogId, error));
   }
-
-  private BlogAggregationDTO addLinkToSelf(BlogAggregationDTO blog) {
-    if (blog.getLink("self") == null) {
-      Link link = linkTo(methodOn(BlogController.class)
-          .getBlog(blog.getBlogId())).withSelfRel();
-      blog.add(link);
-    }
-    return blog;
-  }
-
-  private BlogAggregationDTO addLinkToBlogItems(BlogAggregationDTO blog) {
-    if (blog.getLink("items") == null) {
-      Link link = new Link("/api/v1/blogs/" + blog.getBlogId() + "/items").withRel("items");
-      blog.add(link);
-    }
-    return blog;
-  }
-
 }

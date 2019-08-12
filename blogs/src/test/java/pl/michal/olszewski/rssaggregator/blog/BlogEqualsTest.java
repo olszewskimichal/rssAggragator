@@ -18,7 +18,6 @@ class BlogEqualsTest {
   @Test
   void blogAggregationDtoEqualsContractTest() {
     EqualsVerifier.forClass(BlogAggregationDTO.class)
-        .withIgnoredFields("links")
         .suppress(NONFINAL_FIELDS)
         .withRedefinedSuperclass()
         .verify();

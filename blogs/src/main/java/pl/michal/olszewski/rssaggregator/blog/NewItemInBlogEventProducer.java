@@ -1,11 +1,11 @@
-package pl.michal.olszewski.rssaggregator.blog.newitem;
+package pl.michal.olszewski.rssaggregator.blog;
 
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 
 @Service
-public class NewItemInBlogEventProducer {
+class NewItemInBlogEventProducer {
 
   private final JmsTemplate jmsTemplate;
 
@@ -13,7 +13,7 @@ public class NewItemInBlogEventProducer {
     this.jmsTemplate = jmsTemplate;
   }
 
-  public void writeEventToQueue(NewItemInBlogEvent event) {
+  void writeEventToQueue(NewItemInBlogEvent event) {
     jmsTemplate.convertAndSend("newItems", event);
   }
 }

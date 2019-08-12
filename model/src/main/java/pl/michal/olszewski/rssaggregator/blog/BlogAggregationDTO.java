@@ -6,13 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.hateoas.ResourceSupport;
 
 @Getter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public final class BlogAggregationDTO extends ResourceSupport {
+public final class BlogAggregationDTO {
 
   private String blogId;
   private String link;

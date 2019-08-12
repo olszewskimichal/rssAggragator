@@ -24,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.jms.core.JmsTemplate;
-import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;

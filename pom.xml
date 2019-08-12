@@ -33,10 +33,6 @@
       <groupId>com.fasterxml.jackson.datatype</groupId>
     </dependency>
     <dependency>
-      <artifactId>spring-boot-starter-hateoas</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
       <artifactId>springfox-swagger-ui</artifactId>
       <groupId>io.springfox</groupId>
       <version>2.9.2</version>

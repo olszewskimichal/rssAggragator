@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.blog.newitem.NewItemInBlogEventProducer;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;

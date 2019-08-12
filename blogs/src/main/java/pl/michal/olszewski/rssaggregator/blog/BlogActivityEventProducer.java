@@ -4,11 +4,11 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BlogActivityEventProducer {
+class BlogActivityEventProducer {
 
   private final JmsTemplate jmsTemplate;
 
-  public BlogActivityEventProducer(JmsTemplate jmsTemplate) {
+  BlogActivityEventProducer(JmsTemplate jmsTemplate) {
     this.jmsTemplate = jmsTemplate;
   }
 
