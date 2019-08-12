@@ -5,7 +5,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +33,6 @@ class ReadItemServiceTest {
     readItemService = new ReadItemService(itemRepository, itemUpdater);
     given(itemUpdater.updateItem(any(Item.class))).willAnswer(i -> {
           Item argument = i.getArgument(0);
-          argument.setId(UUID.randomUUID().toString());
           return Mono.just(argument);
         }
     );

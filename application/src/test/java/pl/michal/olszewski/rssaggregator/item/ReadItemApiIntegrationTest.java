@@ -39,8 +39,7 @@ class ReadItemApiIntegrationTest extends IntegrationTestBase {
   @Test
   void should_mark_item_as_unread() {
     Item item = new Item(builder().link("link").build());
-    item.setRead(true);
-    itemRepository.save(item).block();
+    itemRepository.save(item.markAsRead()).block();
 
     thenMarkItemAsUnread(item.getId());
 
