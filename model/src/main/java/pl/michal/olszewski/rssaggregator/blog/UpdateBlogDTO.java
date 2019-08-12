@@ -65,14 +65,4 @@ final class UpdateBlogDTO {
     return Objects.hash(link, description, name, feedURL, publishedDate);
   }
 
-  @Override
-  public String toString() {
-    return "UpdateBlogDTO{" +
-        "link='" + link + '\'' +
-        ", description='" + description + '\'' +
-        ", name='" + name + '\'' +
-        ", feedURL='" + feedURL + '\'' +
-        ", publishedDate=" + publishedDate +
-        '}';
-  }
 }

@@ -2,23 +2,22 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-@NoArgsConstructor
 public final class BlogAggregationDTO {
 
-  private String blogId;
-  private String link;
-  private String description;
-  private String name;
-  private String feedURL;
-  private Instant publishedDate;
-  private Long blogItemsCount = 0L;
+  private final String blogId;
+  private final String link;
+  private final String description;
+  private final String name;
+  private final String feedURL;
+  private final Instant publishedDate;
+  private final Long blogItemsCount;
 
   @Builder
   public BlogAggregationDTO(String blogId, String link, String description, String name, String feedURL, Instant publishedDate, Long blogItemsCount) {
@@ -28,7 +27,7 @@ public final class BlogAggregationDTO {
     this.name = name;
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
-    this.blogItemsCount = blogItemsCount;
+    this.blogItemsCount = Optional.ofNullable(blogItemsCount).orElse(0L);
   }
 
   @Override

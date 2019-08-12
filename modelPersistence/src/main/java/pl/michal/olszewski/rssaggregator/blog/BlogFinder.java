@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -8,13 +9,19 @@ import reactor.core.publisher.Mono;
 public class BlogFinder {
 
   private final BlogReactiveRepository blogReactiveRepository;
+  private final BlogSyncRepository blogSyncRepository;
 
-  BlogFinder(BlogReactiveRepository blogReactiveRepository) {
+  BlogFinder(BlogReactiveRepository blogReactiveRepository, BlogSyncRepository blogSyncRepository) {
     this.blogReactiveRepository = blogReactiveRepository;
+    this.blogSyncRepository = blogSyncRepository;
   }
 
   public Flux<Blog> findAll() {
     return blogReactiveRepository.findAll();
+  }
+
+  List<Blog> findAllSync() {
+    return blogSyncRepository.findAll();
   }
 
   public Mono<BlogAggregationDTO> getBlogWithCount(String id) {

@@ -77,7 +77,7 @@ class UpdateBlogService {
     var blogDTO = rssExtractorService.getBlog(blog.getRssInfo());
     return blogService.updateBlog(blog, blogDTO)
         .doOnSuccess(updatedBlog -> log.trace("STOP updateRssBlogItems dla blog {}", updatedBlog.getName()))
-        .map(v -> true)
+        .map(updatedBlog -> true)
         .onErrorReturn(false);
   }
 

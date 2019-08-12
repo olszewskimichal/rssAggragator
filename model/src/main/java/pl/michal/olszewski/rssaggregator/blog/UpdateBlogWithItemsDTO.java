@@ -7,10 +7,8 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Singular;
-import lombok.ToString;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
-@ToString
 public final class UpdateBlogWithItemsDTO {
 
   private final String link;
@@ -89,7 +87,7 @@ public final class UpdateBlogWithItemsDTO {
         description,
         name,
         feedURL,
-        publishedDate
+        getPublishedDate()
     );
   }
 }

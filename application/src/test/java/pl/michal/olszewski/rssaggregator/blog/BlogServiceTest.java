@@ -48,6 +48,9 @@ class BlogServiceTest {
   @Mock
   private BlogReactiveRepository blogRepository;
 
+  @Mock
+  private BlogSyncRepository blogSyncRepository;
+
   @BeforeEach
   void setUp() {
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
@@ -57,7 +60,7 @@ class BlogServiceTest {
         }
     );
     blogService = new BlogService(
-        new BlogFinder(blogRepository),
+        new BlogFinder(blogRepository, blogSyncRepository),
         new BlogUpdater(blogRepository),
         Caffeine.newBuilder().build(),
         Caffeine.newBuilder().build(),

@@ -1,11 +1,9 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
-import lombok.ToString;
-import lombok.Value;
+import lombok.Getter;
 
-@Value
-@ToString
+@Getter
 public class RssInfo {
 
   private final String feedURL;

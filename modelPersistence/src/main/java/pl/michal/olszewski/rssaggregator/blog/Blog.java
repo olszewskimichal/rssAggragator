@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -18,7 +17,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @NoArgsConstructor
 @Slf4j
-@ToString
 public class Blog {
 
   @Id
@@ -76,7 +74,7 @@ public class Blog {
     active = false;
   }
 
-  public void activate() {
+  void activate() {
     active = true;
   }
 

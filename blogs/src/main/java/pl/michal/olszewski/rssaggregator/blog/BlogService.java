@@ -81,7 +81,7 @@ public class BlogService {
     return Mono.justOrEmpty(blogCache.getIfPresent(id))
         .switchIfEmpty(Mono.defer(() -> blogFinder.findById(id).cache()
             .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-            .map(this::mapToBlogDto)
+            .map(BlogToDtoMapper::mapToBlogDto)
             .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id))
             .doOnSuccess(result -> blogCache.put(result.getId(), result))));
   }
@@ -90,7 +90,7 @@ public class BlogService {
     log.debug("pobieram wszystkie blogi w postaci DTO");
     var dtoFlux = Flux.fromIterable(blogCache.asMap().values())
         .switchIfEmpty(Flux.defer(() -> blogFinder.findAll()
-            .map(this::mapToBlogDto)
+            .map(BlogToDtoMapper::mapToBlogDto)
             .doOnNext(blog -> blogCache.put(blog.getId(), blog)))
             .cache());
     return dtoFlux
@@ -113,18 +113,8 @@ public class BlogService {
             blog.getName(),
             blog.getFeedURL(),
             blog.getPublishedDate()
-        ));
-  }
-
-  private BlogDTO mapToBlogDto(Blog blog) {
-    return new BlogDTO(
-        blog.getId(),
-        blog.getBlogURL(),
-        blog.getDescription(),
-        blog.getName(),
-        blog.getFeedURL(),
-        blog.getPublishedDate()
-    );
+        ))
+        .doOnSuccess(updatedBlog -> blogCache.invalidate(updatedBlog.getId()));
   }
 
   private void addItemToBlog(Blog blog, ItemDTO item) {
@@ -160,7 +150,6 @@ public class BlogService {
     return blogFinder.findByFeedURL(feedUrl)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(feedUrl)));
   }
-
 
   private Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogDTO blogInfoFromRSS) {
     log.debug("aktualizuje bloga {}", blogFromDb.getName());

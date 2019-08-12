@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public class ItemTextSearchRepositoryImpl implements ItemTextSearchRepository {
+class ItemTextSearchRepositoryImpl implements ItemTextSearchRepository {
 
   private final ReactiveMongoTemplate mongoTemplate;
 
-  public ItemTextSearchRepositoryImpl(ReactiveMongoTemplate mongoTemplate) {
+  ItemTextSearchRepositoryImpl(ReactiveMongoTemplate mongoTemplate) {
     this.mongoTemplate = mongoTemplate;
   }
 
