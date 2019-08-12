@@ -51,12 +51,13 @@ public final class UpdateBlogWithItemsDTO {
     return publishedDate;
   }
 
-  List<ItemDTO> getItemsList() {
-    return Collections.unmodifiableList(itemsList);
-  }
-
   public void addNewItem(ItemDTO itemDTO) {
     this.itemsList.add(itemDTO);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(link, description, name, feedURL, publishedDate, itemsList);
   }
 
   @Override
@@ -76,11 +77,6 @@ public final class UpdateBlogWithItemsDTO {
         Objects.equals(itemsList, blogDTO.itemsList);
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(link, description, name, feedURL, publishedDate, itemsList);
-  }
-
   public UpdateBlogDTO toUpdateBlogDto() {
     return new UpdateBlogDTO(
         link,
@@ -89,5 +85,9 @@ public final class UpdateBlogWithItemsDTO {
         feedURL,
         getPublishedDate()
     );
+  }
+
+  List<ItemDTO> getItemsList() {
+    return Collections.unmodifiableList(itemsList);
   }
 }

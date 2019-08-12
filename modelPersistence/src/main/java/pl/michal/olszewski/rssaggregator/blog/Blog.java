@@ -59,13 +59,6 @@ public class Blog {
     this.feedURL = blogDTO.getFeedURL();
   }
 
-  void updateFromDto(UpdateBlogDTO blogDTO) {
-    this.description = blogDTO.getDescription();
-    this.name = blogDTO.getName();
-    this.publishedDate = blogDTO.getPublishedDate();
-    this.lastUpdateDate = Instant.now().minus(2, ChronoUnit.DAYS);
-  }
-
   public boolean isActive() {
     return active;
   }
@@ -74,8 +67,13 @@ public class Blog {
     active = false;
   }
 
-  void activate() {
-    active = true;
+  public RssInfo getRssInfo() {
+    return new RssInfo(feedURL, blogURL, id, lastUpdateDate);
+  }
+
+  @Override
+  public final int hashCode() {
+    return Objects.hash(blogURL, description, name, feedURL, publishedDate, lastUpdateDate, active);
   }
 
   @Override
@@ -96,13 +94,15 @@ public class Blog {
         Objects.equals(lastUpdateDate, blog.lastUpdateDate);
   }
 
-  public RssInfo getRssInfo() {
-    return new RssInfo(feedURL, blogURL, id, lastUpdateDate);
+  void updateFromDto(UpdateBlogDTO blogDTO) {
+    this.description = blogDTO.getDescription();
+    this.name = blogDTO.getName();
+    this.publishedDate = blogDTO.getPublishedDate();
+    this.lastUpdateDate = Instant.now().minus(2, ChronoUnit.DAYS);
   }
 
-  @Override
-  public final int hashCode() {
-    return Objects.hash(blogURL, description, name, feedURL, publishedDate, lastUpdateDate, active);
+  void activate() {
+    active = true;
   }
 
 }

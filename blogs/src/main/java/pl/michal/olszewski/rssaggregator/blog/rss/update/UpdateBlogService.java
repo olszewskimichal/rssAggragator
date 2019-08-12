@@ -57,12 +57,6 @@ class UpdateBlogService {
         );
   }
 
-  private Mono<List<Boolean>> getUpdateBlogByRssList() {
-    return blogFinder.findAll()
-        .flatMap(this::updateRssBlogItems)
-        .collectList();
-  }
-
   Mono<Boolean> updateRssBlogItems(Blog blog) {
     log.debug("Pobieranie nowych danych dla bloga {}", blog.getName());
     return Mono.defer(() -> extractBlogFromRssAndUpdateBlog(blog))
@@ -70,6 +64,12 @@ class UpdateBlogService {
         .doOnError(ex -> log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {}", blog.getName(), ex))
         .subscribeOn(Schedulers.fromExecutor(executor))
         .onErrorReturn(false);
+  }
+
+  private Mono<List<Boolean>> getUpdateBlogByRssList() {
+    return blogFinder.findAll()
+        .flatMap(this::updateRssBlogItems)
+        .collectList();
   }
 
   private Mono<Boolean> extractBlogFromRssAndUpdateBlog(Blog blog) {

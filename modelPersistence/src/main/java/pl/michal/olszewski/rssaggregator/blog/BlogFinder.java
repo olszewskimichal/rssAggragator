@@ -20,12 +20,12 @@ public class BlogFinder {
     return blogReactiveRepository.findAll();
   }
 
-  List<Blog> findAllSync() {
-    return blogSyncRepository.findAll();
-  }
-
   public Mono<BlogAggregationDTO> getBlogWithCount(String id) {
     return blogReactiveRepository.getBlogWithCount(id);
+  }
+
+  List<Blog> findAllSync() {
+    return blogSyncRepository.findAll();
   }
 
   Mono<Blog> findByFeedURL(String url) {

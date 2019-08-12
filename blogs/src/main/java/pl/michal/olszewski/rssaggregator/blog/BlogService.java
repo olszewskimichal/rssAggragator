@@ -37,6 +37,25 @@ public class BlogService {
     this.itemForSearchEventProducer = itemForSearchEventProducer;
   }
 
+  public Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogWithItemsDTO blogInfoFromRSS) {
+    log.debug("aktualizuje bloga {}", blogFromDb.getName());
+    blogInfoFromRSS.getItemsList()
+        .forEach(item -> addItemToBlog(blogFromDb, item));
+    return blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS.toUpdateBlogDto())
+        .doOnNext(this::putToCache);
+  }
+
+  public Flux<BlogDTO> getAllBlogDTOs() {
+    log.debug("pobieram wszystkie blogi w postaci DTO");
+    var dtoFlux = Flux.fromIterable(blogCache.asMap().values())
+        .switchIfEmpty(Flux.defer(() -> blogFinder.findAll()
+            .map(BlogToDtoMapper::mapToBlogDto)
+            .doOnNext(blog -> blogCache.put(blog.getId(), blog)))
+            .cache());
+    return dtoFlux
+        .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
+  }
+
   Mono<BlogDTO> getBlogOrCreate(CreateBlogDTO blogDTO) {
     log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
     return blogFinder.findByFeedURL(blogDTO.getFeedURL())
@@ -49,14 +68,6 @@ public class BlogService {
             blog.getFeedURL(),
             blog.getPublishedDate()
         ));
-  }
-
-  public Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogWithItemsDTO blogInfoFromRSS) {
-    log.debug("aktualizuje bloga {}", blogFromDb.getName());
-    blogInfoFromRSS.getItemsList()
-        .forEach(item -> addItemToBlog(blogFromDb, item));
-    return blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS.toUpdateBlogDto())
-        .doOnNext(this::putToCache);
   }
 
   Mono<Void> deleteBlog(String id) {
@@ -84,17 +95,6 @@ public class BlogService {
             .map(BlogToDtoMapper::mapToBlogDto)
             .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id))
             .doOnSuccess(result -> blogCache.put(result.getId(), result))));
-  }
-
-  public Flux<BlogDTO> getAllBlogDTOs() {
-    log.debug("pobieram wszystkie blogi w postaci DTO");
-    var dtoFlux = Flux.fromIterable(blogCache.asMap().values())
-        .switchIfEmpty(Flux.defer(() -> blogFinder.findAll()
-            .map(BlogToDtoMapper::mapToBlogDto)
-            .doOnNext(blog -> blogCache.put(blog.getId(), blog)))
-            .cache());
-    return dtoFlux
-        .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }
 
   void evictBlogCache() {

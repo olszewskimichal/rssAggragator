@@ -44,6 +44,11 @@ final class UpdateBlogDTO {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(link, description, name, feedURL, publishedDate);
+  }
+
+  @Override
   public boolean equals(Object o) {
 
     if (this == o) {
@@ -58,11 +63,6 @@ final class UpdateBlogDTO {
         Objects.equals(name, that.name) &&
         Objects.equals(feedURL, that.feedURL) &&
         Objects.equals(publishedDate, that.publishedDate);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(link, description, name, feedURL, publishedDate);
   }
 
 }

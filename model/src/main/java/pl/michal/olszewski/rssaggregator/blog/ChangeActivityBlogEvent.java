@@ -17,6 +17,11 @@ abstract class ChangeActivityBlogEvent implements Serializable {
   }
 
   @Override
+  public final int hashCode() {
+    return Objects.hash(blogId, occurredAt);
+  }
+
+  @Override
   public final boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -27,10 +32,5 @@ abstract class ChangeActivityBlogEvent implements Serializable {
     ChangeActivityBlogEvent that = (ChangeActivityBlogEvent) o;
     return Objects.equals(blogId, that.blogId) &&
         Objects.equals(occurredAt, that.occurredAt);
-  }
-
-  @Override
-  public final int hashCode() {
-    return Objects.hash(blogId, occurredAt);
   }
 }

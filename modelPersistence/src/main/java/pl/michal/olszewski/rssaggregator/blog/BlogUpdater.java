@@ -22,20 +22,20 @@ class BlogUpdater {
     return repository.save(blog);
   }
 
+  public Mono<Blog> createNewBlog(CreateBlogDTO blogDTO) {
+    return repository.save(new Blog(blogDTO));
+  }
+
+  public Mono<Void> deleteAll() {
+    return repository.deleteAll();
+  }
+
   Mono<Blog> updateBlogFromDTO(Blog blog, UpdateBlogDTO blogDTO) {
     blog.updateFromDto(blogDTO);
     return repository.save(blog);
   }
 
-  public Mono<Blog> createNewBlog(CreateBlogDTO blogDTO) {
-    return repository.save(new Blog(blogDTO));
-  }
-
   Mono<Void> deleteBlogById(String blogId) {
     return repository.deleteById(blogId);
-  }
-
-  public Mono<Void> deleteAll() {
-    return repository.deleteAll();
   }
 }

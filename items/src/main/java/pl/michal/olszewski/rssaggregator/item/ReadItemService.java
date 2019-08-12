@@ -16,6 +16,17 @@ class ReadItemService {
     this.itemUpdater = itemUpdater;
   }
 
+  Mono<Void> processRequest(ReadItemDTO readItemDTO) {
+    return itemFinder.findItemById(readItemDTO.getItemId())
+        .switchIfEmpty(Mono.error(new ItemNotFoundException(readItemDTO.getItemId())))
+        .flatMap(item -> {
+          if (readItemDTO.isRead()) {
+            return markItemAsRead(item);
+          }
+          return markItemAsUnread(item);
+        });
+  }
+
   private Mono<Void> markItemAsRead(Item item) {
     return Mono.fromCallable(item::markAsRead)
         .flatMap(itemUpdater::updateItem)
@@ -26,16 +37,5 @@ class ReadItemService {
     return Mono.fromCallable(item::markAsUnread)
         .flatMap(itemUpdater::updateItem)
         .then();
-  }
-
-  Mono<Void> processRequest(ReadItemDTO readItemDTO) {
-    return itemFinder.findItemById(readItemDTO.getItemId())
-        .switchIfEmpty(Mono.error(new ItemNotFoundException(readItemDTO.getItemId())))
-        .flatMap(item -> {
-          if (readItemDTO.isRead()) {
-            return markItemAsRead(item);
-          }
-          return markItemAsUnread(item);
-        });
   }
 }

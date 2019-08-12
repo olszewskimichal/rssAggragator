@@ -41,6 +41,11 @@ final class Item {
   }
 
   @Override
+  public final int hashCode() {
+    return Objects.hash(title, description, link, date, author, blogId);
+  }
+
+  @Override
   public final boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -56,11 +61,6 @@ final class Item {
             Objects.equals(date, item.date) &&
             Objects.equals(blogId, item.blogId) &&
             Objects.equals(author, item.author);
-  }
-
-  @Override
-  public final int hashCode() {
-    return Objects.hash(title, description, link, date, author, blogId);
   }
 
   Item markAsRead() {

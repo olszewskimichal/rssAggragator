@@ -34,17 +34,6 @@ class RssExtractorService {
     this.tracer = tracer;
   }
 
-  private UpdateBlogWithItemsDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
-    log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
-    return new UpdateBlogWithItemsDTO(
-        syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
-        HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()),
-        syndFeed.getTitle(),
-        feedURL,
-        syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
-        new ArrayList<>());
-  }
-
   UpdateBlogWithItemsDTO getBlog(RssInfo info) {
     log.trace("getBlog START {}", info);
     try {
@@ -66,6 +55,17 @@ class RssExtractorService {
     } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException ex) {
       throw new RssException(info.getFeedURL(), ex);
     }
+  }
+
+  private UpdateBlogWithItemsDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
+    log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
+    return new UpdateBlogWithItemsDTO(
+        syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
+        HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()),
+        syndFeed.getTitle(),
+        feedURL,
+        syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
+        new ArrayList<>());
   }
 
 }
