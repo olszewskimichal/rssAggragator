@@ -131,10 +131,9 @@ public class BlogService {
 
   public Flux<BlogAggregationDTO> getAllBlogDTOs() {
     log.debug("pobieram wszystkie blogi w postaci DTO");
-    var dtoFlux = Flux.fromIterable(blogAggregationCache.asMap().values())
-        .switchIfEmpty(Flux.defer(() -> blogFinder.getBlogsWithCount()
+    var dtoFlux = Flux.defer(() -> blogFinder.getBlogsWithCount()
             .doOnNext(blog -> blogAggregationCache.put(blog.getBlogId(), blog)))
-            .cache());
+        .cache();
     return dtoFlux
         .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
   }

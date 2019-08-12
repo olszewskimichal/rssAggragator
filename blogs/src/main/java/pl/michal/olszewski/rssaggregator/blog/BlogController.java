@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
-import pl.michal.olszewski.rssaggregator.item.BlogItemsController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -121,8 +120,7 @@ class BlogController {
 
   private BlogAggregationDTO addLinkToBlogItems(BlogAggregationDTO blog) {
     if (blog.getLink("items") == null) {
-      Link link = linkTo(methodOn(BlogItemsController.class)
-          .getBlogItems(blog.getBlogId())).withRel("items");
+      Link link = new Link("/api/v1/blogs/" + blog.getBlogId() + "/items").withRel("items");
       blog.add(link);
     }
     return blog;

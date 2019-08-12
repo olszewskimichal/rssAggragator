@@ -18,10 +18,8 @@ class ItemCacheConfig {
         .expireAfterAccess(2, TimeUnit.DAYS)
         .maximumSize(30000)
         .build();
-    finder.findAllOrderByPublishedDate(200, 0)
-        .doOnNext(item -> cache.put(item.getLink(), ItemToDtoMapper.mapItemToItemDTO(item)))
-        .then()
-        .block();
+    finder.findAllOrderByPublishedDateBlocking(200, 0)
+        .forEach(item -> cache.put(item.getLink(), ItemToDtoMapper.mapItemToItemDTO(item)));
     registry.gauge("itemCache", cache, Cache::estimatedSize);
     return cache;
   }

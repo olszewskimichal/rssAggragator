@@ -24,35 +24,14 @@
       <artifactId>search</artifactId>
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
-
     <dependency>
       <artifactId>de.flapdoodle.embed.mongo</artifactId>
       <groupId>de.flapdoodle.embed</groupId>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <artifactId>springfox-swagger-ui</artifactId>
-      <groupId>io.springfox</groupId>
-      <version>2.9.2</version>
-    </dependency>
-    <dependency>
-      <artifactId>springfox-swagger2</artifactId>
-      <groupId>io.springfox</groupId>
-      <version>2.9.2</version>
-    </dependency>
-    <dependency>
-      <artifactId>spring-boot-starter-webflux</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
     <dependency>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
       <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
-      <groupId>org.springframework.boot</groupId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 

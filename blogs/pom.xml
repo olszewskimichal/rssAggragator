@@ -31,6 +31,10 @@
       <artifactId>jsoup</artifactId>
       <version>1.12.1</version>
     </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
   </dependencies>
 
   <modelVersion>4.0.0</modelVersion>
