@@ -4,11 +4,11 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
-class BlogUpdater {
+class BlogWorker {
 
   private final BlogReactiveRepository repository;
 
-  public BlogUpdater(BlogReactiveRepository repository) {
+  public BlogWorker(BlogReactiveRepository repository) {
     this.repository = repository;
   }
 
@@ -24,10 +24,6 @@ class BlogUpdater {
 
   public Mono<Blog> createNewBlog(CreateBlogDTO blogDTO) {
     return repository.save(new Blog(blogDTO));
-  }
-
-  public Mono<Void> deleteAll() {
-    return repository.deleteAll();
   }
 
   Mono<Blog> updateBlogFromDTO(Blog blog, UpdateBlogDTO blogDTO) {

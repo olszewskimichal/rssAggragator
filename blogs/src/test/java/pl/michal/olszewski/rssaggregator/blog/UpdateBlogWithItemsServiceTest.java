@@ -29,9 +29,9 @@ import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class BlogWithItemsUpdateServiceTest {
+class UpdateBlogWithItemsServiceTest {
 
-  private BlogWithItemsUpdateService blogService;
+  private UpdateBlogWithItemsService blogService;
 
   @Mock
   private JmsTemplate jmsTemplate;
@@ -47,8 +47,8 @@ class BlogWithItemsUpdateServiceTest {
           return Mono.just(argument);
         }
     );
-    blogService = new BlogWithItemsUpdateService(
-        new BlogUpdater(blogRepository),
+    blogService = new UpdateBlogWithItemsService(
+        new BlogWorker(blogRepository),
         Caffeine.newBuilder().build(),
         Caffeine.newBuilder().build(),
         new NewItemInBlogEventProducer(jmsTemplate),

@@ -12,16 +12,16 @@ import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
-public class BlogWithItemsUpdateService {
+public class UpdateBlogWithItemsService {
 
-  private final BlogUpdater blogUpdater;
+  private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
   private final Cache<String, ItemDTO> itemCache;
   private final NewItemInBlogEventProducer producer;
   private final NewItemForSearchEventProducer itemForSearchEventProducer;
 
-  public BlogWithItemsUpdateService(
-      BlogUpdater blogUpdater,
+  public UpdateBlogWithItemsService(
+      BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
       @Qualifier("itemCache") Cache<String, ItemDTO> itemCache,
       NewItemInBlogEventProducer producer,
