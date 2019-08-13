@@ -4,10 +4,8 @@ import static pl.michal.olszewski.rssaggregator.blog.Blog.builder;
 
 import java.util.UUID;
 import java.util.stream.IntStream;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
-@Slf4j
 class BlogListFactory {
 
   private final BlogReactiveRepository repository;

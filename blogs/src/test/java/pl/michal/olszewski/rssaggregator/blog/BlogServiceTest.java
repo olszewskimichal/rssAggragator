@@ -10,23 +10,14 @@ import static org.mockito.Mockito.verify;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.jms.core.JmsTemplate;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
-import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
-import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -35,15 +26,6 @@ import reactor.test.StepVerifier;
 class BlogServiceTest {
 
   private BlogService blogService;
-
-  @Mock
-  private BlogFinder blogFinder;
-
-  @Mock
-  private BlogUpdater blogUpdater;
-
-  @Mock
-  private JmsTemplate jmsTemplate;
 
   @Mock
   private BlogReactiveRepository blogRepository;
@@ -62,10 +44,7 @@ class BlogServiceTest {
     blogService = new BlogService(
         new BlogFinder(blogRepository, blogSyncRepository),
         new BlogUpdater(blogRepository),
-        Caffeine.newBuilder().build(),
-        Caffeine.newBuilder().build(),
-        new NewItemInBlogEventProducer(jmsTemplate),
-        new NewItemForSearchEventProducer(jmsTemplate)
+        Caffeine.newBuilder().build()
     );
     blogService.evictBlogCache();
   }
@@ -130,68 +109,6 @@ class BlogServiceTest {
         .expectComplete()
         .verify();
 
-  }
-
-  @Test
-  void shouldUpdateBlogWhenNewItemAdd() {
-    //given
-    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
-
-    List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1)
-        .mapToObj(number -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(number + "").link("link" + number).build()) //TODO
-        .collect(Collectors.toList());
-
-    UpdateBlogWithItemsDTO blogDTO = UpdateBlogWithItemsDTO.builder()
-        .name("url")
-        .feedURL("url")
-        .itemsList(itemsList)
-        .build();
-
-    //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blog, blogDTO);
-
-    //then
-    StepVerifier.create(updateBlog)
-        .expectNextCount(1L)
-        .expectComplete()
-        .verify();
-    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
-    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
-  }
-
-  @Test
-  void shouldAddItemToBlogOnlyOnce() {
-    //given
-    ItemDTO itemDTO = ItemDTO.builder()
-        .title("title")
-        .link("url")
-        .date(Instant.now())
-        .build();
-
-    Blog blog = Blog.builder()
-        .id(UUID.randomUUID().toString())
-        .feedURL("url")
-        .name("url")
-        .build();
-
-    UpdateBlogWithItemsDTO blogDTO = UpdateBlogWithItemsDTO.builder()
-        .name("url")
-        .feedURL("url")
-        .itemsList(Arrays.asList(itemDTO, itemDTO))
-        .build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
-
-    //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blog, blogDTO);
-
-    //then
-    StepVerifier.create(updateBlog)
-        .expectNextCount(1)
-        .expectComplete()
-        .verify();
-    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
-    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
 
   @Test

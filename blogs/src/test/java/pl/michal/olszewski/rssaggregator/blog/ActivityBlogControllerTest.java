@@ -17,7 +17,7 @@ import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class ActivityBlogControllerTest { //TODO do przeniesienia po przejsciu na moduły
+class ActivityBlogControllerTest {
 
   private ActivityBlogController activityBlogController;
   @Mock
