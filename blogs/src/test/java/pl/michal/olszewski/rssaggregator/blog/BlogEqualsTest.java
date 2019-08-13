@@ -53,16 +53,4 @@ class BlogEqualsTest {
         .verify();
   }
 
-  @Test
-  void eventsContractTest() {
-    EqualsVerifier.forClass(ChangeActivityBlogEvent.class)
-        .suppress(NONFINAL_FIELDS)
-        .verify();
-    EqualsVerifier.forClass(ActivateBlog.class)
-        .suppress(NONFINAL_FIELDS)
-        .verify();
-    EqualsVerifier.forClass(DeactivateBlog.class)
-        .suppress(NONFINAL_FIELDS)
-        .verify();
-  }
 }

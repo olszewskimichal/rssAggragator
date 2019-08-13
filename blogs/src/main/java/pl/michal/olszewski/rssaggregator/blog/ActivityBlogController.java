@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,10 +18,10 @@ import reactor.core.publisher.Mono;
 @Api(value = "/api/v1/blogs")
 public class ActivityBlogController {
 
-  private final BlogActivityEventProducer eventProducer;
+  private final BlogActivityUpdater blogActivityUpdater;
 
-  public ActivityBlogController(BlogActivityEventProducer eventProducer) {
-    this.eventProducer = eventProducer;
+  public ActivityBlogController(BlogActivityUpdater blogActivityUpdater) {
+    this.blogActivityUpdater = blogActivityUpdater;
   }
 
   @PostMapping(value = "/enable/{id}")
@@ -34,9 +33,7 @@ public class ActivityBlogController {
   @SwaggerDocumented
   public Mono<Void> enableBlogById(@PathVariable("id") String blogId) {
     log.debug("Enable blog by Id {} ", blogId);
-    return Mono.fromRunnable(
-        () -> eventProducer.writeEventToQueue(ActivateBlog.builder().blogId(blogId).occurredAt(Instant.now()).build())
-    );
+    return blogActivityUpdater.activateBlog(blogId).then();
   }
 
   @PostMapping(value = "/disable/{id}")
@@ -48,8 +45,6 @@ public class ActivityBlogController {
   @SwaggerDocumented
   public Mono<Void> disableBlogById(@PathVariable("id") String blogId) {
     log.debug("Disable blog by Id {} ", blogId);
-    return Mono.fromRunnable(
-        () -> eventProducer.writeEventToQueue(DeactivateBlog.builder().blogId(blogId).occurredAt(Instant.now()).build())
-    );
+    return blogActivityUpdater.deactivateBlog(blogId).then();
   }
 }
