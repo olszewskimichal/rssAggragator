@@ -43,7 +43,7 @@ class BlogServiceTest {
     );
     blogService = new BlogService(
         new BlogFinder(blogRepository, blogSyncRepository),
-        new BlogUpdater(blogRepository),
+        new BlogWorker(blogRepository),
         Caffeine.newBuilder().build()
     );
     blogService.evictBlogCache();

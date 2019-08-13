@@ -7,9 +7,9 @@ import reactor.core.publisher.Mono;
 class BlogActivityUpdater {
 
   private final BlogFinder blogReactiveRepository;
-  private final BlogUpdater blogUpdater;
+  private final BlogWorker blogUpdater;
 
-  BlogActivityUpdater(BlogFinder blogReactiveRepository, BlogUpdater blogUpdater) {
+  BlogActivityUpdater(BlogFinder blogReactiveRepository, BlogWorker blogUpdater) {
     this.blogReactiveRepository = blogReactiveRepository;
     this.blogUpdater = blogUpdater;
   }

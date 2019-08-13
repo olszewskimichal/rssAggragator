@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
-import pl.michal.olszewski.rssaggregator.blog.BlogWithItemsUpdateService;
+import pl.michal.olszewski.rssaggregator.blog.UpdateBlogWithItemsService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -24,14 +24,14 @@ class UpdateBlogService {
   private final BlogFinder blogFinder;
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
-  private final BlogWithItemsUpdateService blogService;
+  private final UpdateBlogWithItemsService blogService;
   private final Tracer tracer;
 
   public UpdateBlogService(
       BlogFinder blogFinder,
       Executor executor,
       MeterRegistry registry,
-      BlogWithItemsUpdateService blogService,
+      UpdateBlogWithItemsService blogService,
       FeedFetcher feedFetcher,
       Tracer tracer
   ) {

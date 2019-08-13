@@ -5,10 +5,8 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
-@ToString
 public final class BlogAggregationDTO {
 
   private final String blogId;

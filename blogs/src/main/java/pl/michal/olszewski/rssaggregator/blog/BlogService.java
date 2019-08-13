@@ -12,12 +12,12 @@ import reactor.core.publisher.Mono;
 public class BlogService {
 
   private final BlogFinder blogFinder;
-  private final BlogUpdater blogUpdater;
+  private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
 
   public BlogService(
       BlogFinder blogFinder,
-      BlogUpdater blogUpdater,
+      BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache) {
     this.blogFinder = blogFinder;
     this.blogUpdater = blogUpdater;
