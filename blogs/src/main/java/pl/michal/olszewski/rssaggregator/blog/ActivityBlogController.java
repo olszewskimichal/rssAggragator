@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
@@ -24,7 +24,7 @@ public class ActivityBlogController {
     this.blogActivityUpdater = blogActivityUpdater;
   }
 
-  @PostMapping(value = "/enable/{id}")
+  @PutMapping(value = "/enable/{id}")
   @ApiOperation(value = "Aktywuje blog o podanym id")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Pomyslne zlecenie aktywowania bloga"),
@@ -36,7 +36,7 @@ public class ActivityBlogController {
     return blogActivityUpdater.activateBlog(blogId).then();
   }
 
-  @PostMapping(value = "/disable/{id}")
+  @PutMapping(value = "/disable/{id}")
   @ApiOperation(value = "Deaktywuje blog o podanym id")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "Pomyslne zlecenie deaktywowania bloga"),
