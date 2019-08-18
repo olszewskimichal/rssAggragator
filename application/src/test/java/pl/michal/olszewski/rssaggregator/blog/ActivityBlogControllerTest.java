@@ -51,11 +51,9 @@ class ActivityBlogControllerTest extends IntegrationTestBase {
         .verify();
   }
 
-
   private BlogListFactory givenBlog() {
     return new BlogListFactory(blogRepository);
   }
-
 
   private void thenEnableBlogByApi(String blogId) {
     webTestClient.put()
