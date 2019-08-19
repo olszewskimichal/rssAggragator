@@ -9,28 +9,28 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-@Document(indexName = "searchitems")
+@Document(indexName = "searchitems", refreshInterval = "-1")
 @Builder
 @Getter
 final class ItemForSearch {
 
-  @Id
-  private final String id;
   @Field(type = FieldType.Text, fielddata = true, store = true)
   private final String title;
   private final String description;
+  @Id
   private final String link;
+  private final float score;
 
   @JsonCreator
   public ItemForSearch(
-      @JsonProperty("id") String id,
       @JsonProperty("title") String title,
       @JsonProperty("description") String description,
-      @JsonProperty("link") String link
+      @JsonProperty("link") String link,
+      @JsonProperty("score") float score
   ) {
-    this.id = id;
     this.title = title;
     this.description = description;
     this.link = link;
+    this.score = score;
   }
 }

@@ -2,7 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static pl.michal.olszewski.rssaggregator.blog.rss.update.BlogItemsFromFeedExtractor.convertURLToAscii;
-import static pl.michal.olszewski.rssaggregator.blog.rss.update.BlogItemsFromFeedExtractor.getFinalURL;
+import static pl.michal.olszewski.rssaggregator.item.LinkExtractor.getFinalURL;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ class CorrectLinkFromRedirectTest {
   @Test
   void shouldGetFinalLinkFromRedirect() {
     assertThat(getFinalURL("http://jvm-bloggers.com/r/%E0%BB%80%F0%96%A8%A1%E2%BA%B3%F0%AB%89%9A%E1%A2%B5%D1%89%F0%9D%9B%8A"))
-        .isEqualTo("http://namiekko.pl/2017/11/28/recenzja-ksiazki-zawod-programista-macieja-aniserowicza/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers");
+        .isEqualTo("http://namiekko.pl/2017/11/28/recenzja-ksiazki-zawod-programista-macieja-aniserowicza/");
   }
 
   @Test
@@ -35,4 +35,9 @@ class CorrectLinkFromRedirectTest {
     assertThat(finalURL).isEqualTo(finalURL2);
   }
 
+  @Test
+  void shouldRemoveUnnecessaryParametersFromURL() {
+    String finalURL = getFinalURL("http://namiekko.pl/2017/11/28/recenzja-ksiazki-zawod-programista-macieja-aniserowicza/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers");
+    assertThat(finalURL).isEqualTo("http://namiekko.pl/2017/11/28/recenzja-ksiazki-zawod-programista-macieja-aniserowicza/");
+  }
 }

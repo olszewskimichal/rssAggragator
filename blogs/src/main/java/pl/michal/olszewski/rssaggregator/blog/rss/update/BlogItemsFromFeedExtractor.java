@@ -1,9 +1,9 @@
 package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
+import static pl.michal.olszewski.rssaggregator.item.LinkExtractor.getFinalURL;
+
 import com.rometools.rome.feed.synd.SyndFeed;
-import java.io.IOException;
 import java.lang.Character.UnicodeBlock;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -52,26 +52,6 @@ class BlogItemsFromFeedExtractor {
   private static boolean containsUnicode(String url) {
     OptionalInt any = url.chars().parallel().filter(c -> UnicodeBlock.of(c) != UnicodeBlock.BASIC_LATIN).findAny();
     return any.isPresent();
-  }
-
-  static String getFinalURL(String linkUrl) {
-    try {
-      log.trace("getFinalURL for link {}", linkUrl);
-      HttpURLConnection con = (HttpURLConnection) new URL(linkUrl).openConnection();
-      con.addRequestProperty("User-Agent", "Mozilla/4.76");
-      con.setInstanceFollowRedirects(false);
-      con.setRequestMethod("HEAD");
-      con.setConnectTimeout(700);
-      con.connect();
-      if (con.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || con.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
-        log.trace("wykonuje redirect dla linku {}", linkUrl);
-        String redirectUrl = con.getHeaderField("Location");
-        return getFinalURL(redirectUrl).replaceAll("[&?]gi.*", "");
-      }
-    } catch (IOException ignored) {
-      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ignored);
-    }
-    return linkUrl;
   }
 
 }

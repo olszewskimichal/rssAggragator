@@ -16,7 +16,7 @@ public class ElasticConfig {
 
   @Bean
   public ReactiveElasticsearchClient reactiveElasticsearchClient() {
-    ClientConfiguration configuration = ClientConfiguration.builder()
+    var configuration = ClientConfiguration.builder()
         .connectedTo("localhost:9200", "localhost:9300")
         .build();
 
@@ -35,7 +35,8 @@ public class ElasticConfig {
 
   @Bean
   public ReactiveElasticsearchOperations reactiveElasticsearchOperations() {
-    return new ReactiveElasticsearchTemplate(reactiveElasticsearchClient(), elasticsearchConverter());
+    var resultsMapper = new ScoreResultsMapper();
+    return new ReactiveElasticsearchTemplate(reactiveElasticsearchClient(), elasticsearchConverter(), resultsMapper);
   }
 
 }
