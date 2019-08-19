@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.search.items;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,8 @@ class NewItemForSearchEventConsumerTest extends ElasticIntegrationTestBase {
   private ReactiveElasticsearchOperations reactiveElasticsearchTemplate;
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws IOException, InterruptedException {
+    setupElastic();
     NativeSearchQuery deleteQuery = new NativeSearchQueryBuilder()
         .withQuery(QueryBuilders.matchAllQuery())
         .build();

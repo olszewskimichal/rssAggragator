@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.search.items;
 import static org.assertj.core.api.Assertions.assertThat;
 import static pl.michal.olszewski.rssaggregator.search.items.ItemForSearch.builder;
 
+import java.io.IOException;
 import java.util.stream.Stream;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,8 @@ class ItemTextSearchRepositoryImplTest extends ElasticIntegrationTestBase {
   private ItemTextSearchRepository itemTextSearchRepository;
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws IOException, InterruptedException {
+    setupElastic();
     NativeSearchQuery query = new NativeSearchQueryBuilder()
         .withQuery(QueryBuilders.matchAllQuery())
         .build();
