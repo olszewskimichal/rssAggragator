@@ -14,8 +14,7 @@ public abstract class ElasticIntegrationTestBase extends IntegrationTestBase {
     if (embeddedElastic == null) {
       embeddedElastic = EmbeddedElastic.builder()
           .withElasticVersion("6.8.0")
-          .withSetting(PopularProperties.HTTP_PORT, 9200)
-          .withSetting(PopularProperties.TRANSPORT_TCP_PORT, 9300)
+          .withSetting(PopularProperties.TRANSPORT_TCP_PORT, 9999)
           .withEsJavaOpts("-Xms128m -Xmx512m")
           .withDownloadUrl(new URL("https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.8.0.zip"))
           .withStartTimeout(1, TimeUnit.MINUTES)

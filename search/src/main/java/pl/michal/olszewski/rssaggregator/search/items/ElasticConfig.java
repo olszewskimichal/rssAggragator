@@ -17,7 +17,7 @@ public class ElasticConfig {
   @Bean
   public ReactiveElasticsearchClient reactiveElasticsearchClient() {
     var configuration = ClientConfiguration.builder()
-        .connectedTo("localhost:9200", "localhost:9300")
+        .connectedTo("localhost:9200", "localhost:9300", "localhost:9999")
         .build();
 
     return ReactiveRestClients.create(configuration);
