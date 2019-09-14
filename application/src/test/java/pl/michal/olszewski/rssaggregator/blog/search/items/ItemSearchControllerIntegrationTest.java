@@ -1,5 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog.search.items;
 
+import static pl.michal.olszewski.rssaggregator.blog.search.items.ItemForSearch.builder;
+
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,9 +24,9 @@ class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
   @Test
   void shouldReturnSearchResultByMatchingTextWithoutLimit() {
     List<ItemForSearch> itemList = List.of(
-        ItemForSearch.builder().link("link1").title("AAA").build(),
-        ItemForSearch.builder().link("link2").title("BBB").build(),
-        ItemForSearch.builder().link("link3").title("CCC").build()
+        builder().link("link1").title("AAA").build(),
+        builder().link("link2").title("BBB").build(),
+        builder().link("link3").title("CCC").build()
     );
     mongoTemplate.insertAll(itemList);
 
@@ -36,9 +38,9 @@ class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
   @Test
   void shouldReturnSearchResultByMatchingTextWithLimit() {
     List<ItemForSearch> itemList = List.of(
-        ItemForSearch.builder().link("link1").title("BBB").build(),
-        ItemForSearch.builder().link("link2").title("BBB").build(),
-        ItemForSearch.builder().link("link3").title("CCC").build()
+        builder().link("link1").title("BBB").build(),
+        builder().link("link2").title("BBB").build(),
+        builder().link("link3").title("CCC").build()
     );
     mongoTemplate.insertAll(itemList);
 

@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static pl.michal.olszewski.rssaggregator.blog.Blog.builder;
 
 import com.mongodb.MongoWriteException;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,7 +98,7 @@ class BlogRepositoryTest {
     givenBlog()
         .withURL("url");
     //then
-    assertThatThrownBy(() -> entityManager.save(Blog.builder().blogURL("url").build()))
+    assertThatThrownBy(() -> entityManager.save(builder().blogURL("url").build()))
         .hasCauseInstanceOf(MongoWriteException.class)
         .isInstanceOf(DuplicateKeyException.class)
         .hasMessageContaining("duplicate key error collection");
@@ -135,7 +136,8 @@ class BlogRepositoryTest {
 
   @Test
   void shouldGetAllBlogsIfAllAreActive() {
-    givenBlog().buildNumberOfBlogsAndSave(5);
+    givenBlog()
+        .buildNumberOfBlogsAndSave(5);
     //when
     Flux<Blog> streamAll = blogRepository.findAll();
     //then
@@ -160,7 +162,7 @@ class BlogRepositoryTest {
   }
 
   private BlogListFactory givenBlog() {
-    return new BlogListFactory(blogRepository, entityManager);
+    return new BlogListFactory(blogRepository);
   }
 
 }

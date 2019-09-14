@@ -1,8 +1,9 @@
 package pl.michal.olszewski.rssaggregator.blog.activity;
 
+import static java.time.Instant.now;
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static pl.michal.olszewski.rssaggregator.blog.Blog.builder;
 
-import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +31,11 @@ class BlogActivityEventConsumerTest extends IntegrationTestBase {
 
   @Test
   void shouldActivateBlogByEvent() {
-    Blog blog = repository.save(Blog.builder().build()).block();
-    eventConsumer.receiveActivateMessage(ActivateBlog.builder().occurredAt(Instant.now()).blogId(blog.getId()).build());
+    Blog blog = repository.save(builder().build()).block();
+    eventConsumer.receiveActivateMessage(ActivateBlog.builder().occurredAt(now()).blogId(blog.getId()).build());
     //then
     StepVerifier.create(repository.findById(blog.getId()))
-        .assertNext(v -> assertThat(v.isActive()).isTrue())
+        .assertNext(blogFromDB -> assertThat(blogFromDB.isActive()).isTrue())
         .expectComplete()
         .verify();
     StepVerifier.create(activityBlogEventRepository.count())
@@ -45,12 +46,12 @@ class BlogActivityEventConsumerTest extends IntegrationTestBase {
 
   @Test
   void shouldDeactivateBlogByEvent() {
-    Blog blog = repository.save(Blog.builder().build()).block();
-    eventConsumer.receiveDeactivateMessage(DeactivateBlog.builder().occurredAt(Instant.now()).blogId(blog.getId()).build());
+    Blog blog = repository.save(builder().build()).block();
+    eventConsumer.receiveDeactivateMessage(DeactivateBlog.builder().occurredAt(now()).blogId(blog.getId()).build());
     //when
     //then
     StepVerifier.create(repository.findById(blog.getId()))
-        .assertNext(v -> assertThat(v.isActive()).isFalse())
+        .assertNext(blogFromDb -> assertThat(blogFromDb.isActive()).isFalse())
         .expectComplete()
         .verify();
     StepVerifier.create(activityBlogEventRepository.count())

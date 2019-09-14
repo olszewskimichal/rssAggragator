@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import pl.michal.olszewski.rssaggregator.blog.items.BlogItemsController;
 import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
+import pl.michal.olszewski.rssaggregator.item.BlogItemsController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -93,8 +93,7 @@ class BlogController {
   })
   @SwaggerDocumented
   public Mono<BlogDTO> addBlog(@RequestBody BlogDTO blogDTO) {
-    log.debug("POST - addBlog {}", blogDTO.getName());
-    log.trace("POST - addBlog {}", blogDTO);
+    log.debug("POST - addBlog {}", blogDTO);
     return blogService.getBlogOrCreate(blogDTO)
         .doOnSuccess(blog -> log.debug("END addBlog {}", blogDTO.getName()))
         .doOnError(error -> log.error("ERROR addBlog {}", blogDTO.getName(), error));

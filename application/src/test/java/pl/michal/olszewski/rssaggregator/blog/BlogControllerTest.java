@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +13,10 @@ import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import org.springframework.web.reactive.function.BodyInserters;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import pl.michal.olszewski.rssaggregator.item.ItemListFactory;
 import reactor.test.StepVerifier;
 
 class BlogControllerTest extends IntegrationTestBase {
-
   @Autowired
   private BlogReactiveRepository blogRepository;
 
@@ -36,45 +35,49 @@ class BlogControllerTest extends IntegrationTestBase {
 
   @Test
   void should_get_empty_list_of_blogs() {
-    givenBlog()
-        .buildNumberOfBlogsDTOAndSave(0);
+    //given
 
+    //when
     ListBodySpec<BlogAggregationDTO> blogs = thenGetBlogsFromApi();
 
+    //then
     blogs.hasSize(0);
   }
 
   @Test
   void should_get_all_blogs() {
+    //given
     givenBlog()
-        .buildNumberOfBlogsDTOAndSave(3);
+        .buildNumberOfBlogsAndSave(3);
 
+    //when
     ListBodySpec<BlogAggregationDTO> blogs = thenGetBlogsFromApi();
 
+    //then
     blogs.hasSize(3);
   }
 
   @Test
   void should_get_one_blog() {
-    Blog blog = givenBlog()
-        .buildNumberOfBlogsAndSave(1).get(0);
-    BlogAggregationDTO expected = new BlogAggregationDTO(blog);
+    //given
+    Blog blog = givenBlog().createAndSaveNewBlog();
+    BlogAggregationDTO expected = new BlogAggregationDTO(blog.getId(), new BlogDTO(blog));
 
     BodySpec<BlogAggregationDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
 
-    blogDTO.value(v -> assertThat(v).isEqualToComparingFieldByField(expected));
+    blogDTO.value(aggregationDTO -> assertThat(aggregationDTO).isEqualToComparingFieldByField(expected));
   }
 
   @Test
   void should_create_a_blog() {
     //given
-    blogRepository.deleteAll().block();
+
     //when
     thenCreateBlogByApi("test");
 
     //then
     StepVerifier.create(blogRepository.findAll())
-        .assertNext(v -> assertThat(v).isNotNull())
+        .assertNext(blog -> assertThat(blog).isNotNull())
         .expectComplete()
         .verify();
   }
@@ -82,10 +85,18 @@ class BlogControllerTest extends IntegrationTestBase {
   @Test
   void should_update_existing_blog() {
     //given
-    Instant instant = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-    Blog blog = givenBlog()
-        .buildNumberOfBlogsAndSave(1).get(0);
-    BlogDTO blogDTO = new BlogDTO(blog.getBlogURL(), "desc", blog.getName(), blog.getFeedURL(), instant, new ArrayList<>()); //TODO skrocic linie
+    Instant expectedPublishedDate = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    String expectedDescription = "desc";
+
+    Blog blog = givenBlog().createAndSaveNewBlog();
+
+    BlogDTO blogDTO = BlogDTO.builder()
+        .link(blog.getBlogURL())
+        .description(expectedDescription)
+        .name(blog.getName())
+        .feedURL(blog.getFeedURL())
+        .publishedDate(expectedPublishedDate)
+        .build();
 
     //when
     thenUpdateBlogByApi(blogDTO);
@@ -93,15 +104,15 @@ class BlogControllerTest extends IntegrationTestBase {
     //then
     assertThat(blogRepository.findById(blog.getId()).block())
         .isNotNull()
-        .hasFieldOrPropertyWithValue("description", "desc")
-        .hasFieldOrPropertyWithValue("publishedDate", instant);
+        .hasFieldOrPropertyWithValue("description", expectedDescription)
+        .hasFieldOrPropertyWithValue("publishedDate", expectedPublishedDate);
   }
 
   @Test
   void should_delete_existing_blog() {
     //given
-    Blog blog = givenBlog()
-        .buildNumberOfBlogsAndSave(1).get(0);
+    Blog blog = givenBlog().createAndSaveNewBlog();
+
     //when
     thenDeleteOneBlogFromApi(blog.getId());
 
@@ -115,16 +126,34 @@ class BlogControllerTest extends IntegrationTestBase {
   void should_get_one_blogWith2Items() {
     //given
     Blog blog = givenBlog()
-        .buildBlogWithItemsAndSave(2);
+        .createAndSaveNewBlog();
+
+    givenItems()
+        .buildNumberOfItemsAndSave(2, blog.getId());
+
     //when
     BodySpec<BlogAggregationDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
     //then
     blogDTO.value(v -> assertThat(v).isNotNull());
   }
 
-  private BlogListFactory givenBlog() {
-    return new BlogListFactory(blogRepository, mongoTemplate);
+  @Test
+  void shouldThrowExceptionOnDuplicateKey() {
+    //given
+    givenBlog()
+        .withURL("test");
+    //when
+    thenThrowExceptionOnCreateBlogByApi("test");
   }
+
+  private BlogListFactory givenBlog() {
+    return new BlogListFactory(blogRepository);
+  }
+
+  private ItemListFactory givenItems() {
+    return new ItemListFactory(mongoTemplate);
+  }
+
 
   private ListBodySpec<BlogAggregationDTO> thenGetBlogsFromApi() {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs", port)
@@ -147,6 +176,14 @@ class BlogControllerTest extends IntegrationTestBase {
         .body(BodyInserters.fromObject(BlogDTO.builder().link(link).build()))
         .exchange()
         .expectStatus().isNoContent();
+  }
+
+  private void thenThrowExceptionOnCreateBlogByApi(String link) {
+    webTestClient.post()
+        .uri("http://localhost:{port}/api/v1/blogs", port)
+        .body(BodyInserters.fromObject(BlogDTO.builder().link(link).build()))
+        .exchange()
+        .expectStatus().is5xxServerError();
   }
 
   private void thenUpdateBlogByApi(BlogDTO blogDTO) {

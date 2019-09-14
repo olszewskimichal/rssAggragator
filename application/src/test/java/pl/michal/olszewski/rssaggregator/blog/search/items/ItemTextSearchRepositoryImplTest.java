@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog.search.items;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static pl.michal.olszewski.rssaggregator.blog.search.items.ItemForSearch.builder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,9 +30,9 @@ class ItemTextSearchRepositoryImplTest extends IntegrationTestBase {
   void shouldFindItemWhereTitleMatchingToQuery() {
     //given
     List<ItemForSearch> blogList = Arrays.asList(
-        ItemForSearch.builder().link("URL1").title("TDD in JAVA").description("TDD").build(),
-        ItemForSearch.builder().link("URL2").title("TDD in PYTHON").description("TDD").build(),
-        ItemForSearch.builder().link("URL3").title("TDD in JAVASCRIPT").description("TDD").build()
+        builder().link("URL1").title("TDD in JAVA").description("TDD").build(),
+        builder().link("URL2").title("TDD in PYTHON").description("TDD").build(),
+        builder().link("URL3").title("TDD in JAVASCRIPT").description("TDD").build()
     );
     mongoTemplate.insertAll(blogList);
     //when
@@ -45,9 +46,9 @@ class ItemTextSearchRepositoryImplTest extends IntegrationTestBase {
   void shouldFindItemWhereDescriptionMatchingToQuery() {
     //given
     List<ItemForSearch> blogList = Arrays.asList(
-        ItemForSearch.builder().link("URL1").description("TDD in JAVA").title("TDD").build(),
-        ItemForSearch.builder().link("URL2").description("TDD in PYTHON").title("TDD").build(),
-        ItemForSearch.builder().link("URL3").description("TDD in JAVASCRIPT").title("TDD").build()
+        builder().link("URL1").description("TDD in JAVA").title("TDD").build(),
+        builder().link("URL2").description("TDD in PYTHON").title("TDD").build(),
+        builder().link("URL3").description("TDD in JAVASCRIPT").title("TDD").build()
     );
     mongoTemplate.insertAll(blogList);
     //when

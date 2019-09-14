@@ -29,9 +29,6 @@ class ReadItemServiceTest {
   @BeforeEach
   void setUp() {
     readItemService = new ReadItemService(itemRepository);
-    given(itemRepository.findById("itemId")).willReturn(Mono.just(new Item()));
-    given(itemRepository.findById("itemId2")).willReturn(Mono.empty());
-
     given(itemRepository.save(any(Item.class))).willAnswer(i -> {
           Item argument = i.getArgument(0);
           argument.setId(UUID.randomUUID().toString());
@@ -42,6 +39,7 @@ class ReadItemServiceTest {
 
   @Test
   void shouldMarkItemAsRead() {
+    given(itemRepository.findById("itemId")).willReturn(Mono.just(new Item()));
     var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(true).build();
 
     Mono<Void> result = readItemService.processRequest(readItemDTO);
@@ -54,6 +52,7 @@ class ReadItemServiceTest {
 
   @Test
   void shouldMarkItemAsUnread() {
+    given(itemRepository.findById("itemId")).willReturn(Mono.just(new Item()));
     var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(false).build();
 
     Mono<Void> result = readItemService.processRequest(readItemDTO);
@@ -67,6 +66,7 @@ class ReadItemServiceTest {
 
   @Test
   void shouldThrowExceptionWhenItemByIdNotExists() {
+    given(itemRepository.findById("itemId2")).willReturn(Mono.empty());
     var readItemDTO = ReadItemDTO.builder().itemId("itemId2").read(false).build();
 
     Mono<Void> result = readItemService.processRequest(readItemDTO);

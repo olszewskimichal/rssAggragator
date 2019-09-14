@@ -2,12 +2,14 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static pl.michal.olszewski.rssaggregator.blog.Blog.builder;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
 
@@ -21,8 +23,8 @@ class BlogCacheTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    mongoTemplate.dropCollection(Blog.class);
-    blog = mongoTemplate.save(Blog.builder().blogURL("nazwa").feedURL("nazwa").name("nazwa").build());
+    mongoTemplate.remove(new Query(), "blog");
+    blog = mongoTemplate.save(builder().blogURL("nazwa").feedURL("nazwa").name("nazwa").build());
     service.evictBlogCache();
   }
 

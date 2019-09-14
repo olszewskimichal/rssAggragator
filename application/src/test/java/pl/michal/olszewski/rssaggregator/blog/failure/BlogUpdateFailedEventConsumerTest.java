@@ -1,8 +1,9 @@
 package pl.michal.olszewski.rssaggregator.blog.failure;
 
+import static java.time.Instant.now;
 import static org.assertj.core.api.Assertions.assertThat;
+import static pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent.builder;
 
-import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ class BlogUpdateFailedEventConsumerTest extends IntegrationTestBase {
   @Test
   void shouldPersistNewEventToDbOnEvent() {
     //given
-    eventConsumer.receiveMessage(BlogUpdateFailedEvent.builder().occurredAt(Instant.now()).blogId("id").build());
+    eventConsumer.receiveMessage(builder().occurredAt(now()).blogId("id").build());
     //when
     assertThat(blogUpdateFailedEventRepository.count()).isEqualTo(1L);
   }

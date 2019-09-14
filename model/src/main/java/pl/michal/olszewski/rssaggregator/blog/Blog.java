@@ -2,25 +2,17 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Singular;
 import lombok.ToString;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import pl.michal.olszewski.rssaggregator.item.Item;
 
 @Document
 @Getter
@@ -42,8 +34,6 @@ public class Blog {
   private Instant publishedDate;
   private Instant lastUpdateDate;
   private boolean active = true;
-  @DBRef
-  private Set<Item> items = new HashSet<>();
 
   @Builder
   public Blog(
@@ -53,8 +43,7 @@ public class Blog {
       String name,
       String feedURL,
       Instant publishedDate,
-      Instant lastUpdateDate,
-      @Singular Set<Item> items
+      Instant lastUpdateDate
   ) {
     this.id = id;
     this.blogURL = blogURL;
@@ -62,7 +51,6 @@ public class Blog {
     this.name = name;
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
-    this.items = new HashSet<>(items);
     this.lastUpdateDate = lastUpdateDate;
   }
 
@@ -72,17 +60,6 @@ public class Blog {
     this.name = blogDTO.getName();
     this.feedURL = blogDTO.getFeedURL();
     this.publishedDate = blogDTO.getPublishedDate();
-  }
-
-  public Set<Item> getItems() {
-    return Collections.unmodifiableSet(items);
-  }
-
-  public void addItem(Item item, MongoTemplate mongoTemplate) {
-    if (items.add(item)) {
-      mongoTemplate.save(item);
-      log.trace("Dodaje nowy wpis do bloga {} o tytule {} z linkiem {}", this.getName(), item.getTitle(), item.getLink());
-    }
   }
 
   void updateFromDto(BlogDTO blogDTO) {
@@ -119,8 +96,7 @@ public class Blog {
         Objects.equals(name, blog.name) &&
         Objects.equals(feedURL, blog.feedURL) &&
         Objects.equals(publishedDate, blog.publishedDate) &&
-        Objects.equals(lastUpdateDate, blog.lastUpdateDate) &&
-        Objects.equals(items, blog.items);
+        Objects.equals(lastUpdateDate, blog.lastUpdateDate);
   }
 
   public RssInfo getRssInfo() {
@@ -129,24 +105,7 @@ public class Blog {
 
   @Override
   public final int hashCode() {
-    return Objects.hash(blogURL, description, name, feedURL, publishedDate, lastUpdateDate, active, items);
+    return Objects.hash(blogURL, description, name, feedURL, publishedDate, lastUpdateDate, active);
   }
 
-  @Value
-  @ToString
-  public static
-  class RssInfo {
-
-    private final String feedURL;
-    private final String blogURL;
-    private final String blogId;
-    private final Instant lastUpdateDate;
-
-    RssInfo(String feedURL, String blogURL, String blogId, Instant lastUpdateDate) {
-      this.feedURL = feedURL;
-      this.blogURL = blogURL;
-      this.blogId = blogId;
-      this.lastUpdateDate = lastUpdateDate == null ? Instant.MIN : lastUpdateDate;
-    }
-  }
 }

@@ -12,7 +12,7 @@ import org.springframework.hateoas.ResourceSupport;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-class BlogAggregationDTO extends ResourceSupport {
+public final class BlogAggregationDTO extends ResourceSupport {
 
   private String blogId;
   private String link;
@@ -20,17 +20,16 @@ class BlogAggregationDTO extends ResourceSupport {
   private String name;
   private String feedURL;
   private Instant publishedDate;
-  private Long blogItemsCount;
+  private Long blogItemsCount = 0L;
 
-
-  BlogAggregationDTO(Blog blog) {
-    this.blogId = blog.getId();
-    this.link = blog.getBlogURL();
+  BlogAggregationDTO(String blogId, BlogDTO blog) {
+    this.blogId = blogId;
+    this.link = blog.getLink();
     this.description = blog.getDescription();
     this.name = blog.getName();
     this.feedURL = blog.getFeedURL();
     this.publishedDate = blog.getPublishedDate();
-    this.blogItemsCount = (long) blog.getItems().size();
+    this.blogItemsCount = (long) blog.getItemsList().size();
   }
 
   @Override

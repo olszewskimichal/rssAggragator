@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.newitem;
+package pl.michal.olszewski.rssaggregator.item;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -15,16 +15,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class NewItemInBlogEvent implements Serializable {
 
   private final Instant occurredAt;
-  private final String linkUrl;
-  private final String linkTitle;
+  private final ItemDTO itemDTO;
   private final String blogId;
   @Id
   private String id;
 
-  public NewItemInBlogEvent(Instant occurredAt, String linkUrl, String linkTitle, String blogId) {
+  public NewItemInBlogEvent(Instant occurredAt, ItemDTO itemDTO, String blogId) {
     this.occurredAt = occurredAt;
-    this.linkUrl = linkUrl;
-    this.linkTitle = linkTitle;
+    this.itemDTO = itemDTO;
     this.blogId = blogId;
   }
 }

@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.newitem;
+package pl.michal.olszewski.rssaggregator.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,16 +16,25 @@ class NewItemInBlogConsumerTest extends IntegrationTestBase {
   @Autowired
   private NewItemInBlogEventRepository repository;
 
+  @Autowired
+  private ItemRepository itemRepository;
+
   @BeforeEach
   void setUp() {
+    itemRepository.deleteAll().block();
     repository.deleteAll();
   }
 
   @Test
-  void shouldPersistNewEventToDbOnEvent() {
+  void shouldPersistNewEventAndNewItemToDbOnEvent() {
     //given
-    eventConsumer.receiveMessage(new NewItemInBlogEvent(Instant.now(), "link", "title", "id"));
+    ItemDTO item = ItemDTO.builder().link("link")
+        .title("title")
+        .blogId("id")
+        .build();
+    eventConsumer.receiveMessage(new NewItemInBlogEvent(Instant.now(), item, "id"));
     //then
     assertThat(repository.count()).isEqualTo(1L);
+    assertThat(itemRepository.count().block()).isEqualTo(1L);
   }
 }

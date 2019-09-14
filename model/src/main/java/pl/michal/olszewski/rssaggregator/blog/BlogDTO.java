@@ -1,36 +1,44 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Singular;
 import lombok.ToString;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Getter
-@Builder
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public
-class BlogDTO {
+public final class BlogDTO {
 
-  private String link;
-  private String description;
-  private String name;
-  private String feedURL;
-  private Instant publishedDate;
-  @JsonProperty("itemsList")
-  @Singular("item")
-  private List<ItemDTO> itemsList = new ArrayList<>();
+  private final String link;
+  private final String description;
+  private final String name;
+  private final String feedURL;
+  private final Instant publishedDate;
+  private final List<ItemDTO> itemsList;
+
+  @Builder
+  public BlogDTO(
+      String link,
+      String description,
+      String name,
+      String feedURL,
+      Instant publishedDate,
+      @Singular("item") List<ItemDTO> itemsList
+  ) {
+    this.link = link;
+    this.description = description;
+    this.name = name;
+    this.feedURL = feedURL;
+    this.publishedDate = publishedDate;
+    this.itemsList = Optional.ofNullable(itemsList).orElse(List.of());
+  }
 
   public BlogDTO(Blog blog) {
     this.link = blog.getBlogURL();
@@ -38,15 +46,10 @@ class BlogDTO {
     this.name = blog.getName();
     this.feedURL = blog.getFeedURL();
     this.publishedDate = blog.getPublishedDate();
-    this.itemsList = blog.getItems().stream()
-        .map(ItemDTO::new)
-        .collect(Collectors.toList());
+    this.itemsList = new ArrayList<>();
   }
 
   List<ItemDTO> getItemsList() {
-    if (itemsList == null) {
-      itemsList = new ArrayList<>();
-    }
     return Collections.unmodifiableList(itemsList);
   }
 

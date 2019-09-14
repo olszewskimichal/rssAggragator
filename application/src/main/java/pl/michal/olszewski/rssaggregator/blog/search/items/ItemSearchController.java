@@ -17,7 +17,7 @@ public class ItemSearchController {
   }
 
   @GetMapping
-  Flux<ItemSearchResult> searchItemsMatchingBy(
+  public Flux<ItemSearchResult> searchItemsMatchingBy(
       @RequestParam(value = "text") String searchText,
       @RequestParam(value = "limit", required = false) Integer limit) {
     return itemTextSearchRepository.findMatching(

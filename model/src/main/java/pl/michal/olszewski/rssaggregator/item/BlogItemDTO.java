@@ -1,10 +1,9 @@
-package pl.michal.olszewski.rssaggregator.blog.items;
+package pl.michal.olszewski.rssaggregator.item;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import lombok.Getter;
-import pl.michal.olszewski.rssaggregator.item.Item;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
