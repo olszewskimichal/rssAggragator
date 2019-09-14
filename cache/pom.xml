@@ -27,7 +27,11 @@
       <groupId>pl.michal.olszewski</groupId>
       <artifactId>modelPersistence</artifactId>
       <version>0.0.11-SNAPSHOT</version>
-      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <artifactId>model</artifactId>
+      <groupId>pl.michal.olszewski</groupId>
+      <version>0.0.11-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
