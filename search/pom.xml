@@ -26,4 +26,7 @@
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
   </dependencies>
+
+  <packaging>jar</packaging>
+
 </project>
