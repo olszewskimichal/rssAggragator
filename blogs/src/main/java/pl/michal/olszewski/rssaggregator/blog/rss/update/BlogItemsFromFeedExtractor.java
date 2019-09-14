@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import com.rometools.rome.feed.synd.SyndFeed;
+import io.sentry.Sentry;
 import java.io.IOException;
 import java.lang.Character.UnicodeBlock;
 import java.net.HttpURLConnection;
@@ -68,8 +69,9 @@ class BlogItemsFromFeedExtractor {
         String redirectUrl = con.getHeaderField("Location");
         return getFinalURL(redirectUrl).replaceAll("[&?]gi.*", "");
       }
-    } catch (IOException ignored) {
-      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ignored);
+    } catch (IOException ex) {
+      Sentry.capture(ex);
+      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ex);
     }
     return linkUrl;
   }
