@@ -2,33 +2,41 @@ package pl.michal.olszewski.rssaggregator.search.items;
 
 import static pl.michal.olszewski.rssaggregator.search.items.ItemForSearch.builder;
 
-import java.util.List;
+import java.io.IOException;
+import java.util.stream.Stream;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
-import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
+import pl.michal.olszewski.rssaggregator.integration.ElasticIntegrationTestBase;
+import reactor.core.publisher.Mono;
 
-class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
+class ItemSearchControllerIntegrationTest extends ElasticIntegrationTestBase {
 
   @Autowired
-  private MongoTemplate mongoTemplate;
+  private ReactiveElasticsearchOperations elasticsearchOperations;
 
   @BeforeEach
-  void setUp() {
-    mongoTemplate.remove(new Query(), "itemsSearch");
+  void setUp() throws IOException, InterruptedException {
+    setupElastic();
+    NativeSearchQuery query = new NativeSearchQueryBuilder()
+        .withQuery(QueryBuilders.matchAllQuery())
+        .build();
+    elasticsearchOperations.deleteBy(query, ItemForSearch.class).block();
   }
 
   @Test
   void shouldReturnSearchResultByMatchingTextWithoutLimit() {
-    List<ItemForSearch> itemList = List.of(
+    Stream.of(
         builder().link("link1").title("AAA").build(),
         builder().link("link2").title("BBB").build(),
         builder().link("link3").title("CCC").build()
-    );
-    mongoTemplate.insertAll(itemList);
+    ).map(itemForSearch -> elasticsearchOperations.save(itemForSearch))
+        .forEach(Mono::block);
 
     ListBodySpec<ItemSearchResult> result = thenGetSearchResultFromAPI("AAA", null);
 
@@ -37,12 +45,12 @@ class ItemSearchControllerIntegrationTest extends IntegrationTestBase {
 
   @Test
   void shouldReturnSearchResultByMatchingTextWithLimit() {
-    List<ItemForSearch> itemList = List.of(
+    Stream.of(
         builder().link("link1").title("BBB").build(),
         builder().link("link2").title("BBB").build(),
         builder().link("link3").title("CCC").build()
-    );
-    mongoTemplate.insertAll(itemList);
+    ).map(itemForSearch -> elasticsearchOperations.save(itemForSearch))
+        .forEach(Mono::block);
 
     ListBodySpec<ItemSearchResult> result = thenGetSearchResultFromAPI("BBB", 1);
 
