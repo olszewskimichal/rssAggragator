@@ -115,6 +115,15 @@
       <artifactId>spring-cloud-starter-sleuth</artifactId>
       <groupId>org.springframework.cloud</groupId>
     </dependency>
+    <dependency>
+      <artifactId>spring-cloud-starter-zipkin</artifactId>
+      <groupId>org.springframework.cloud</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>sentry-spring</artifactId>
+      <groupId>io.sentry</groupId>
+      <version>1.7.23</version>
+    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>

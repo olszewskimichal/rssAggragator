@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.item;
 
+import io.sentry.Sentry;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -25,8 +26,9 @@ public class LinkExtractor {
         return getFinalURL(redirectUrl).replaceAll("[&?]gi.*", "");
       }
       linkUrl = getUrlWithoutParameters(linkUrl);
-    } catch (IOException | URISyntaxException ignored) {
-      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ignored);
+    } catch (IOException | URISyntaxException ex) {
+      Sentry.capture(ex);
+      log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ex);
     }
     return linkUrl;
   }
