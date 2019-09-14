@@ -20,7 +20,6 @@ public class ItemDTO implements Serializable {
   private final String author;
   private final String blogId;
 
-
   @JsonCreator
   public ItemDTO(
       @JsonProperty("title") String title,
@@ -35,14 +34,5 @@ public class ItemDTO implements Serializable {
     this.date = date;
     this.author = author;
     this.blogId = blogId;
-  }
-
-  public ItemDTO(Item item) {
-    this.title = item.getTitle();
-    this.description = item.getDescription();
-    this.link = item.getLink();
-    this.date = item.getDate();
-    this.author = item.getAuthor();
-    this.blogId = item.getBlogId();
   }
 }

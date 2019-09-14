@@ -31,11 +31,11 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldReturnTheSameCollectionFromCache() {
     //given
-    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs();
-    List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
+    Flux<BlogDTO> allBlogs = service.getAllBlogDTOs();
+    List<BlogDTO> blogList = allBlogs.collectList().block();
 
     //when
-    Flux<BlogAggregationDTO> cacheBlogs = service.getAllBlogDTOs();
+    Flux<BlogDTO> cacheBlogs = service.getAllBlogDTOs();
 
     //then
     assertThat(blogList).hasSameElementsAs(cacheBlogs.toIterable());
@@ -44,12 +44,12 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldAfterEvictCacheAndReturnNotTheSameCollection() {
     //given
-    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs();
-    List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
+    Flux<BlogDTO> allBlogs = service.getAllBlogDTOs();
+    List<BlogDTO> blogList = allBlogs.collectList().block();
 
     //when
     service.evictBlogCache();
-    Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs();
+    Flux<BlogDTO> blogs = service.getAllBlogDTOs();
 
     //then
     assertNotSame(allBlogs, blogs);
@@ -59,12 +59,12 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldAfterCreateNewBlogAndReturnNotTheSameCollection() {
     //given
-    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs();
-    List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
+    Flux<BlogDTO> allBlogs = service.getAllBlogDTOs();
+    List<BlogDTO> blogList = allBlogs.collectList().block();
 
     //when
-    service.getBlogOrCreate(BlogDTO.builder().name("nazwa2").build()).block();
-    Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs();
+    service.getBlogOrCreate(CreateBlogDTO.builder().name("nazwa2").build()).block();
+    Flux<BlogDTO> blogs = service.getAllBlogDTOs();
 
     //then
     assertNotSame(allBlogs, blogs);
@@ -74,12 +74,12 @@ class BlogCacheTest extends IntegrationTestBase {
   @Test
   void shouldAfterDeleteNewBlogAndReturnNotTheSameCollection() {
     //given
-    Flux<BlogAggregationDTO> allBlogs = service.getAllBlogDTOs();
-    List<BlogAggregationDTO> blogList = allBlogs.collectList().block();
+    Flux<BlogDTO> allBlogs = service.getAllBlogDTOs();
+    List<BlogDTO> blogList = allBlogs.collectList().block();
 
     //when
     service.deleteBlog(blog.getId()).block();
-    Flux<BlogAggregationDTO> blogs = service.getAllBlogDTOs();
+    Flux<BlogDTO> blogs = service.getAllBlogDTOs();
 
     //then
     assertNotSame(allBlogs, blogs);

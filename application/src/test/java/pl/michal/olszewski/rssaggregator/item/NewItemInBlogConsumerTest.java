@@ -14,15 +14,11 @@ class NewItemInBlogConsumerTest extends IntegrationTestBase {
   private NewItemInBlogEventConsumer eventConsumer;
 
   @Autowired
-  private NewItemInBlogEventRepository repository;
-
-  @Autowired
   private ItemRepository itemRepository;
 
   @BeforeEach
   void setUp() {
     itemRepository.deleteAll().block();
-    repository.deleteAll();
   }
 
   @Test
@@ -34,7 +30,6 @@ class NewItemInBlogConsumerTest extends IntegrationTestBase {
         .build();
     eventConsumer.receiveMessage(new NewItemInBlogEvent(Instant.now(), item, "id"));
     //then
-    assertThat(repository.count()).isEqualTo(1L);
     assertThat(itemRepository.count().block()).isEqualTo(1L);
   }
 }

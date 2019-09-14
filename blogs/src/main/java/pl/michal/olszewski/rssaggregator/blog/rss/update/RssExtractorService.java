@@ -19,37 +19,22 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.blog.BlogDTO;
 import pl.michal.olszewski.rssaggregator.blog.RssInfo;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEventProducer;
+import pl.michal.olszewski.rssaggregator.blog.UpdateBlogWithItemsDTO;
 
 @Service
 @Slf4j
 class RssExtractorService {
 
   private final FeedFetcher feedFetcher;
-  private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
   private final Tracer tracer;
 
-  RssExtractorService(FeedFetcher feedFetcher, BlogUpdateFailedEventProducer blogUpdateFailedEventProducer, Tracer tracer) {
+  RssExtractorService(FeedFetcher feedFetcher, Tracer tracer) {
     this.feedFetcher = feedFetcher;
-    this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
     this.tracer = tracer;
   }
 
-  private BlogDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
-    log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
-    return new BlogDTO(
-        syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
-        HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()),
-        syndFeed.getTitle(),
-        feedURL,
-        syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
-        new ArrayList<>());
-  }
-
-  BlogDTO getBlog(RssInfo info) {
+  UpdateBlogWithItemsDTO getBlog(RssInfo info) {
     log.trace("getBlog START {}", info);
     try {
       SSLContext ctx = SSLContext.getInstance("TLS");
@@ -62,15 +47,25 @@ class RssExtractorService {
           .parallelStream()
           .filter(entry -> entry.getPublishedDate() == null && entry.getUpdatedDate() != null)
           .forEach(entry -> entry.setPublishedDate(entry.getUpdatedDate()));
-      BlogDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
+      UpdateBlogWithItemsDTO blogInfo = getBlogInfo(feed, info.getFeedURL(), info.getBlogURL());
       getItemsForBlog(feed, info)
           .forEach(blogInfo::addNewItem);
       log.trace("getBlog STOP {}", info);
       return blogInfo;
     } catch (IOException | FeedException | FetcherException | NoSuchAlgorithmException | KeyManagementException ex) {
-      blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().context().toString(), info.getFeedURL(), info.getBlogId(), ex.getMessage()));
       throw new RssException(info.getFeedURL(), ex);
     }
+  }
+
+  private UpdateBlogWithItemsDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
+    log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
+    return new UpdateBlogWithItemsDTO(
+        syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
+        HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()),
+        syndFeed.getTitle(),
+        feedURL,
+        syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
+        new ArrayList<>());
   }
 
 }

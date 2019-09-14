@@ -7,13 +7,20 @@
     <dependency>
       <artifactId>model</artifactId>
       <groupId>pl.michal.olszewski</groupId>
-      <scope>compile</scope>
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <version>1.12.1</version>
+      <groupId>pl.michal.olszewski</groupId>
+      <artifactId>modelPersistence</artifactId>
+      <version>0.0.11-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-webflux</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+      <groupId>org.springframework.boot</groupId>
     </dependency>
   </dependencies>
   <modelVersion>4.0.0</modelVersion>

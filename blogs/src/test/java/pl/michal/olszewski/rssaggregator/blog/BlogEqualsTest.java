@@ -18,7 +18,6 @@ class BlogEqualsTest {
   @Test
   void blogAggregationDtoEqualsContractTest() {
     EqualsVerifier.forClass(BlogAggregationDTO.class)
-        .withIgnoredFields("links")
         .suppress(NONFINAL_FIELDS)
         .withRedefinedSuperclass()
         .verify();
@@ -27,6 +26,29 @@ class BlogEqualsTest {
   @Test
   void blogDtoEqualsContractTest() {
     EqualsVerifier.forClass(BlogDTO.class)
+        .suppress(NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  void updateBlogDTOEqualsContractTest() {
+    EqualsVerifier.forClass(UpdateBlogDTO.class)
+        .suppress(NONFINAL_FIELDS)
+        .withRedefinedSuperclass()
+        .verify();
+  }
+
+  @Test
+  void updateBlogWithItemsDTOEqualsContractTest() {
+    EqualsVerifier.forClass(UpdateBlogWithItemsDTO.class)
+        .suppress(NONFINAL_FIELDS)
+        .withRedefinedSuperclass()
+        .verify();
+  }
+
+  @Test
+  void createBlogDtoEqualsContractTest() {
+    EqualsVerifier.forClass(CreateBlogDTO.class)
         .suppress(NONFINAL_FIELDS)
         .verify();
   }

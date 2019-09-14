@@ -28,8 +28,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogAggregationDTO;
-import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
+import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
@@ -45,7 +44,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   private UpdateBlogService updateBlogService;
 
   @Autowired
-  private BlogReactiveRepository blogRepository;
+  private BlogFinder blogRepository;
 
   @Autowired
   @Qualifier(value = "blogCache")
@@ -62,8 +61,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @BeforeEach
   void setUp() {
-    mongoTemplate.remove(new Query(), "item");
-    blogRepository.deleteAll().block();
+    mongoTemplate.remove(new Query(), "blog");
     blogCache.invalidateAll();
   }
 
@@ -77,7 +75,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .name("spring")
         .feedURL("https://spring.blog.test/")
         .build();
-    blogRepository.save(blog).block();
+    mongoTemplate.save(blog);
 
     Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
 
@@ -110,7 +108,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .feedURL("https://devstyle.pl/feed")
         .lastUpdateDate(Instant.now())
         .build();
-    blogRepository.save(blog).block();
+    mongoTemplate.save(blog);
 
     Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
 
@@ -132,24 +130,23 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   }
 
   @Test
-  void shouldReturnFalseOnTimeoutAndWriteNewEventToDB() {
+  void shouldReturnFalseOnTimeout() {
     Blog blog = Blog.builder()
         .blogURL("https://spring.io/")
         .name("spring")
         .feedURL("https://xcasdasda.io/")
         .build();
-    blogRepository.save(blog).block();
+    mongoTemplate.save(blog);
 
     Mono<Boolean> result = updateBlogService.updateRssBlogItems(blog);
     StepVerifier.withVirtualTime(() -> result)
         .thenAwait(Duration.ofSeconds(5))
         .expectNext(false)
         .verifyComplete();
-    verify(jmsTemplate, times(1)).convertAndSend(anyString(), any(BlogUpdateFailedEvent.class));
   }
 
   @Test
-  void shouldWriteNewEventToDBWhenFetcherFailed() throws FetcherException, IOException, FeedException {
+  void shouldReturnFalseWhenFetcherFailed() throws FetcherException, IOException, FeedException {
     given(feedFetcher.retrieveFeed(anyString(), any())).willThrow(new FeedException("some exception"));
 
     Blog blog = Blog.builder()
@@ -158,7 +155,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .feedURL("https://devstyle.xxx/feed")
         .build();
 
-    blogRepository.save(blog).block();
+    mongoTemplate.save(blog);
 
     Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
 
@@ -166,7 +163,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .create(result)
         .expectNext(false)
         .verifyComplete();
-    verify(jmsTemplate, times(1)).convertAndSend(anyString(), any(BlogUpdateFailedEvent.class));
   }
 
   private SyndFeedImpl buildSyndFeed() {

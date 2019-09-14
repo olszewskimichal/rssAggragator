@@ -18,10 +18,10 @@ class BlogItemDTO {
   @JsonProperty("author")
   private final String author;
 
-  BlogItemDTO(Item item) {
-    this.title = item.getTitle();
-    this.link = item.getLink();
-    this.date = item.getDate();
-    this.author = item.getAuthor();
+  public BlogItemDTO(String title, String link, Instant date, String author) {
+    this.title = title;
+    this.link = link;
+    this.date = date;
+    this.author = author;
   }
 }

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class FeedFetcherConfig {
+class FeedFetcherConfig {
 
   @Bean
   public FeedFetcher feedFetcher(FeedFetcherCacheImpl feedFetcherCache) {

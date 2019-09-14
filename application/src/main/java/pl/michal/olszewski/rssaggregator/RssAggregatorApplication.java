@@ -4,19 +4,26 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
+import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import pl.michal.olszewski.rssaggregator.config.Profiles;
 
-@SpringBootApplication
+@SpringBootApplication(
+    exclude = {
+        ElasticsearchRepositoriesAutoConfiguration.class,
+        MongoRepositoriesAutoConfiguration.class
+    }
+)
 @EnableCaching
 @EnableAsync
 @EntityScan(
@@ -25,13 +32,20 @@ import pl.michal.olszewski.rssaggregator.config.Profiles;
 @EnableScheduling
 @EnableConfigurationProperties
 @EnableJms
+@EnableMongoRepositories(
+    basePackages = {
+        "pl.michal.olszewski.rssaggregator.item",
+        "pl.michal.olszewski.rssaggregator.blog",
+        "pl.michal.olszewski.rssaggregator.cache"
+    }
+)
 public class RssAggregatorApplication {
 
   public static void main(String[] args) {
     SpringApplication.run(RssAggregatorApplication.class, args);
   }
 
-  @Profile({Profiles.PRODUCTION})
+  @Profile({"prod"})
   @Bean
   @Primary
   public Executor threadPoolTaskExecutorProd() {
@@ -41,7 +55,7 @@ public class RssAggregatorApplication {
     return threadPoolTaskExecutor;
   }
 
-  @Profile({Profiles.DEVELOPMENT})
+  @Profile({"development"})
   @Bean
   @Primary
   public Executor threadPoolTaskExecutorDevelopment() {
@@ -51,7 +65,7 @@ public class RssAggregatorApplication {
     return threadPoolTaskExecutor;
   }
 
-  @Profile({Profiles.TEST})
+  @Profile({"test"})
   @Bean
   @Primary
   public Executor testThreadPoolTaskExecutor() {

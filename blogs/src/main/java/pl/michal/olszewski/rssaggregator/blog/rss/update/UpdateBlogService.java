@@ -6,16 +6,13 @@ import brave.Tracer;
 import com.rometools.fetcher.FeedFetcher;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.blog.BlogReactiveRepository;
-import pl.michal.olszewski.rssaggregator.blog.BlogService;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEvent;
-import pl.michal.olszewski.rssaggregator.blog.failure.BlogUpdateFailedEventProducer;
+import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
+import pl.michal.olszewski.rssaggregator.blog.UpdateBlogWithItemsService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -24,26 +21,23 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 class UpdateBlogService {
 
-  private final BlogReactiveRepository repository;
+  private final BlogFinder blogFinder;
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
-  private final BlogService blogService;
-  private final BlogUpdateFailedEventProducer blogUpdateFailedEventProducer;
+  private final UpdateBlogWithItemsService blogService;
   private final Tracer tracer;
 
   public UpdateBlogService(
-      BlogReactiveRepository repository,
+      BlogFinder blogFinder,
       Executor executor,
       MeterRegistry registry,
-      BlogService blogService,
-      BlogUpdateFailedEventProducer blogUpdateFailedEventProducer,
+      UpdateBlogWithItemsService blogService,
       FeedFetcher feedFetcher,
       Tracer tracer
   ) {
-    this.repository = repository;
-    this.blogUpdateFailedEventProducer = blogUpdateFailedEventProducer;
+    this.blogFinder = blogFinder;
     this.tracer = tracer;
-    this.rssExtractorService = new RssExtractorService(feedFetcher, blogUpdateFailedEventProducer, this.tracer);
+    this.rssExtractorService = new RssExtractorService(feedFetcher, this.tracer);
     this.blogService = blogService;
     if (registry != null) {
       this.executor = monitor(registry, executor, "prod_pool");
@@ -63,25 +57,19 @@ class UpdateBlogService {
         );
   }
 
-  private Mono<List<Boolean>> getUpdateBlogByRssList() {
-    return repository.findAll()
-        .flatMap(this::updateRssBlogItems)
-        .collectList();
-  }
-
   Mono<Boolean> updateRssBlogItems(Blog blog) {
     log.debug("Pobieranie nowych danych dla bloga {}", blog.getName());
     return Mono.defer(() -> extractBlogFromRssAndUpdateBlog(blog))
         .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
-        .doOnError(ex -> {
-              if (ex instanceof UpdateTimeoutException) {
-                blogUpdateFailedEventProducer.writeEventToQueue(new BlogUpdateFailedEvent(Instant.now(), tracer.currentSpan().context().toString(), blog.getFeedURL(), blog.getId(), ex.getMessage()));
-              }
-          log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {}", blog.getName(), ex);
-            }
-        )
+        .doOnError(ex -> log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {}", blog.getName(), ex))
         .subscribeOn(Schedulers.fromExecutor(executor))
         .onErrorReturn(false);
+  }
+
+  private Mono<List<Boolean>> getUpdateBlogByRssList() {
+    return blogFinder.findAll()
+        .flatMap(this::updateRssBlogItems)
+        .collectList();
   }
 
   private Mono<Boolean> extractBlogFromRssAndUpdateBlog(Blog blog) {
@@ -89,9 +77,7 @@ class UpdateBlogService {
     var blogDTO = rssExtractorService.getBlog(blog.getRssInfo());
     return blogService.updateBlog(blog, blogDTO)
         .doOnSuccess(updatedBlog -> log.trace("STOP updateRssBlogItems dla blog {}", updatedBlog.getName()))
-        .map(v -> true)
+        .map(updatedBlog -> true)
         .onErrorReturn(false);
   }
-
-
 }

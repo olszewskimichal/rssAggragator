@@ -12,22 +12,22 @@
   <artifactId>cache</artifactId>
   <dependencies>
     <dependency>
-      <groupId>pl.michal.olszewski</groupId>
-      <artifactId>model</artifactId>
-      <version>0.0.11-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <artifactId>spring-boot-starter-cache</artifactId>
-      <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-boot-starter-data-mongodb</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>
     <dependency>
       <artifactId>caffeine</artifactId>
       <groupId>com.github.ben-manes.caffeine</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+      <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+      <groupId>pl.michal.olszewski</groupId>
+      <artifactId>modelPersistence</artifactId>
+      <version>0.0.11-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 

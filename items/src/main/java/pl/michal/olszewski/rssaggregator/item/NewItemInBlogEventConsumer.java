@@ -8,19 +8,16 @@ import org.springframework.stereotype.Component;
 @Slf4j
 class NewItemInBlogEventConsumer {
 
-  private final NewItemInBlogEventRepository newItemInBlogEventRepository;
-  private final ItemRepository itemRepository;
+  private final ItemSaver itemSaver;
 
-  public NewItemInBlogEventConsumer(NewItemInBlogEventRepository newItemInBlogEventRepository, ItemRepository itemRepository) {
-    this.newItemInBlogEventRepository = newItemInBlogEventRepository;
-    this.itemRepository = itemRepository;
+  NewItemInBlogEventConsumer(ItemSaver itemSaver) {
+    this.itemSaver = itemSaver;
   }
 
   @JmsListener(destination = "newItems")
   public void receiveMessage(NewItemInBlogEvent event) {
     log.info("Received <{}>", event);
-    newItemInBlogEventRepository.save(event);
-    itemRepository.save(new Item(event.getItemDTO())).block();
+    itemSaver.saveNewItem(event.getItemDTO());
     log.info("Event <{}>", event);
   }
 

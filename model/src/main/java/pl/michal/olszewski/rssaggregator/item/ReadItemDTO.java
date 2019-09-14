@@ -20,6 +20,11 @@ final class ReadItemDTO {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(itemId, read);
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (this == o) {
       return true;
@@ -30,10 +35,5 @@ final class ReadItemDTO {
     ReadItemDTO that = (ReadItemDTO) o;
     return read == that.read &&
         Objects.equals(itemId, that.itemId);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(itemId, read);
   }
 }

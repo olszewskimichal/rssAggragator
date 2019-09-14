@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.ItemListFactory;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
@@ -33,22 +33,10 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
     givenItems()
         .buildNumberOfItemsAndSave(2, blog.getId());
 
-    Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
+    Mono<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogWithCount(blog.getId());
 
     StepVerifier.create(blogsWithCount)
         .assertNext(aggregationDTO -> assertThat(aggregationDTO.getBlogItemsCount()).isEqualTo(2))
-        .verifyComplete();
-  }
-
-  @Test
-  void shouldAggregateBlogWithoutItems() {
-    givenBlog()
-        .createAndSaveNewBlog();
-
-    Flux<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogsWithCount();
-
-    StepVerifier.create(blogsWithCount)
-        .assertNext(aggregationDTO -> assertThat(aggregationDTO.getBlogItemsCount()).isEqualTo(0))
         .verifyComplete();
   }
 

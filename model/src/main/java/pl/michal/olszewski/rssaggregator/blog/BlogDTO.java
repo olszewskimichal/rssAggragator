@@ -1,60 +1,43 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Singular;
-import lombok.ToString;
-import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
 @Getter
-@ToString
-public final class BlogDTO {
+final class BlogDTO {
 
+  private final String id;
   private final String link;
   private final String description;
   private final String name;
   private final String feedURL;
   private final Instant publishedDate;
-  private final List<ItemDTO> itemsList;
 
   @Builder
-  public BlogDTO(
-      String link,
-      String description,
-      String name,
-      String feedURL,
-      Instant publishedDate,
-      @Singular("item") List<ItemDTO> itemsList
+  @JsonCreator
+  BlogDTO(
+      @JsonProperty("id") String id,
+      @JsonProperty("link") String link,
+      @JsonProperty("description") String description,
+      @JsonProperty("name") String name,
+      @JsonProperty("feedURL") String feedURL,
+      @JsonProperty("publishedDate") Instant publishedDate
   ) {
+    this.id = id;
     this.link = link;
     this.description = description;
     this.name = name;
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
-    this.itemsList = Optional.ofNullable(itemsList).orElse(List.of());
   }
 
-  public BlogDTO(Blog blog) {
-    this.link = blog.getBlogURL();
-    this.description = blog.getDescription();
-    this.name = blog.getName();
-    this.feedURL = blog.getFeedURL();
-    this.publishedDate = blog.getPublishedDate();
-    this.itemsList = new ArrayList<>();
-  }
-
-  List<ItemDTO> getItemsList() {
-    return Collections.unmodifiableList(itemsList);
-  }
-
-  public void addNewItem(ItemDTO itemDTO) {
-    this.itemsList.add(itemDTO);
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, link, description, name, feedURL, publishedDate);
   }
 
   @Override
@@ -66,16 +49,23 @@ public final class BlogDTO {
       return false;
     }
     BlogDTO blogDTO = (BlogDTO) o;
-    return Objects.equals(link, blogDTO.link) &&
+    return Objects.equals(id, blogDTO.id) &&
+        Objects.equals(link, blogDTO.link) &&
         Objects.equals(description, blogDTO.description) &&
         Objects.equals(name, blogDTO.name) &&
         Objects.equals(feedURL, blogDTO.feedURL) &&
-        Objects.equals(publishedDate, blogDTO.publishedDate) &&
-        Objects.equals(itemsList, blogDTO.itemsList);
+        Objects.equals(publishedDate, blogDTO.publishedDate);
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(link, description, name, feedURL, publishedDate, itemsList);
+  public String toString() {
+    return "BlogDTO{" +
+        "id='" + id + '\'' +
+        ", link='" + link + '\'' +
+        ", description='" + description + '\'' +
+        ", name='" + name + '\'' +
+        ", feedURL='" + feedURL + '\'' +
+        ", publishedDate=" + publishedDate +
+        '}';
   }
 }
