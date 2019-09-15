@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.search.items;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
@@ -15,12 +16,9 @@ import org.springframework.data.elasticsearch.core.mapping.SimpleElasticsearchMa
 public class ElasticConfig {
 
   @Bean
-  public ReactiveElasticsearchClient reactiveElasticsearchClient() {
-    var configuration = ClientConfiguration.builder()
-        .connectedTo("localhost:9200", "localhost:9300", "localhost:9999", "localhost:9998")
-        .build();
-
-    return ReactiveRestClients.create(configuration);
+  public ReactiveElasticsearchOperations reactiveElasticsearchOperations(@Value("${elasticNode}") final String elasticNode) {
+    var resultsMapper = new ScoreResultsMapper();
+    return new ReactiveElasticsearchTemplate(reactiveElasticsearchClient(elasticNode), elasticsearchConverter(), resultsMapper);
   }
 
   @Bean
@@ -33,10 +31,12 @@ public class ElasticConfig {
     return new SimpleElasticsearchMappingContext();
   }
 
-  @Bean
-  public ReactiveElasticsearchOperations reactiveElasticsearchOperations() {
-    var resultsMapper = new ScoreResultsMapper();
-    return new ReactiveElasticsearchTemplate(reactiveElasticsearchClient(), elasticsearchConverter(), resultsMapper);
+  private ReactiveElasticsearchClient reactiveElasticsearchClient(final String elasticNode) {
+    var configuration = ClientConfiguration.builder()
+        .connectedTo(elasticNode)
+        .build();
+
+    return ReactiveRestClients.create(configuration);
   }
 
 }
