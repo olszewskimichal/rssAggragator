@@ -4,7 +4,7 @@ jdk: openjdk13
 dist: trusty
 
 install:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
 cache:
   directories:
