@@ -19,19 +19,6 @@
       <charset>utf8</charset>
     </encoder>
   </appender>
-
-  <!-- Appender to log to file -->​
-  <appender name="flatfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${LOG_FILE}</file>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.gz</fileNamePattern>
-      <maxHistory>7</maxHistory>
-    </rollingPolicy>
-    <encoder>
-      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
-      <charset>utf8</charset>
-    </encoder>
-  </appender>
   ​
   <!-- Appender to log to file in a JSON format -->
   <appender name="logstash" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -82,7 +69,6 @@
   <root level="INFO">
     <appender-ref ref="console"/>
     <!-- uncomment this to have also JSON logs -->
-    appender-ref ref="logstash"/>
-    <!--<appender-ref ref="flatfile"/>-->
+    <appender-ref ref="logstash"/>
   </root>
 </configuration>
