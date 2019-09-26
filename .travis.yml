@@ -1,10 +1,10 @@
 language: java
 sudo: false
-jdk: openjdk13
+jdk: openjdk12
 dist: trusty
 
 install:
-  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
 cache:
   directories:
