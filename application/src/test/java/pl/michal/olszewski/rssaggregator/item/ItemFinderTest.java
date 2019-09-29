@@ -8,27 +8,23 @@ import com.mongodb.MongoWriteException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.test.context.ActiveProfiles;
+import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-@DataMongoTest
-@ActiveProfiles("test")
-@EnableMongoAuditing
-class ItemRepositoryTest {
+class ItemFinderTest extends IntegrationTestBase {
 
   @Autowired
   protected MongoTemplate mongoTemplate;
 
   @Autowired
-  private ItemRepository itemRepository;
+  private ItemFinder itemFinder;
 
   @BeforeEach
   void setUp() {
@@ -48,7 +44,7 @@ class ItemRepositoryTest {
         new Item(builder().link("title2").date(instant.minusSeconds(10)).build())
     ));
     //when
-    Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2, 0);
+    Flux<Item> items = itemFinder.findAllOrderByPublishedDate(2, 0);
 
     //then
     StepVerifier.create(items)
@@ -66,7 +62,7 @@ class ItemRepositoryTest {
     Item title3 = mongoTemplate.save(new Item(builder().link("title3").build()));
 
     //when
-    Flux<Item> items = itemRepository.findAllOrderByCreatedAt(2, 0);
+    Flux<Item> items = itemFinder.findAllOrderByCreatedAt(2, 0);
 
     //then
     StepVerifier.create(items)
@@ -86,7 +82,7 @@ class ItemRepositoryTest {
     ));
 
     //when
-    Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2, 0);
+    Flux<Item> items = itemFinder.findAllOrderByPublishedDate(2, 0);
     //then
     StepVerifier.create(items)
         .expectNextCount(2)
@@ -122,11 +118,25 @@ class ItemRepositoryTest {
     ));
 
     //when
-    Flux<Item> byBlogId = itemRepository.findAllByBlogId("id1");
+    Flux<BlogItemDTO> byBlogId = itemFinder.getBlogItemsForBlog("id1");
     //then
     StepVerifier.create(byBlogId)
         .expectNextCount(2L)
         .expectComplete()
         .verify();
+  }
+
+  @Test
+  void shouldFindAllItemsFromDate() {
+    //given
+    mongoTemplate.save(new Item(builder().blogId("id1").link("link1").build()));
+    Item item2 = mongoTemplate.save(new Item(builder().blogId("id2").link("link1").build()));
+    mongoTemplate.save(new Item(builder().blogId("id3").link("link1").build()));
+
+    //when
+    List<Item> itemList = itemFinder.findItemsFromDateOrderByCreatedAt(item2.getCreatedAt());
+
+    //then
+    assertThat(itemList.size()).isEqualTo(2);
   }
 }
