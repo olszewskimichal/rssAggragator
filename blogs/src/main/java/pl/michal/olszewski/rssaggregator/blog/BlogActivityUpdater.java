@@ -1,9 +1,11 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
+@Slf4j
 class BlogActivityUpdater {
 
   private final BlogFinder blogReactiveRepository;
@@ -15,12 +17,14 @@ class BlogActivityUpdater {
   }
 
   Mono<Blog> activateBlog(String id) {
+    log.debug("Activate blog by id {}", id);
     return blogReactiveRepository.findById(id)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
         .flatMap(blogUpdater::activateBlog);
   }
 
   Mono<Blog> deactivateBlog(String id) {
+    log.debug("Deactivate blog by id {}", id);
     return blogReactiveRepository.findById(id)
         .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
         .flatMap(blogUpdater::deactivateBlog);

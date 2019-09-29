@@ -43,6 +43,7 @@ public class UpdateBlogWithItemsService {
 
   private void addItemToBlog(Blog blog, ItemDTO item) {
     if (itemCache.getIfPresent(item.getLink()) == null) {
+      log.debug("addItemToBlog {} to blog {}", item.getLink(), blog.getBlogURL());
       itemCache.put(item.getLink(), item);
       producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item, blog.getId()));
       itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(Instant.now(), item.getLink(), item.getTitle(), item.getDescription()));
