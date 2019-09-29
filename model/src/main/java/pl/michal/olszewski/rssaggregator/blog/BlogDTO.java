@@ -3,11 +3,11 @@ package pl.michal.olszewski.rssaggregator.blog;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
-import java.util.Objects;
 import lombok.Builder;
-import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@Getter
 final class BlogDTO {
 
   private final String id;
@@ -35,37 +35,42 @@ final class BlogDTO {
     this.publishedDate = publishedDate;
   }
 
+  public String getId() {
+    return id;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getFeedURL() {
+    return feedURL;
+  }
+
+  public Instant getPublishedDate() {
+    return publishedDate;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(id, link, description, name, feedURL, publishedDate);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BlogDTO blogDTO = (BlogDTO) o;
-    return Objects.equals(id, blogDTO.id) &&
-        Objects.equals(link, blogDTO.link) &&
-        Objects.equals(description, blogDTO.description) &&
-        Objects.equals(name, blogDTO.name) &&
-        Objects.equals(feedURL, blogDTO.feedURL) &&
-        Objects.equals(publishedDate, blogDTO.publishedDate);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 
   @Override
   public String toString() {
-    return "BlogDTO{" +
-        "id='" + id + '\'' +
-        ", link='" + link + '\'' +
-        ", description='" + description + '\'' +
-        ", name='" + name + '\'' +
-        ", feedURL='" + feedURL + '\'' +
-        ", publishedDate=" + publishedDate +
-        '}';
+    return ToStringBuilder.reflectionToString(this);
   }
 }

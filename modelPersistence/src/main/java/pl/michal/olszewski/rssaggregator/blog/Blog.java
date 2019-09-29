@@ -4,29 +4,18 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-@Getter
-@NoArgsConstructor
-@Slf4j
 public class Blog {
 
   @Id
-  @Setter
   private String id;
   @Indexed(unique = true)
   private String blogURL;
-  @TextIndexed(weight = 1)
   private String description;
-  @TextIndexed(weight = 2)
   private String name;
   private String feedURL;
   private Instant publishedDate;
@@ -59,6 +48,41 @@ public class Blog {
     this.feedURL = blogDTO.getFeedURL();
   }
 
+  public Blog() {
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public String getBlogURL() {
+    return blogURL;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getFeedURL() {
+    return feedURL;
+  }
+
+  public Instant getPublishedDate() {
+    return publishedDate;
+  }
+
+  public Instant getLastUpdateDate() {
+    return lastUpdateDate;
+  }
+
   public boolean isActive() {
     return active;
   }
@@ -69,6 +93,18 @@ public class Blog {
 
   public RssInfo getRssInfo() {
     return new RssInfo(feedURL, blogURL, id, lastUpdateDate);
+  }
+
+
+  void updateFromDto(UpdateBlogDTO blogDTO) {
+    this.description = blogDTO.getDescription();
+    this.name = blogDTO.getName();
+    this.publishedDate = blogDTO.getPublishedDate();
+    this.lastUpdateDate = Instant.now().minus(2, ChronoUnit.DAYS);
+  }
+
+  void activate() {
+    active = true;
   }
 
   @Override
@@ -93,16 +129,4 @@ public class Blog {
         Objects.equals(publishedDate, blog.publishedDate) &&
         Objects.equals(lastUpdateDate, blog.lastUpdateDate);
   }
-
-  void updateFromDto(UpdateBlogDTO blogDTO) {
-    this.description = blogDTO.getDescription();
-    this.name = blogDTO.getName();
-    this.publishedDate = blogDTO.getPublishedDate();
-    this.lastUpdateDate = Instant.now().minus(2, ChronoUnit.DAYS);
-  }
-
-  void activate() {
-    active = true;
-  }
-
 }

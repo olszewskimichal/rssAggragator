@@ -68,7 +68,7 @@ class BlogServiceTest {
   @Test
   void shouldNotTryCreatingBlogWhenExist() {
     //given
-    given(blogRepository.findByFeedURL("nazwa")).willReturn(Mono.just(new Blog()));
+    given(blogRepository.findByFeedURL("nazwa")).willReturn(Mono.just(Blog.builder().build()));
 
     CreateBlogDTO blogDTO = CreateBlogDTO.builder()
         .feedURL("nazwa")

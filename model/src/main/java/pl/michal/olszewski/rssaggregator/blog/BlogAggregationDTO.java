@@ -1,12 +1,11 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.Builder;
-import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@Getter
 public final class BlogAggregationDTO {
 
   private final String blogId;
@@ -28,26 +27,42 @@ public final class BlogAggregationDTO {
     this.blogItemsCount = Optional.ofNullable(blogItemsCount).orElse(0L);
   }
 
+  public String getBlogId() {
+    return blogId;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getFeedURL() {
+    return feedURL;
+  }
+
+  public Instant getPublishedDate() {
+    return publishedDate;
+  }
+
+  public Long getBlogItemsCount() {
+    return blogItemsCount;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(blogId, link, description, name, feedURL, publishedDate, blogItemsCount);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BlogAggregationDTO that = (BlogAggregationDTO) o;
-    return Objects.equals(blogId, that.blogId) &&
-        Objects.equals(link, that.link) &&
-        Objects.equals(description, that.description) &&
-        Objects.equals(name, that.name) &&
-        Objects.equals(feedURL, that.feedURL) &&
-        Objects.equals(publishedDate, that.publishedDate) &&
-        Objects.equals(blogItemsCount, that.blogItemsCount);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
+
 }

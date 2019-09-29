@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.time.Instant;
 import lombok.Builder;
-import lombok.Getter;
 
-@Getter
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemDTO implements Serializable {
@@ -34,5 +32,29 @@ public class ItemDTO implements Serializable {
     this.date = date;
     this.author = author;
     this.blogId = blogId;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
+  public Instant getDate() {
+    return date;
+  }
+
+  public String getAuthor() {
+    return author;
+  }
+
+  public String getBlogId() {
+    return blogId;
   }
 }

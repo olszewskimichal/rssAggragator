@@ -2,9 +2,11 @@ package pl.michal.olszewski.rssaggregator.search.items;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@Data
+@Getter
 class ItemSearchResult {
 
   private final String title;
@@ -23,5 +25,15 @@ class ItemSearchResult {
     this.description = description;
     this.link = link;
     this.score = score;
+  }
+
+  @Override
+  public int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 }

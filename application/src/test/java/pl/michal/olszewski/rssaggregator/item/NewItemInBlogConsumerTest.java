@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ class NewItemInBlogConsumerTest extends IntegrationTestBase {
         .title("title")
         .blogId("id")
         .build();
-    eventConsumer.receiveMessage(new NewItemInBlogEvent(Instant.now(), item, "id"));
+    eventConsumer.receiveMessage(new NewItemInBlogEvent(item, "id"));
     //then
     assertThat(itemRepository.count().block()).isEqualTo(1L);
   }

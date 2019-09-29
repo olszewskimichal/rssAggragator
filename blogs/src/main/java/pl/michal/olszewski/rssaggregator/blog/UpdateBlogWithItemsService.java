@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -44,8 +43,8 @@ public class UpdateBlogWithItemsService {
   private void addItemToBlog(Blog blog, ItemDTO item) {
     if (itemCache.getIfPresent(item.getLink()) == null) {
       itemCache.put(item.getLink(), item);
-      producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item, blog.getId()));
-      itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(Instant.now(), item.getLink(), item.getTitle(), item.getDescription()));
+      producer.writeEventToQueue(new NewItemInBlogEvent(item, blog.getId()));
+      itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(item.getLink(), item.getTitle(), item.getDescription()));
     }
   }
 

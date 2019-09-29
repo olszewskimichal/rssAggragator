@@ -3,9 +3,7 @@ package pl.michal.olszewski.rssaggregator.item;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
-import lombok.Getter;
 
-@Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 class BlogItemDTO {
 
@@ -23,5 +21,21 @@ class BlogItemDTO {
     this.link = link;
     this.date = date;
     this.author = author;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
+  public Instant getDate() {
+    return date;
+  }
+
+  public String getAuthor() {
+    return author;
   }
 }

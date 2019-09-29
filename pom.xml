@@ -29,6 +29,11 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <artifactId>commons-lang3</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <version>3.9</version>
+    </dependency>
+    <dependency>
       <artifactId>jackson-datatype-jsr310</artifactId>
       <groupId>com.fasterxml.jackson.datatype</groupId>
     </dependency>
