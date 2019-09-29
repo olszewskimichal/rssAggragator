@@ -7,6 +7,7 @@ import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +22,7 @@ class DuplicateItemsFixer {
     this.mongoTemplate = mongoTemplate;
   }
 
+  @Scheduled(cron = "0 15 2 * * ?")
   void removeDuplicatesFromLastWeek() {
     Instant from = Instant.now().minus(7, DAYS);
     itemFinder.findItemsFromDateOrderByCreatedAt(from)
