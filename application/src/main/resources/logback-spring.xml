@@ -2,7 +2,12 @@
 <configuration>
   <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
   <!-- Example for logging into the build folder of your project -->
-  <property name="LOG_FILE" value="/var/logs/${BUILD_FOLDER:-build}/RSS"/>​
+  <springProfile name="prod">
+    <property name="LOG_FILE" value="/var/logs/${BUILD_FOLDER:-build}/RSS"/>​
+  </springProfile>
+  <springProfile name="!prod">
+    <property name="LOG_FILE" value="${BUILD_FOLDER:-build}/RSS"/>​
+  </springProfile>
 
   <!-- You can override this to have a custom pattern -->
   <property name="CONSOLE_LOG_PATTERN"
@@ -69,6 +74,8 @@
   <root level="INFO">
     <appender-ref ref="console"/>
     <!-- uncomment this to have also JSON logs -->
-    <appender-ref ref="logstash"/>
+    <springProfile name="prod">
+      <appender-ref ref="logstash"/>
+    </springProfile>
   </root>
 </configuration>

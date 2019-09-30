@@ -13,6 +13,7 @@ public class LinkExtractor {
 
   public static String getFinalURL(String linkUrl) {
     try {
+      linkUrl = getUrlWithoutParameters(linkUrl);
       log.trace("getFinalURL for link {}", linkUrl);
       var con = (HttpURLConnection) new URL(linkUrl).openConnection();
       con.addRequestProperty("User-Agent", "Mozilla/4.76");
@@ -25,7 +26,6 @@ public class LinkExtractor {
         String redirectUrl = con.getHeaderField("Location");
         return getFinalURL(redirectUrl).replaceAll("[&?]gi.*", "");
       }
-      linkUrl = getUrlWithoutParameters(linkUrl);
     } catch (IOException | URISyntaxException ex) {
       Sentry.capture(ex);
       log.error("Wystapil blad przy próbie wyciagniecia finalnego linku z {} o tresci ", linkUrl, ex);

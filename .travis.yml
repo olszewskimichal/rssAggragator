@@ -1,6 +1,6 @@
 language: java
 sudo: false
-jdk: openjdk12
+jdk: openjdk13
 dist: trusty
 
 install:
