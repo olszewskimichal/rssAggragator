@@ -69,6 +69,8 @@
   <root level="INFO">
     <appender-ref ref="console"/>
     <!-- uncomment this to have also JSON logs -->
-    <appender-ref ref="logstash"/>
+    <springProfile name="prod">
+      <appender-ref ref="logstash"/>
+    </springProfile>
   </root>
 </configuration>
