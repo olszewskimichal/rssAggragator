@@ -2,7 +2,7 @@ package pl.michal.olszewski.rssaggregator.item;
 
 import java.util.Objects;
 
-public class BlogItemLink {
+public final class BlogItemLink {
 
   private final String blogId;
   private final String linkUrl;
