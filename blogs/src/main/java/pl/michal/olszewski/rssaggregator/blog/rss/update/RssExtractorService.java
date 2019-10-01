@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static pl.michal.olszewski.rssaggregator.blog.rss.update.BlogItemsFromFeedExtractor.getItemsForBlog;
 
-import brave.Tracer;
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -27,11 +26,9 @@ import pl.michal.olszewski.rssaggregator.blog.UpdateBlogWithItemsDTO;
 class RssExtractorService {
 
   private final FeedFetcher feedFetcher;
-  private final Tracer tracer;
 
-  RssExtractorService(FeedFetcher feedFetcher, Tracer tracer) {
+  RssExtractorService(FeedFetcher feedFetcher) {
     this.feedFetcher = feedFetcher;
-    this.tracer = tracer;
   }
 
   UpdateBlogWithItemsDTO getBlog(RssInfo info) {

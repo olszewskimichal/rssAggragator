@@ -5,6 +5,7 @@ import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import pl.michal.olszewski.rssaggregator.item.BlogItemLink;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
@@ -16,14 +17,14 @@ public class UpdateBlogWithItemsService {
 
   private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
-  private final Cache<String, ItemDTO> itemCache;
+  private final Cache<BlogItemLink, ItemDTO> itemCache;
   private final NewItemInBlogEventProducer producer;
   private final NewItemForSearchEventProducer itemForSearchEventProducer;
 
   public UpdateBlogWithItemsService(
       BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
-      @Qualifier("itemCache") Cache<String, ItemDTO> itemCache,
+      @Qualifier("itemCache") Cache<BlogItemLink, ItemDTO> itemCache,
       NewItemInBlogEventProducer producer,
       NewItemForSearchEventProducer itemForSearchEventProducer) {
     this.blogUpdater = blogUpdater;
@@ -42,8 +43,10 @@ public class UpdateBlogWithItemsService {
   }
 
   private void addItemToBlog(Blog blog, ItemDTO item) {
-    if (itemCache.getIfPresent(item.getLink()) == null) {
-      itemCache.put(item.getLink(), item);
+    BlogItemLink itemLink = new BlogItemLink(blog.getId(), item.getLink());
+    if (itemCache.getIfPresent(itemLink) == null) {
+      log.debug("addItemToBlog {} to blog {}", item.getLink(), blog.getBlogURL());
+      itemCache.put(itemLink, item);
       producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item, blog.getId()));
       itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(Instant.now(), item.getLink(), item.getTitle(), item.getDescription()));
     }

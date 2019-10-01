@@ -37,7 +37,7 @@ class UpdateBlogService {
   ) {
     this.blogFinder = blogFinder;
     this.tracer = tracer;
-    this.rssExtractorService = new RssExtractorService(feedFetcher, this.tracer);
+    this.rssExtractorService = new RssExtractorService(feedFetcher);
     this.blogService = blogService;
     if (registry != null) {
       this.executor = monitor(registry, executor, "prod_pool");

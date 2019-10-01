@@ -1,9 +1,11 @@
 package pl.michal.olszewski.rssaggregator.search.items;
 
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
+import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.client.reactive.ReactiveElasticsearchClient;
 import org.springframework.data.elasticsearch.client.reactive.ReactiveRestClients;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
@@ -19,6 +21,15 @@ public class ElasticConfig {
   public ReactiveElasticsearchOperations reactiveElasticsearchOperations(@Value("${elasticNode}") final String elasticNode) {
     var resultsMapper = new ScoreResultsMapper();
     return new ReactiveElasticsearchTemplate(reactiveElasticsearchClient(elasticNode), elasticsearchConverter(), resultsMapper);
+  }
+
+  @Bean
+  RestHighLevelClient client(@Value("${elasticNode}") final String elasticNode) {
+    var clientConfiguration = ClientConfiguration.builder()
+        .connectedTo(elasticNode)
+        .build();
+
+    return RestClients.create(clientConfiguration).rest();
   }
 
   @Bean

@@ -10,6 +10,11 @@
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <artifactId>cache</artifactId>
+      <groupId>pl.michal.olszewski</groupId>
+      <version>0.0.11-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>pl.michal.olszewski</groupId>
       <artifactId>modelPersistence</artifactId>
       <version>0.0.11-SNAPSHOT</version>

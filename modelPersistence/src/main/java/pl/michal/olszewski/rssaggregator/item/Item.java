@@ -7,20 +7,20 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 @Getter
 @ToString
 @NoArgsConstructor
+@CompoundIndex(def = "{'link':1, 'blogId':1}", name = "uniqueBlogItemIndex", unique = true)
 final class Item {
 
   @Id
   private String id;
   private String title;
   private String description;
-  @Indexed(unique = true)
   private String link;
   private Instant date;
   private String author;
@@ -71,5 +71,9 @@ final class Item {
   Item markAsUnread() {
     this.read = false;
     return this;
+  }
+
+  void updateLink(String newLink) {
+    this.link = newLink;
   }
 }
