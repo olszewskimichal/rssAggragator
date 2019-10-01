@@ -25,7 +25,8 @@ public final class BlogAggregationDTO {
     this.name = name;
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
-    this.blogItemsCount = Optional.ofNullable(blogItemsCount).orElse(0L);
+    this.blogItemsCount = Optional.ofNullable(blogItemsCount)
+        .orElse(0L);
   }
 
   @Override

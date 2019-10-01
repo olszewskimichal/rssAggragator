@@ -19,12 +19,12 @@
     <dependency>
       <artifactId>rome</artifactId>
       <groupId>com.rometools</groupId>
-      <version>1.12.1</version>
+      <version>1.12.2</version>
     </dependency>
     <dependency>
       <artifactId>rome-fetcher</artifactId>
       <groupId>com.rometools</groupId>
-      <version>1.12.1</version>
+      <version>1.12.2</version>
     </dependency>
     <dependency>
       <groupId>org.jsoup</groupId>

@@ -7,6 +7,7 @@ import java.lang.Character.UnicodeBlock;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,7 +28,9 @@ class BlogItemsFromFeedExtractor {
         .filter(entry -> entry.getPublishedDate().toInstant().isAfter(rssInfo.getLastUpdateDate()))
         .map(entry -> new ItemDTO(
             entry.getTitle(),
-            entry.getDescription() != null ? HtmlTagRemover.removeHtmlTagFromDescription(entry.getDescription().getValue()) : "",
+            Optional.ofNullable(entry.getDescription())
+                .map(description -> HtmlTagRemover.removeHtmlTagFromDescription(entry.getDescription().getValue()))
+                .orElse(""),
             getFinalURL(convertURLToAscii(entry.getLink())),
             entry.getPublishedDate().toInstant(),
             entry.getAuthor(),

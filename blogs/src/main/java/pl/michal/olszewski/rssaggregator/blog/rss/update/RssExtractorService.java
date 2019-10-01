@@ -1,6 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
+import static java.util.Optional.ofNullable;
 import static pl.michal.olszewski.rssaggregator.blog.rss.update.BlogItemsFromFeedExtractor.getItemsForBlog;
+import static pl.michal.olszewski.rssaggregator.blog.rss.update.HtmlTagRemover.removeHtmlTagFromDescription;
 
 import com.rometools.fetcher.FeedFetcher;
 import com.rometools.fetcher.FetcherException;
@@ -13,6 +15,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -58,10 +61,12 @@ class RssExtractorService {
     log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
     return new UpdateBlogWithItemsDTO(
         syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
-        HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()),
+        removeHtmlTagFromDescription(syndFeed.getDescription()),
         syndFeed.getTitle(),
         feedURL,
-        syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
+        ofNullable(syndFeed.getPublishedDate())
+            .map(Date::toInstant)
+            .orElse(Instant.now()),
         new ArrayList<>());
   }
 

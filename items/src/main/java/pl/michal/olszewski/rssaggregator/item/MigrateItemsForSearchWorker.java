@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.item;
 
+import static java.lang.Integer.MAX_VALUE;
 import static pl.michal.olszewski.rssaggregator.item.LinkExtractor.getFinalURL;
 
 import java.time.Instant;
@@ -18,7 +19,7 @@ class MigrateItemsForSearchWorker {
   }
 
   void migrateItemsForSearch() {
-    itemFinder.findAllOrderByPublishedDateBlocking(Integer.MAX_VALUE, 0)
+    itemFinder.findAllOrderByPublishedDateBlocking(MAX_VALUE, 0)
         .forEach(item -> newItemForSearchEventProducer.writeEventToQueue(NewItemForSearchEvent.builder()
             .itemDescription(item.getDescription())
             .itemTitle(item.getTitle())

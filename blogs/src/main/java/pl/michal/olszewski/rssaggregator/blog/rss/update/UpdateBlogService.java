@@ -1,11 +1,11 @@
 package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
+import static java.time.Duration.ofSeconds;
+import static reactor.core.scheduler.Schedulers.fromExecutor;
 
-import brave.Tracer;
 import com.rometools.fetcher.FeedFetcher;
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
 import pl.michal.olszewski.rssaggregator.blog.UpdateBlogWithItemsService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 @Service
 @Slf4j
@@ -25,25 +24,18 @@ class UpdateBlogService {
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
   private final UpdateBlogWithItemsService blogService;
-  private final Tracer tracer;
 
   public UpdateBlogService(
       BlogFinder blogFinder,
       Executor executor,
       MeterRegistry registry,
       UpdateBlogWithItemsService blogService,
-      FeedFetcher feedFetcher,
-      Tracer tracer
+      FeedFetcher feedFetcher
   ) {
     this.blogFinder = blogFinder;
-    this.tracer = tracer;
     this.rssExtractorService = new RssExtractorService(feedFetcher);
     this.blogService = blogService;
-    if (registry != null) {
-      this.executor = monitor(registry, executor, "prod_pool");
-    } else {
-      this.executor = executor;
-    }
+    this.executor = monitor(registry, executor, "prod_pool");
   }
 
   Flux<Boolean> updateAllActiveBlogsByRss() {
@@ -60,9 +52,9 @@ class UpdateBlogService {
   Mono<Boolean> updateRssBlogItems(Blog blog) {
     log.debug("Pobieranie nowych danych dla bloga {}", blog.getName());
     return Mono.defer(() -> extractBlogFromRssAndUpdateBlog(blog))
-        .timeout(Duration.ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
+        .timeout(ofSeconds(5), Mono.error(new UpdateTimeoutException(blog.getName())))
         .doOnError(ex -> log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {}", blog.getName(), ex))
-        .subscribeOn(Schedulers.fromExecutor(executor))
+        .subscribeOn(fromExecutor(executor))
         .onErrorReturn(false);
   }
 
