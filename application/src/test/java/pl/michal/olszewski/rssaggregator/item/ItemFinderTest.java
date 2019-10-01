@@ -139,4 +139,18 @@ class ItemFinderTest extends IntegrationTestBase {
     //then
     assertThat(itemList.size()).isEqualTo(2);
   }
+
+  @Test
+  void shouldFindAllItemsByCreatedAt() {
+    //given
+    mongoTemplate.save(new Item(builder().blogId("id1").link("link1").build()));
+    mongoTemplate.save(new Item(builder().blogId("id2").link("link1").build()));
+    mongoTemplate.save(new Item(builder().blogId("id3").link("link1").build()));
+
+    //when
+    List<Item> itemList = itemFinder.findItemsFromDateOrderByCreatedAt(null);
+
+    //then
+    assertThat(itemList.size()).isEqualTo(3);
+  }
 }

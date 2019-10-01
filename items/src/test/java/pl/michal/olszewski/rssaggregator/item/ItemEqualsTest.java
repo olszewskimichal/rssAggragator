@@ -20,4 +20,11 @@ class ItemEqualsTest {
         .suppress(Warning.NONFINAL_FIELDS)
         .verify();
   }
+
+  @Test
+  void blogItemLinkEqualsContractTest() {
+    EqualsVerifier.forClass(BlogItemLink.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
 }
