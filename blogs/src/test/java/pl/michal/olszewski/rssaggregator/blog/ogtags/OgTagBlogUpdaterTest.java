@@ -1,5 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog.ogtags;
 
+import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.fromName;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -17,9 +19,9 @@ class OgTagBlogUpdaterTest {
 
     Map<OgTagType, String> collect = Stream.of(document.getElementsByTag("meta"))
         .flatMap(Collection::stream)
-        .filter(element -> OgTagType.fromName(element.attr("property")) != null)
+        .filter(element -> fromName(element.attr("property")) != null)
         .collect(Collectors.toMap(
-            element -> OgTagType.fromName(element.attr("property")),
+            element -> fromName(element.attr("property")),
             element -> element.attr("content")
         ));
 

@@ -12,6 +12,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogInfo;
 
 @Document
 @Getter
@@ -31,6 +32,7 @@ public class Blog {
   private String feedURL;
   private Instant publishedDate;
   private Instant lastUpdateDate;
+  private String imageUrl;
   private boolean active = true;
 
   @Builder
@@ -41,7 +43,8 @@ public class Blog {
       String name,
       String feedURL,
       Instant publishedDate,
-      Instant lastUpdateDate
+      Instant lastUpdateDate,
+      String imageUrl
   ) {
     this.id = id;
     this.blogURL = blogURL;
@@ -50,6 +53,7 @@ public class Blog {
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
     this.lastUpdateDate = lastUpdateDate;
+    this.imageUrl = imageUrl;
   }
 
   public Blog(CreateBlogDTO blogDTO) {
@@ -105,4 +109,15 @@ public class Blog {
     active = true;
   }
 
+  public void updateBlogByOgTagInfo(OgTagBlogInfo blogInfo) {
+    if (name != null && blogInfo.getTitle() != null) {
+      name = blogInfo.getTitle();
+    }
+    if (description != null && blogInfo.getDescription() != null) {
+      description = blogInfo.getDescription();
+    }
+    if (imageUrl != null && blogInfo.getImageUrl() != null) {
+      imageUrl = blogInfo.getImageUrl();
+    }
+  }
 }

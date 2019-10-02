@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,8 +25,13 @@ public class BlogFinder {
     return blogReactiveRepository.getBlogWithCount(id);
   }
 
+
   List<Blog> findAllSync() {
     return blogSyncRepository.findAll();
+  }
+
+  public Optional<Blog> findByIdSync(String id) {
+    return blogSyncRepository.findById(id);
   }
 
   Mono<Blog> findByFeedURL(String url) {

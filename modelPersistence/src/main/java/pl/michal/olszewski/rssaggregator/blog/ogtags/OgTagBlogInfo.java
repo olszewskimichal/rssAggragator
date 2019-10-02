@@ -12,6 +12,7 @@ public class OgTagBlogInfo {
     this.imageUrl = imageUrl;
   }
 
+
   @Override
   public String toString() {
     return "OgTagBlogInfo{" +
@@ -21,15 +22,15 @@ public class OgTagBlogInfo {
         '}';
   }
 
-  String getTitle() {
+  public String getTitle() {
     return title;
   }
 
-  String getDescription() {
+  public String getDescription() {
     return description;
   }
 
-  String getImageUrl() {
+  public String getImageUrl() {
     return imageUrl;
   }
 }
