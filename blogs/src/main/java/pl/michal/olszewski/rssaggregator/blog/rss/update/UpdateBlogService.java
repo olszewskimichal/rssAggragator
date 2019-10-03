@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
 
-import brave.Tracer;
 import com.rometools.fetcher.FeedFetcher;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
@@ -25,25 +24,18 @@ class UpdateBlogService {
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
   private final UpdateBlogWithItemsService blogService;
-  private final Tracer tracer;
 
   public UpdateBlogService(
       BlogFinder blogFinder,
       Executor executor,
       MeterRegistry registry,
       UpdateBlogWithItemsService blogService,
-      FeedFetcher feedFetcher,
-      Tracer tracer
+      FeedFetcher feedFetcher
   ) {
     this.blogFinder = blogFinder;
-    this.tracer = tracer;
     this.rssExtractorService = new RssExtractorService(feedFetcher);
     this.blogService = blogService;
-    if (registry != null) {
-      this.executor = monitor(registry, executor, "prod_pool");
-    } else {
-      this.executor = executor;
-    }
+    this.executor = monitor(registry, executor, "prod_pool");
   }
 
   Flux<Boolean> updateAllActiveBlogsByRss() {

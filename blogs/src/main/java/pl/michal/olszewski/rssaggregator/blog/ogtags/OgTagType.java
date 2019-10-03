@@ -2,7 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog.ogtags;
 
 import java.util.stream.Stream;
 
-public enum OgTagType {
+enum OgTagType {
   TITLE("og:title"),
   DESCRIPTION("og:description"),
   IMAGE("og:image");

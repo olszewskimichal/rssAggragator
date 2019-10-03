@@ -2,9 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog.ogtags;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.stereotype.Component;
 
-@Component
 public class InMemoryPageInfoExtractor implements PageInfoExtractor {
 
   @Override
@@ -12,15 +10,15 @@ public class InMemoryPageInfoExtractor implements PageInfoExtractor {
     Document document = new Document("url");
     Element titleMeta = document.appendElement("meta");
     titleMeta.attr("property", "og:title");
-    titleMeta.attr("content", "test");
+    titleMeta.attr("content", "title");
 
     Element descriptionMeta = document.appendElement("meta");
     descriptionMeta.attr("property", "og:description");
-    descriptionMeta.attr("content", "test2");
+    descriptionMeta.attr("content", "description");
 
     Element imageMeta = document.appendElement("meta");
     imageMeta.attr("property", "og:image");
-    imageMeta.attr("content", "test3");
+    imageMeta.attr("content", "imageUrl");
     return document;
   }
 }

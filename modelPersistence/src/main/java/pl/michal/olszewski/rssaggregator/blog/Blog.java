@@ -77,7 +77,7 @@ public class Blog {
 
   @Override
   public final int hashCode() {
-    return Objects.hash(blogURL, description, name, feedURL, publishedDate, lastUpdateDate, active);
+    return Objects.hash(blogURL, description, name, feedURL, publishedDate, lastUpdateDate, active, imageUrl);
   }
 
   @Override
@@ -95,6 +95,7 @@ public class Blog {
         Objects.equals(name, blog.name) &&
         Objects.equals(feedURL, blog.feedURL) &&
         Objects.equals(publishedDate, blog.publishedDate) &&
+        Objects.equals(imageUrl, blog.imageUrl) &&
         Objects.equals(lastUpdateDate, blog.lastUpdateDate);
   }
 
@@ -110,13 +111,13 @@ public class Blog {
   }
 
   public void updateBlogByOgTagInfo(OgTagBlogInfo blogInfo) {
-    if (name != null && blogInfo.getTitle() != null) {
+    if (name == null && blogInfo.getTitle() != null) {
       name = blogInfo.getTitle();
     }
-    if (description != null && blogInfo.getDescription() != null) {
+    if (description == null && blogInfo.getDescription() != null) {
       description = blogInfo.getDescription();
     }
-    if (imageUrl != null && blogInfo.getImageUrl() != null) {
+    if (blogInfo.getImageUrl() != null) {
       imageUrl = blogInfo.getImageUrl();
     }
   }

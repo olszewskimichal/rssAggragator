@@ -1,27 +1,24 @@
 package pl.michal.olszewski.rssaggregator.blog.ogtags;
 
-import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.fromName;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.Test;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 
 class OgTagBlogUpdaterTest {
 
+  private OgTagBlogUpdater updater = new OgTagBlogUpdater(new InMemoryPageInfoExtractor());
+
   @Test
-  void shouldUpdateBlogByOgTag() throws IOException {
+  void shouldUpdateBlogByOgTag() {
     //given
-
+    Blog blog = Blog.builder().blogURL("url").build();
     //when
-
+    updater.updateBlogByOgTagInfo(blog);
     //then
+    assertThat(blog.getDescription()).isEqualTo("description");
+    assertThat(blog.getName()).isEqualTo("title");
+    assertThat(blog.getImageUrl()).isEqualTo("imageUrl");
 
   }
 }

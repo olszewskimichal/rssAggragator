@@ -1,10 +1,14 @@
 package pl.michal.olszewski.rssaggregator.blog.ogtags;
 
-import java.io.IOException;
+import static java.util.stream.Stream.of;
+import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.DESCRIPTION;
+import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.IMAGE;
+import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.TITLE;
+import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.fromName;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
@@ -23,31 +27,29 @@ class OgTagBlogUpdater {
     this.pageInfoExtractor = pageInfoExtractor;
   }
 
-  void updateBlogByOgTagInfo(Blog blog) {
+  Blog updateBlogByOgTagInfo(Blog blog) {
     OgTagBlogInfo blogInfo = getBlogInfoFromMetaTags(blog.getBlogURL());
-    blog.updateBlogByOgTagInfo(blogInfo);
+    if (blogInfo != null) {
+      blog.updateBlogByOgTagInfo(blogInfo);
+    }
+    return blog;
   }
 
   OgTagBlogInfo getBlogInfoFromMetaTags(String url) {
-    try {
-      Document document = pageInfoExtractor.getPageInfoFromUrl(url);
-      Map<OgTagType, String> collect = Stream.of(document.getElementsByTag(OgTagBlogUpdater.META))
-          .flatMap(Collection::stream)
-          .filter(element -> OgTagType.fromName(element.attr(OgTagBlogUpdater.PROPERTY)) != null)
-          .collect(Collectors.toMap(
-              element -> OgTagType.fromName(element.attr(OgTagBlogUpdater.PROPERTY)),
-              element -> element.attr(OgTagBlogUpdater.CONTENT)
-          ));
+    Document document = pageInfoExtractor.getPageInfoFromUrl(url);
+    Map<OgTagType, String> collect = of(document.getElementsByTag(META))
+        .flatMap(Collection::stream)
+        .filter(element -> fromName(element.attr(PROPERTY)) != null)
+        .collect(Collectors.toMap(
+            element -> fromName(element.attr(PROPERTY)),
+            element -> element.attr(CONTENT)
+        ));
 
-      return new OgTagBlogInfo(
-          collect.getOrDefault(OgTagType.TITLE, ""),
-          collect.getOrDefault(OgTagType.DESCRIPTION, ""),
-          collect.getOrDefault(OgTagType.IMAGE, "")
-      );
-    } catch (IOException ex) {
-      log.warn("Nie mogę pobrać OG:Tagów z bloga {}", url);
-      return null;
-    }
+    return new OgTagBlogInfo(
+        collect.getOrDefault(TITLE, ""),
+        collect.getOrDefault(DESCRIPTION, ""),
+        collect.getOrDefault(IMAGE, "")
+    );
   }
 
 }

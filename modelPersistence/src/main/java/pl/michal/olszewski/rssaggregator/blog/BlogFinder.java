@@ -25,7 +25,6 @@ public class BlogFinder {
     return blogReactiveRepository.getBlogWithCount(id);
   }
 
-
   List<Blog> findAllSync() {
     return blogSyncRepository.findAll();
   }
