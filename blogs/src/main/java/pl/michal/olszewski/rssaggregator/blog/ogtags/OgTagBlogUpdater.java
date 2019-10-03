@@ -31,25 +31,32 @@ class OgTagBlogUpdater {
     OgTagBlogInfo blogInfo = getBlogInfoFromMetaTags(blog.getBlogURL());
     if (blogInfo != null) {
       blog.updateBlogByOgTagInfo(blogInfo);
+    } else {
+      log.warn("Nie mogę pobrać informacji z OgTagów dla bloga {}", blog.getBlogURL());
     }
     return blog;
   }
 
   OgTagBlogInfo getBlogInfoFromMetaTags(String url) {
     Document document = pageInfoExtractor.getPageInfoFromUrl(url);
-    Map<OgTagType, String> collect = of(document.getElementsByTag(META))
-        .flatMap(Collection::stream)
-        .filter(element -> fromName(element.attr(PROPERTY)) != null)
-        .collect(Collectors.toMap(
-            element -> fromName(element.attr(PROPERTY)),
-            element -> element.attr(CONTENT)
-        ));
+    if (document != null) {
+      Map<OgTagType, String> collect = of(document.getElementsByTag(META))
+          .flatMap(Collection::stream)
+          .filter(element -> fromName(element.attr(PROPERTY)) != null)
+          .collect(Collectors.toMap(
+              element -> fromName(element.attr(PROPERTY)),
+              element -> element.attr(CONTENT),
+              (a1, a2) -> a1
+          ));
 
-    return new OgTagBlogInfo(
-        collect.getOrDefault(TITLE, ""),
-        collect.getOrDefault(DESCRIPTION, ""),
-        collect.getOrDefault(IMAGE, "")
-    );
+      return new OgTagBlogInfo(
+          collect.getOrDefault(TITLE, ""),
+          collect.getOrDefault(DESCRIPTION, ""),
+          collect.getOrDefault(IMAGE, "")
+      );
+    } else {
+      return null;
+    }
   }
 
 }

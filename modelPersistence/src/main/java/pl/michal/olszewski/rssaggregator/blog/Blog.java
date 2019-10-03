@@ -1,5 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import static org.springframework.util.StringUtils.isEmpty;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
@@ -111,10 +113,10 @@ public class Blog {
   }
 
   public void updateBlogByOgTagInfo(OgTagBlogInfo blogInfo) {
-    if (name == null && blogInfo.getTitle() != null) {
+    if (isEmpty(name) && blogInfo.getTitle() != null) {
       name = blogInfo.getTitle();
     }
-    if (description == null && blogInfo.getDescription() != null) {
+    if (isEmpty(description) && blogInfo.getDescription() != null) {
       description = blogInfo.getDescription();
     }
     if (blogInfo.getImageUrl() != null) {

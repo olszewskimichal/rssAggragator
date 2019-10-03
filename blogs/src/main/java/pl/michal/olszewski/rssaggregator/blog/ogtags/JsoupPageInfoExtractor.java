@@ -15,8 +15,8 @@ class JsoupPageInfoExtractor implements PageInfoExtractor {
   public Document getPageInfoFromUrl(String url) {
     try {
       return Jsoup.connect(url).userAgent("myUserAgent").get();
-    } catch (IOException e) {
-      log.warn("Nie mogę pobrać OG:Tagów z bloga {}", url);
+    } catch (IOException | IllegalArgumentException e) {
+      log.warn("Nie mogę pobrać OG:Tagów z bloga {}", url, e);
       return null;
     }
   }
