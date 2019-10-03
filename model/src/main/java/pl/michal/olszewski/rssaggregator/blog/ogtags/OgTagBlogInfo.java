@@ -1,5 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog.ogtags;
 
+import java.util.Objects;
+
 public class OgTagBlogInfo {
 
   private final String title;
@@ -10,16 +12,6 @@ public class OgTagBlogInfo {
     this.title = title;
     this.description = description;
     this.imageUrl = imageUrl;
-  }
-
-
-  @Override
-  public String toString() {
-    return "OgTagBlogInfo{" +
-        "title='" + title + '\'' +
-        ", description='" + description + '\'' +
-        ", imageUrl='" + imageUrl + '\'' +
-        '}';
   }
 
   public String getTitle() {
@@ -33,4 +25,33 @@ public class OgTagBlogInfo {
   public String getImageUrl() {
     return imageUrl;
   }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(title, description, imageUrl);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof OgTagBlogInfo)) {
+      return false;
+    }
+    OgTagBlogInfo that = (OgTagBlogInfo) o;
+    return Objects.equals(title, that.title) &&
+        Objects.equals(description, that.description) &&
+        Objects.equals(imageUrl, that.imageUrl);
+  }
+
+  @Override
+  public String toString() {
+    return "OgTagBlogInfo{" +
+        "title='" + title + '\'' +
+        ", description='" + description + '\'' +
+        ", imageUrl='" + imageUrl + '\'' +
+        '}';
+  }
+
 }

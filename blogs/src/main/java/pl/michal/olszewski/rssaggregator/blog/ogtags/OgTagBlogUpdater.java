@@ -31,14 +31,12 @@ class OgTagBlogUpdater {
     OgTagBlogInfo blogInfo = getBlogInfoFromMetaTags(blog.getBlogURL());
     if (blogInfo != null) {
       blog.updateBlogByOgTagInfo(blogInfo);
-    } else {
-      log.warn("Nie mogę pobrać informacji z OgTagów dla bloga {}", blog.getBlogURL());
     }
     return blog;
   }
 
   OgTagBlogInfo getBlogInfoFromMetaTags(String url) {
-    Document document = pageInfoExtractor.getPageInfoFromUrl(url);
+    Document document = pageInfoExtractor.getPageInfoFromUrl(url); //TODO opakowac to w Optional
     if (document != null) {
       Map<OgTagType, String> collect = of(document.getElementsByTag(META))
           .flatMap(Collection::stream)
