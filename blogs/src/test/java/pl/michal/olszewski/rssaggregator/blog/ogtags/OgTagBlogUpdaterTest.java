@@ -9,28 +9,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.Test;
+import pl.michal.olszewski.rssaggregator.blog.Blog;
 
 class OgTagBlogUpdaterTest {
 
   @Test
-  void test4() throws IOException {
-    Document document = Jsoup.connect("https://devstyle.pl").userAgent("myUserAgent").get();
+  void shouldUpdateBlogByOgTag() throws IOException {
+    //given
 
-    Map<OgTagType, String> collect = Stream.of(document.getElementsByTag("meta"))
-        .flatMap(Collection::stream)
-        .filter(element -> fromName(element.attr("property")) != null)
-        .collect(Collectors.toMap(
-            element -> fromName(element.attr("property")),
-            element -> element.attr("content")
-        ));
+    //when
 
-    OgTagBlogInfo ogTagBlogInfo = new OgTagBlogInfo(
-        collect.getOrDefault(OgTagType.TITLE, ""),
-        collect.getOrDefault(OgTagType.DESCRIPTION, ""),
-        collect.getOrDefault(OgTagType.IMAGE, "")
-    );
+    //then
 
-    System.err.println(ogTagBlogInfo);
   }
 }
