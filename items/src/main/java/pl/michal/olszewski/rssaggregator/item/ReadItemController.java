@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 
 @RestController()
 @Slf4j
+@CrossOrigin
 class ReadItemController {
 
   private final ReadItemService readItemService;
