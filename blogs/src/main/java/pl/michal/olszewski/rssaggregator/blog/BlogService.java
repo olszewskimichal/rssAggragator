@@ -45,8 +45,8 @@ public class BlogService {
             blog.getDescription(),
             blog.getName(),
             blog.getFeedURL(),
-            blog.getPublishedDate()
-        ));
+            blog.getPublishedDate(),
+            blog.getImageUrl()));
   }
 
   Mono<Void> deleteBlog(String id) {
@@ -91,8 +91,8 @@ public class BlogService {
             blog.getDescription(),
             blog.getName(),
             blog.getFeedURL(),
-            blog.getPublishedDate()
-        ))
+            blog.getPublishedDate(),
+            blog.getImageUrl()))
         .doOnSuccess(updatedBlog -> blogCache.invalidate(updatedBlog.getId()));
   }
 
@@ -105,8 +105,8 @@ public class BlogService {
             updatedBlog.getDescription(),
             updatedBlog.getName(),
             updatedBlog.getFeedURL(),
-            updatedBlog.getPublishedDate()
-        )
+            updatedBlog.getPublishedDate(),
+            updatedBlog.getImageUrl())
     );
   }
 

@@ -9,7 +9,7 @@ class BlogToDtoMapper {
         blog.getDescription(),
         blog.getName(),
         blog.getFeedURL(),
-        blog.getPublishedDate()
-    );
+        blog.getPublishedDate(),
+        blog.getImageUrl());
   }
 }
