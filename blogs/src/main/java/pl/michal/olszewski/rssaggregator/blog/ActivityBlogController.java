@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/v1/blogs")
 @Slf4j
 @Api(value = "/api/v1/blogs")
+@CrossOrigin
 public class ActivityBlogController {
 
   private final BlogActivityUpdater blogActivityUpdater;
