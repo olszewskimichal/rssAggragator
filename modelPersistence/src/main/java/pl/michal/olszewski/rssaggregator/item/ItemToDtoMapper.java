@@ -15,6 +15,7 @@ class ItemToDtoMapper {
 
   static BlogItemDTO mapToBlogItemDTO(Item item) {
     return new BlogItemDTO(
+        item.getId(),
         item.getTitle(),
         item.getLink(),
         item.getDate(),
