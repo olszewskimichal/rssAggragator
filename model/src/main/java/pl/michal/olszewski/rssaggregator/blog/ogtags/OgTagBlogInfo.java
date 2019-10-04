@@ -27,12 +27,12 @@ public class OgTagBlogInfo {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(title, description, imageUrl);
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) {
       return true;
     }
