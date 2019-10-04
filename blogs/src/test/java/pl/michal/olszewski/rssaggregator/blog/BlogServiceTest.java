@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogUpdater;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -33,8 +34,13 @@ class BlogServiceTest {
   @Mock
   private BlogSyncRepository blogSyncRepository;
 
+  @Mock
+  private OgTagBlogUpdater ogTagBlogUpdater;
+
   @BeforeEach
   void setUp() {
+    given(ogTagBlogUpdater.updateBlogByOgTagInfo(any(Blog.class)))
+        .willAnswer(i -> i.getArgument(0));
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
           Blog argument = i.getArgument(0);
           argument.setId(UUID.randomUUID().toString());
@@ -46,7 +52,8 @@ class BlogServiceTest {
         new BlogWorker(blogRepository),
         Caffeine.newBuilder().build(),
         (blogUrl, feedUrl) -> {
-        });
+        },
+        ogTagBlogUpdater);
     blogService.evictBlogCache();
   }
 
