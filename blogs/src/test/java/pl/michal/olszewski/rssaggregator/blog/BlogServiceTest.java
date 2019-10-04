@@ -45,7 +45,8 @@ class BlogServiceTest {
         new BlogFinder(blogRepository, blogSyncRepository),
         new BlogWorker(blogRepository),
         Caffeine.newBuilder().build(),
-        new InMemoryBlogValidation());
+        (blogUrl, feedUrl) -> {
+        });
     blogService.evictBlogCache();
   }
 
