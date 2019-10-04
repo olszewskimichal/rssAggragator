@@ -44,8 +44,9 @@ class BlogServiceTest {
     blogService = new BlogService(
         new BlogFinder(blogRepository, blogSyncRepository),
         new BlogWorker(blogRepository),
-        Caffeine.newBuilder().build()
-    );
+        Caffeine.newBuilder().build(),
+        (blogUrl, feedUrl) -> {
+        });
     blogService.evictBlogCache();
   }
 
@@ -121,10 +122,10 @@ class BlogServiceTest {
         .description("desc")
         .name("url")
         .build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
+    given(blogRepository.findById("id")).willReturn(Mono.just(blog));
 
     //when
-    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO);
+    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO, "id");
 
     //then
     StepVerifier.create(updateBlog)

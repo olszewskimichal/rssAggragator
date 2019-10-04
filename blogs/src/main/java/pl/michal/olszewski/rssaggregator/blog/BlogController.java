@@ -62,7 +62,7 @@ class BlogController {
         .doOnError(error -> log.error("ERROR GET blogs", error));
   }
 
-  @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ApiOperation(value = "Sluzy do aktualizacji bloga o podanym id")
   @ApiResponses(value = {
@@ -71,10 +71,9 @@ class BlogController {
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Mono<BlogDTO> updateBlog(@RequestBody UpdateBlogDTO blogDTO) {
-    log.debug("PUT - updateBlog {}", blogDTO.getName());
-    log.trace("PUT - updateBlog {}", blogDTO);
-    return blogService.updateBlog(blogDTO)
+  public Mono<BlogDTO> updateBlog(@RequestBody UpdateBlogDTO blogDTO, @PathVariable String id) {
+    log.debug("PUT - updateBlog {} {}", id, blogDTO);
+    return blogService.updateBlog(blogDTO, id)
         .doOnSuccess(blog -> log.debug("END updateBlog"))
         .doOnError(error -> log.error("ERROR updateBlog", error));
   }
