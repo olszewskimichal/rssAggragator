@@ -1,7 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
@@ -10,8 +11,9 @@ import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Mono;
 
 @Service
-@Slf4j
 public class UpdateBlogWithItemsService {
+
+  private static final Logger log = LoggerFactory.getLogger(UpdateBlogWithItemsService.class);
 
   private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
@@ -19,7 +21,7 @@ public class UpdateBlogWithItemsService {
   private final NewItemInBlogEventProducer producer;
   private final NewItemForSearchEventProducer itemForSearchEventProducer;
 
-  public UpdateBlogWithItemsService(
+  UpdateBlogWithItemsService(
       BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
       @Qualifier("itemCache") Cache<String, ItemDTO> itemCache,

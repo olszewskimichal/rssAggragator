@@ -1,21 +1,23 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-@Slf4j
 public class BlogService {
+
+  private static final Logger log = LoggerFactory.getLogger(BlogService.class);
 
   private final BlogFinder blogFinder;
   private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
 
-  public BlogService(
+  BlogService(
       BlogFinder blogFinder,
       BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache) {

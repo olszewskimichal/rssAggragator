@@ -2,13 +2,13 @@ package pl.michal.olszewski.rssaggregator.blog.rss.update;
 
 import static io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics.monitor;
 
-import brave.Tracer;
 import com.rometools.fetcher.FeedFetcher;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Executor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
@@ -18,26 +18,23 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
-@Slf4j
 class UpdateBlogService {
 
+  private static final Logger log = LoggerFactory.getLogger(UpdateBlogService.class);
   private final BlogFinder blogFinder;
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
   private final UpdateBlogWithItemsService blogService;
-  private final Tracer tracer;
 
   public UpdateBlogService(
       BlogFinder blogFinder,
       Executor executor,
       MeterRegistry registry,
       UpdateBlogWithItemsService blogService,
-      FeedFetcher feedFetcher,
-      Tracer tracer
+      FeedFetcher feedFetcher
   ) {
     this.blogFinder = blogFinder;
-    this.tracer = tracer;
-    this.rssExtractorService = new RssExtractorService(feedFetcher, this.tracer);
+    this.rssExtractorService = new RssExtractorService(feedFetcher);
     this.blogService = blogService;
     if (registry != null) {
       this.executor = monitor(registry, executor, "prod_pool");

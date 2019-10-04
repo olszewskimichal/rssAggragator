@@ -10,13 +10,15 @@ import java.net.URL;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriUtils;
 import pl.michal.olszewski.rssaggregator.blog.RssInfo;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 
-@Slf4j
 class BlogItemsFromFeedExtractor {
+
+  private static final Logger log = LoggerFactory.getLogger(BlogItemsFromFeedExtractor.class);
 
   private BlogItemsFromFeedExtractor() {
   }

@@ -1,13 +1,14 @@
 package pl.michal.olszewski.rssaggregator.item;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 class NewItemInBlogEventConsumer {
 
+  private static final Logger log = LoggerFactory.getLogger(NewItemInBlogEventConsumer.class);
   private final ItemSaver itemSaver;
 
   NewItemInBlogEventConsumer(ItemSaver itemSaver) {

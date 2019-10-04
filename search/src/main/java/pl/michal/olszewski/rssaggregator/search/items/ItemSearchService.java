@@ -1,13 +1,14 @@
 package pl.michal.olszewski.rssaggregator.search.items;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 class ItemSearchService {
 
+  private static final Logger log = LoggerFactory.getLogger(ItemSearchService.class);
   private final ReactiveElasticsearchOperations reactiveElasticsearchTemplate;
 
   ItemSearchService(ReactiveElasticsearchOperations reactiveElasticsearchTemplate) {

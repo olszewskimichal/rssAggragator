@@ -3,13 +3,15 @@ package pl.michal.olszewski.rssaggregator.config;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.rometools.fetcher.impl.SyndFeedInfo;
 import java.net.URL;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-@Slf4j
 class FeedFetcherCacheImpl implements com.rometools.fetcher.impl.FeedFetcherCache {
+
+  private static final Logger log = LoggerFactory.getLogger(FeedFetcherCacheImpl.class);
 
   private final Cache<String, SyndFeedInfo> feedCacheProd;
 

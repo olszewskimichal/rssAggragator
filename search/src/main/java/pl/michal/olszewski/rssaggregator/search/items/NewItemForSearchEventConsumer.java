@@ -1,14 +1,14 @@
 package pl.michal.olszewski.rssaggregator.search.items;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 
 @Component
-@Slf4j
 class NewItemForSearchEventConsumer {
-
+  private static final Logger log = LoggerFactory.getLogger(NewItemForSearchEventConsumer.class);
   private final ItemSearchService itemSearchService;
 
   NewItemForSearchEventConsumer(ItemSearchService itemSearchService) {
