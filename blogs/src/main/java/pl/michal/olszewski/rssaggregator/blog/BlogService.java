@@ -14,14 +14,18 @@ public class BlogService {
   private final BlogFinder blogFinder;
   private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
+  private final BlogValidation blogValidation;
 
   public BlogService(
       BlogFinder blogFinder,
       BlogWorker blogUpdater,
-      @Qualifier("blogCache") Cache<String, BlogDTO> blogCache) {
+      @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
+      BlogValidation blogValidation
+  ) {
     this.blogFinder = blogFinder;
     this.blogUpdater = blogUpdater;
     this.blogCache = blogCache;
+    this.blogValidation = blogValidation;
   }
 
   public Flux<BlogDTO> getAllBlogDTOs() {
@@ -111,6 +115,7 @@ public class BlogService {
   }
 
   private Mono<Blog> createBlog(CreateBlogDTO blogDTO) {
+    blogValidation.validate(blogDTO);
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     return blogUpdater.createNewBlog(blogDTO)
         .doOnNext(this::putToCache);

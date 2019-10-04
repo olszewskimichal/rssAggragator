@@ -44,8 +44,8 @@ class BlogServiceTest {
     blogService = new BlogService(
         new BlogFinder(blogRepository, blogSyncRepository),
         new BlogWorker(blogRepository),
-        Caffeine.newBuilder().build()
-    );
+        Caffeine.newBuilder().build(),
+        new InMemoryBlogValidation());
     blogService.evictBlogCache();
   }
 
