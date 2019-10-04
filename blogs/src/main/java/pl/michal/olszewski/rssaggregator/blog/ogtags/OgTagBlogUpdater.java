@@ -7,10 +7,9 @@ import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.TITLE;
 import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.fromName;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 
@@ -36,25 +35,20 @@ class OgTagBlogUpdater {
   }
 
   OgTagBlogInfo getBlogInfoFromMetaTags(String url) {
-    Document document = pageInfoExtractor.getPageInfoFromUrl(url); //TODO opakowac to w Optional
-    if (document != null) {
-      Map<OgTagType, String> collect = of(document.getElementsByTag(META))
-          .flatMap(Collection::stream)
-          .filter(element -> fromName(element.attr(PROPERTY)) != null)
-          .collect(Collectors.toMap(
-              element -> fromName(element.attr(PROPERTY)),
-              element -> element.attr(CONTENT),
-              (a1, a2) -> a1
-          ));
-
-      return new OgTagBlogInfo(
-          collect.getOrDefault(TITLE, ""),
-          collect.getOrDefault(DESCRIPTION, ""),
-          collect.getOrDefault(IMAGE, "")
-      );
-    } else {
-      return null;
-    }
+    return Optional.ofNullable(pageInfoExtractor.getPageInfoFromUrl(url))
+        .map(document -> of(document.getElementsByTag(META))
+            .flatMap(Collection::stream)
+            .filter(element -> fromName(element.attr(PROPERTY)) != null)
+            .collect(Collectors.toMap(
+                element -> fromName(element.attr(PROPERTY)),
+                element -> element.attr(CONTENT),
+                (a1, a2) -> a1
+            )))
+        .map(ogTagTypeMap -> new OgTagBlogInfo(
+            ogTagTypeMap.getOrDefault(TITLE, ""),
+            ogTagTypeMap.getOrDefault(DESCRIPTION, ""),
+            ogTagTypeMap.getOrDefault(IMAGE, "")
+        )).orElse(null);
   }
 
 }
