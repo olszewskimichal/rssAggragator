@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 class InMemoryBlogValidation implements BlogValidation {
 
   @Override
-  public void validate(CreateBlogDTO createBlogDTO) {
+  public void validate(String blogUrl, String feedUrl) {
 
   }
 }

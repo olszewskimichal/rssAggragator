@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 class HttpBlogValidation implements BlogValidation {
 
   @Override
-  public void validate(CreateBlogDTO createBlogDTO) {
-    if (createBlogDTO.getLink() == null || createBlogDTO.getFeedURL() == null) {
+  public void validate(String blogUrl, String feedUrl) {
+    if (blogUrl == null || feedUrl == null) {
       throw new IncompleteBlogException();
     }
 
@@ -23,8 +23,8 @@ class HttpBlogValidation implements BlogValidation {
         .connectTimeout(Duration.ofSeconds(10))
         .build();
 
-    sendRequest(client, createBlogDTO.getLink());
-    sendRequest(client, createBlogDTO.getFeedURL());
+    sendRequest(client, blogUrl);
+    sendRequest(client, feedUrl);
   }
 
   private void sendRequest(HttpClient client, String url) {

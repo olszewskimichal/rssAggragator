@@ -121,10 +121,10 @@ class BlogServiceTest {
         .description("desc")
         .name("url")
         .build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
+    given(blogRepository.findById("id")).willReturn(Mono.just(blog));
 
     //when
-    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO);
+    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO, "id");
 
     //then
     StepVerifier.create(updateBlog)

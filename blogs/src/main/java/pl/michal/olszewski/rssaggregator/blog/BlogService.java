@@ -85,9 +85,11 @@ public class BlogService {
     blogCache.invalidateAll();
   }
 
-  Mono<BlogDTO> updateBlog(UpdateBlogDTO blogDTO) {
+  Mono<BlogDTO> updateBlog(UpdateBlogDTO blogDTO, String blogId) {
     log.debug("Aktualizacja bloga {}", blogDTO.getName());
-    return getBlogByFeedUrl(blogDTO.getFeedURL())
+    blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
+    return blogFinder.findById(blogId).cache()
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId)))
         .flatMap(blog -> updateBlog(blog, blogDTO))
         .map(blog -> new BlogDTO(
             blog.getId(),
@@ -115,16 +117,10 @@ public class BlogService {
   }
 
   private Mono<Blog> createBlog(CreateBlogDTO blogDTO) {
-    blogValidation.validate(blogDTO);
+    blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     return blogUpdater.createNewBlog(blogDTO)
         .doOnNext(this::putToCache);
-  }
-
-  private Mono<Blog> getBlogByFeedUrl(String feedUrl) {
-    log.debug("getBlogByFeedUrl feedUrl {}", feedUrl);
-    return blogFinder.findByFeedURL(feedUrl)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(feedUrl)));
   }
 
   private Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogDTO blogInfoFromRSS) {
