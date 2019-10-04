@@ -16,6 +16,7 @@ final class BlogDTO {
   private final String name;
   private final String feedURL;
   private final Instant publishedDate;
+  private final String imageURL;
 
   @Builder
   @JsonCreator
@@ -25,19 +26,20 @@ final class BlogDTO {
       @JsonProperty("description") String description,
       @JsonProperty("name") String name,
       @JsonProperty("feedURL") String feedURL,
-      @JsonProperty("publishedDate") Instant publishedDate
-  ) {
+      @JsonProperty("publishedDate") Instant publishedDate,
+      @JsonProperty("imageURL") String imageURL) {
     this.id = id;
     this.link = link;
     this.description = description;
     this.name = name;
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
+    this.imageURL = imageURL;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, link, description, name, feedURL, publishedDate);
+    return Objects.hash(id, link, description, name, feedURL, publishedDate, imageURL);
   }
 
   @Override
@@ -54,6 +56,7 @@ final class BlogDTO {
         Objects.equals(description, blogDTO.description) &&
         Objects.equals(name, blogDTO.name) &&
         Objects.equals(feedURL, blogDTO.feedURL) &&
+        Objects.equals(imageURL, blogDTO.imageURL) &&
         Objects.equals(publishedDate, blogDTO.publishedDate);
   }
 
@@ -66,6 +69,7 @@ final class BlogDTO {
         ", name='" + name + '\'' +
         ", feedURL='" + feedURL + '\'' +
         ", publishedDate=" + publishedDate +
+        ", imageURL='" + imageURL + '\'' +
         '}';
   }
 }

@@ -1,0 +1,23 @@
+package pl.michal.olszewski.rssaggregator.blog.ogtags;
+
+import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
+@Component
+@Profile("!integration")
+@Slf4j
+class JsoupPageInfoExtractor implements PageInfoExtractor {
+
+  public Document getPageInfoFromUrl(String url) {
+    try {
+      return Jsoup.connect(url).userAgent("myUserAgent").get();
+    } catch (IOException | IllegalArgumentException e) {
+      log.warn("Nie mogę pobrać OG:Tagów z bloga {}", url, e);
+      return null;
+    }
+  }
+}

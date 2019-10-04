@@ -61,8 +61,8 @@ public class UpdateBlogWithItemsService {
             updatedBlog.getDescription(),
             updatedBlog.getName(),
             updatedBlog.getFeedURL(),
-            updatedBlog.getPublishedDate()
-        )
+            updatedBlog.getPublishedDate(),
+            updatedBlog.getImageUrl())
     );
   }
 
