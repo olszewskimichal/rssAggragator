@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
+import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -28,6 +29,7 @@ class ItemFinderTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
+    mongoTemplate.remove(new Query(), "blog");
     mongoTemplate.remove(new Query(), "item");
   }
 
@@ -111,6 +113,7 @@ class ItemFinderTest extends IntegrationTestBase {
   @Test
   void shouldFindByBlogId() {
     //given
+    mongoTemplate.insert(Blog.builder().id("id1").build());
     mongoTemplate.insertAll(Arrays.asList(
         new Item(builder().blogId("id1").link("link1").build()),
         new Item(builder().blogId("id1").link("link2").build()),

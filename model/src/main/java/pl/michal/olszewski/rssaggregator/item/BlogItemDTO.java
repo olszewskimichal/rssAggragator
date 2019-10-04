@@ -9,16 +9,20 @@ import lombok.Getter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 class BlogItemDTO {
 
-  @JsonProperty("title")
+  private final String id;
   private final String title;
-  @JsonProperty("link")
   private final String link;
-  @JsonProperty("date")
   private final Instant date;
-  @JsonProperty("author")
   private final String author;
 
-  public BlogItemDTO(String title, String link, Instant date, String author) {
+  public BlogItemDTO(
+      @JsonProperty("id") String id,
+      @JsonProperty("title") String title,
+      @JsonProperty("link") String link,
+      @JsonProperty("date") Instant date,
+      @JsonProperty("author") String author
+  ) {
+    this.id = id;
     this.title = title;
     this.link = link;
     this.date = date;

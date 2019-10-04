@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import pl.michal.olszewski.rssaggregator.blog.BlogNotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -45,6 +46,10 @@ class ItemFinder {
 
   Flux<BlogItemDTO> getBlogItemsForBlog(String blogId) {
     log.debug("getBlogItemsForBlog {}", blogId);
+    boolean exists = mongoTemplate.exists(new Query().addCriteria(Criteria.where("_id").is(blogId)), "blog");
+    if (!exists) {
+      throw new BlogNotFoundException(blogId);
+    }
     return itemRepository.findAllByBlogId(blogId)
         .map(ItemToDtoMapper::mapToBlogItemDTO);
   }
