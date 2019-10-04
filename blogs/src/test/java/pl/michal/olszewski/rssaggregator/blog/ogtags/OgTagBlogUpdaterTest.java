@@ -19,6 +19,18 @@ class OgTagBlogUpdaterTest {
     assertThat(blog.getDescription()).isEqualTo("description");
     assertThat(blog.getName()).isEqualTo("title");
     assertThat(blog.getImageUrl()).isEqualTo("imageUrl");
-
   }
+
+  @Test
+  void shouldOnlyUpdateImageUrlByOgTagWhenBlogHasInfoAboutDescriptionAndName() {
+    //given
+    Blog blog = Blog.builder().description("desc").name("name").blogURL("url").build();
+    //when
+    updater.updateBlogByOgTagInfo(blog);
+    //then
+    assertThat(blog.getDescription()).isEqualTo("desc");
+    assertThat(blog.getName()).isEqualTo("name");
+    assertThat(blog.getImageUrl()).isEqualTo("imageUrl");
+  }
+
 }
