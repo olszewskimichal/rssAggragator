@@ -26,7 +26,6 @@ class OgTagPropertiesScheduler {
     List<Blog> collect = blogSyncRepository.findAll().stream()
         .map(ogTagBlogUpdater::updateBlogByOgTagInfo)
         .collect(Collectors.toList());
-    blogSyncRepository.saveAll(collect);
     log.info("updateBlogPropertiesFromOgTagsInfo FINISHED");
   }
 }

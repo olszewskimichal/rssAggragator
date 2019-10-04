@@ -10,28 +10,31 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 
 @Slf4j
 @Service
-class OgTagBlogUpdater {
+public class OgTagBlogUpdater {
 
   private static final String META = "meta";
   private static final String PROPERTY = "property";
   private static final String CONTENT = "content";
   private final PageInfoExtractor pageInfoExtractor;
+  private final MongoTemplate mongoTemplate;
 
-  OgTagBlogUpdater(PageInfoExtractor pageInfoExtractor) {
+  OgTagBlogUpdater(PageInfoExtractor pageInfoExtractor, MongoTemplate mongoTemplate) {
     this.pageInfoExtractor = pageInfoExtractor;
+    this.mongoTemplate = mongoTemplate;
   }
 
-  Blog updateBlogByOgTagInfo(Blog blog) {
+  public Blog updateBlogByOgTagInfo(Blog blog) {
     OgTagBlogInfo blogInfo = getBlogInfoFromMetaTags(blog.getBlogURL());
     if (blogInfo != null) {
       blog.updateBlogByOgTagInfo(blogInfo);
     }
-    return blog;
+    return mongoTemplate.save(blog);
   }
 
   OgTagBlogInfo getBlogInfoFromMetaTags(String url) {

@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogUpdater;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -15,17 +16,20 @@ public class BlogService {
   private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
   private final BlogValidation blogValidation;
+  private final OgTagBlogUpdater ogTagBlogUpdater;
 
   public BlogService(
       BlogFinder blogFinder,
       BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
-      BlogValidation blogValidation
+      BlogValidation blogValidation,
+      OgTagBlogUpdater ogTagBlogUpdater
   ) {
     this.blogFinder = blogFinder;
     this.blogUpdater = blogUpdater;
     this.blogCache = blogCache;
     this.blogValidation = blogValidation;
+    this.ogTagBlogUpdater = ogTagBlogUpdater;
   }
 
   public Flux<BlogDTO> getAllBlogDTOs() {
@@ -120,12 +124,14 @@ public class BlogService {
     blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     return blogUpdater.createNewBlog(blogDTO)
+        .map(ogTagBlogUpdater::updateBlogByOgTagInfo)
         .doOnNext(this::putToCache);
   }
 
   private Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogDTO blogInfoFromRSS) {
     log.debug("aktualizuje bloga {}", blogFromDb.getName());
     return blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS)
+        .map(ogTagBlogUpdater::updateBlogByOgTagInfo)
         .doOnNext(this::putToCache);
   }
 }
