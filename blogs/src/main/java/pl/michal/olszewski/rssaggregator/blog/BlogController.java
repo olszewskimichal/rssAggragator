@@ -57,6 +57,7 @@ class BlogController {
   })
   @SwaggerDocumented
   public Mono<PageBlogDTO> getBlogs(
+      @ApiParam(name = "limit")
       @RequestParam(value = "limit", required = false) Integer limit,
       @ApiParam(name = "page")
       @RequestParam(value = "page", required = false) Integer page

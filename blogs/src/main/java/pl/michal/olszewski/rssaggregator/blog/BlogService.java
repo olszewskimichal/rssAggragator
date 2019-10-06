@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogUpdater;
+import pl.michal.olszewski.rssaggregator.util.Page;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -36,10 +37,9 @@ public class BlogService {
   }
 
   public Mono<PageBlogDTO> getAllBlogDTOs(Integer limit, Integer page) {
-    limit = limit == null ? 50 : limit;
-    page = page == null ? 0 : page;
-    log.debug("pobieram wszystkie blogi w postaci DTO z limitem {} dla strony {}", limit, page);
-    PageRequest pageRequest = PageRequest.of(page, limit);
+    Page pageable = new Page(limit, page);
+    log.debug("pobieram wszystkie blogi w postaci DTO {}", pageable);
+    PageRequest pageRequest = PageRequest.of(pageable.getPage(), pageable.getLimit());
     Mono<Long> count = Mono.just(blogCache.estimatedSize());
     Mono<List<BlogDTO>> pagedBlog = Flux.fromIterable(blogCache.asMap().values())
         .buffer(pageRequest.getPageSize(), pageRequest.getPageNumber() + 1)

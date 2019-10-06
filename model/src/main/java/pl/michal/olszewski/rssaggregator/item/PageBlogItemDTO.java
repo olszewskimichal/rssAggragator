@@ -1,25 +1,24 @@
-package pl.michal.olszewski.rssaggregator.blog;
+package pl.michal.olszewski.rssaggregator.item;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Objects;
 
-class PageBlogDTO {
+final class PageBlogItemDTO {
 
-  private final List<BlogDTO> content;
+  private final List<BlogItemDTO> content;
   private final long totalElements;
 
   @JsonCreator
-  public PageBlogDTO(
-      @JsonProperty("content") List<BlogDTO> content,
-      @JsonProperty("totalElements") long totalElements
-  ) {
+  PageBlogItemDTO(
+      @JsonProperty("content") List<BlogItemDTO> content,
+      @JsonProperty("totalElements") long totalElements) {
     this.content = content;
     this.totalElements = totalElements;
   }
 
-  public List<BlogDTO> getContent() {
+  public List<BlogItemDTO> getContent() {
     return content;
   }
 
@@ -28,26 +27,26 @@ class PageBlogDTO {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(content, totalElements);
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) {
       return true;
     }
-    if (!(o instanceof PageBlogDTO)) {
+    if (!(o instanceof PageBlogItemDTO)) {
       return false;
     }
-    PageBlogDTO that = (PageBlogDTO) o;
+    PageBlogItemDTO that = (PageBlogItemDTO) o;
     return totalElements == that.totalElements &&
         Objects.equals(content, that.content);
   }
 
   @Override
   public String toString() {
-    return "PageBlogDTO{" +
+    return "PageBlogItemDTO{" +
         "content=" + content +
         ", totalElements=" + totalElements +
         '}';
