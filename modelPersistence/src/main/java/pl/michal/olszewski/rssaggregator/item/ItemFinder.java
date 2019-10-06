@@ -30,6 +30,10 @@ class ItemFinder {
     this.mongoTemplate = mongoTemplate;
   }
 
+  Mono<Long> countAllItems() {
+    return itemRepository.count().cache();
+  }
+
   Mono<Item> findItemById(String id) {
     return itemRepository.findById(id);
   }
@@ -56,7 +60,7 @@ class ItemFinder {
     return itemRepository.findAllByBlogId(blogId)
         .collectList()
         .map(result -> new PageBlogItemDTO(
-            result.stream().skip(pageable.getLimit() * pageable.getPage()).limit(pageable.getLimit()).map(ItemToDtoMapper::mapToBlogItemDTO).collect(Collectors.toList()),
+            result.stream().skip(pageable.getLimit() * pageable.getPageForSearch()).limit(pageable.getLimit()).map(ItemToDtoMapper::mapToBlogItemDTO).collect(Collectors.toList()),
             result.size())
         );
   }

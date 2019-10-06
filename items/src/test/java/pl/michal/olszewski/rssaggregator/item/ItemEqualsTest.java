@@ -41,4 +41,18 @@ class ItemEqualsTest {
         .suppress(Warning.NONFINAL_FIELDS)
         .verify();
   }
+
+  @Test
+  void itemDtoEqualsContractTest() {
+    EqualsVerifier.forClass(ItemDTO.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  void pageItemDtoEqualsContractTest() {
+    EqualsVerifier.forClass(PageItemDTO.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/items")
@@ -28,11 +28,11 @@ class NewestItemsController {
   @GetMapping
   @ApiOperation(value = "Służy do pobierania najnowszych wpisow na blogach posortowanych wedlug daty publikacji")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Lista wpisow na blogach", response = ItemDTO.class),
+      @ApiResponse(code = 200, message = "Lista wpisow na blogach", response = PageItemDTO.class),
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Flux<ItemDTO> getItemsOrderByPublishedDate(
+  public Mono<PageItemDTO> getItemsOrderByPublishedDate(
       @ApiParam(name = "limit", value = "okresla ile elementow chcemy pobrac")
       @RequestParam(value = "limit", required = false)
           Integer limit,
@@ -40,20 +40,17 @@ class NewestItemsController {
       @RequestParam(value = "page", required = false)
           Integer page) {
     log.debug("GET ItemsOrderByPublishedDate with limit {} and page {}", limit, page);
-    return itemService.getNewestItemsOrderByPublishedDate(
-        limit == null ? 10 : limit,
-        page == null ? 0 : page - 1
-    );
+    return itemService.getNewestItemsOrderByPublishedDate(limit, page);
   }
 
   @GetMapping("/createdAt")
   @ApiOperation(value = "Służy do pobierania najnowszych wpisow na blogach posortowanych wedlug daty zapisania do bazy danych")
   @ApiResponses(value = {
-      @ApiResponse(code = 200, message = "Lista wpisow na blogach", response = ItemDTO.class),
+      @ApiResponse(code = 200, message = "Lista wpisow na blogach", response = PageItemDTO.class),
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Flux<ItemDTO> getItemsOrderByCreatedAt(
+  public Mono<PageItemDTO> getItemsOrderByCreatedAt(
       @ApiParam(name = "limit", value = "okresla ile elementow chcemy pobrac")
       @RequestParam(value = "limit", required = false)
           Integer limit,
@@ -62,9 +59,6 @@ class NewestItemsController {
           Integer page
   ) {
     log.debug("GET ItemsOrderByCreatedAt with limit {} and page {}", limit, page);
-    return itemService.getNewestItemsOrderByCreatedAt(
-        limit == null ? 10 : limit,
-        page == null ? 0 : page - 1
-    );
+    return itemService.getNewestItemsOrderByCreatedAt(limit, page);
   }
 }

@@ -39,7 +39,7 @@ public class BlogService {
   public Mono<PageBlogDTO> getAllBlogDTOs(Integer limit, Integer page) {
     Page pageable = new Page(limit, page);
     log.debug("pobieram wszystkie blogi w postaci DTO {}", pageable);
-    PageRequest pageRequest = PageRequest.of(pageable.getPage(), pageable.getLimit());
+    PageRequest pageRequest = PageRequest.of(pageable.getPageForSearch(), pageable.getLimit());
     Mono<Long> count = Mono.just(blogCache.estimatedSize());
     Mono<List<BlogDTO>> pagedBlog = Flux.fromIterable(blogCache.asMap().values())
         .buffer(pageRequest.getPageSize(), pageRequest.getPageNumber() + 1)

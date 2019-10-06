@@ -7,19 +7,19 @@ public class Page {
 
   public Page(Integer limit, Integer page) {
     this.limit = limit == null ? 50 : limit;
-    this.page = page == null ? 50 : page;
+    this.page = page == null ? 1 : page;
   }
 
   public int getLimit() {
     return limit;
   }
 
-  public int getPage() {
-    return page;
+  public int getPageForSearch() {
+    return page - 1;
   }
 
   public int getPageForHuman() {
-    return page + 1;
+    return page;
   }
 
 }
