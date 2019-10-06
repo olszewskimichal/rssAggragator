@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -55,10 +56,14 @@ class BlogController {
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Flux<BlogDTO> getBlogs() {
+  public Mono<PageBlogDTO> getBlogs(
+      @RequestParam(value = "limit", required = false) Integer limit,
+      @ApiParam(name = "page")
+      @RequestParam(value = "page", required = false) Integer page
+  ) {
     log.debug("START GET blogs");
-    return blogService.getAllBlogDTOs()
-        .doOnComplete(() -> log.debug("END GET blogs"))
+    return blogService.getAllBlogDTOs(limit, page)
+        .doOnSuccess(blogs -> log.debug("END GET blogs"))
         .doOnError(error -> log.error("ERROR GET blogs", error));
   }
 
