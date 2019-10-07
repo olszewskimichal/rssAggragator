@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/api/v1/items")
+@CrossOrigin
 class NewestItemsController {
 
   private static final Logger log = LoggerFactory.getLogger(NewestItemsController.class);

@@ -5,9 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import pl.michal.olszewski.rssaggregator.item.BlogItemLink;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
-import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEventBuilder;
+import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -17,14 +18,14 @@ public class UpdateBlogWithItemsService {
 
   private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
-  private final Cache<String, ItemDTO> itemCache;
+  private final Cache<BlogItemLink, ItemDTO> itemCache;
   private final NewItemInBlogEventProducer producer;
   private final NewItemForSearchEventProducer itemForSearchEventProducer;
 
   UpdateBlogWithItemsService(
       BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
-      @Qualifier("itemCache") Cache<String, ItemDTO> itemCache,
+      @Qualifier("itemCache") Cache<BlogItemLink, ItemDTO> itemCache,
       NewItemInBlogEventProducer producer,
       NewItemForSearchEventProducer itemForSearchEventProducer) {
     this.blogUpdater = blogUpdater;
@@ -43,18 +44,26 @@ public class UpdateBlogWithItemsService {
   }
 
   private void addItemToBlog(Blog blog, ItemDTO item) {
-    if (itemCache.getIfPresent(item.getLink()) == null) {
-      itemCache.put(item.getLink(), item);
+    BlogItemLink itemLink = new BlogItemLink(blog.getId(), item.getLink());
+    if (itemCache.getIfPresent(itemLink) == null) {
+      log.debug("addItemToBlog {} to blog {}", item.getLink(), blog.getBlogURL());
+      itemCache.put(itemLink, item);
       producer.writeEventToQueue(new NewItemInBlogEvent(item, blog.getId()));
-      itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEventBuilder().linkUrl(item.getLink()).itemTitle(item.getTitle()).itemDescription(item.getDescription()).build());
+      itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(item.getLink(), item.getTitle(), item.getDescription()));
     }
   }
 
   private void putToCache(Blog updatedBlog) {
     blogCache.put(
         updatedBlog.getId(),
-        new BlogDTOBuilder().id(updatedBlog.getId()).link(updatedBlog.getBlogURL()).description(updatedBlog.getDescription()).name(updatedBlog.getName()).feedURL(updatedBlog.getFeedURL())
-            .publishedDate(updatedBlog.getPublishedDate()).build()
+        new BlogDTO(
+            updatedBlog.getId(),
+            updatedBlog.getBlogURL(),
+            updatedBlog.getDescription(),
+            updatedBlog.getName(),
+            updatedBlog.getFeedURL(),
+            updatedBlog.getPublishedDate(),
+            updatedBlog.getImageUrl())
     );
   }
 

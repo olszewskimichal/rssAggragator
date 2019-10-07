@@ -15,6 +15,7 @@ final class BlogDTO {
   private final String name;
   private final String feedURL;
   private final Instant publishedDate;
+  private final String imageURL;
 
   @JsonCreator
   BlogDTO(
@@ -23,7 +24,8 @@ final class BlogDTO {
       @JsonProperty("description") String description,
       @JsonProperty("name") String name,
       @JsonProperty("feedURL") String feedURL,
-      @JsonProperty("publishedDate") Instant publishedDate
+      @JsonProperty("publishedDate") Instant publishedDate,
+      @JsonProperty("imageURL") String imageURL
   ) {
     this.id = id;
     this.link = link;
@@ -31,6 +33,7 @@ final class BlogDTO {
     this.name = name;
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
+    this.imageURL = imageURL;
   }
 
   public String getId() {
@@ -56,6 +59,8 @@ final class BlogDTO {
   public Instant getPublishedDate() {
     return publishedDate;
   }
+
+
 
   @Override
   public int hashCode() {

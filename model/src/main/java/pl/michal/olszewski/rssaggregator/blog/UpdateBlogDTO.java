@@ -26,7 +26,7 @@ final class UpdateBlogDTO {
     this.publishedDate = publishedDate;
   }
 
-  public String getLink() {
+  String getLink() {
     return link;
   }
 

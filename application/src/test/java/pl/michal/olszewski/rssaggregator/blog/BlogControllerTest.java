@@ -108,7 +108,7 @@ class BlogControllerTest extends IntegrationTestBase {
         .build();
 
     //when
-    thenUpdateBlogByApi(blogDTO);
+    thenUpdateBlogByApi(blogDTO, blog.getId());
 
     //then
     assertThat(blogRepository.findById(blog.getId()).block())
@@ -195,9 +195,9 @@ class BlogControllerTest extends IntegrationTestBase {
         .expectStatus().is5xxServerError();
   }
 
-  private void thenUpdateBlogByApi(BlogDTO blogDTO) {
+  private void thenUpdateBlogByApi(BlogDTO blogDTO, String blogId) {
     webTestClient.put()
-        .uri("http://localhost:{port}/api/v1/blogs", port)
+        .uri("http://localhost:{port}/api/v1/blogs/{blogId}", port, blogId)
         .body(BodyInserters.fromObject(blogDTO))
         .exchange()
         .expectStatus().isNoContent();

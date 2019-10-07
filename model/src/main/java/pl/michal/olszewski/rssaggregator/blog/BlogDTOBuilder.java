@@ -10,6 +10,7 @@ public class BlogDTOBuilder {
   private String name;
   private String feedURL;
   private Instant publishedDate;
+  private String imageURL;
 
   public BlogDTOBuilder id(String id) {
     this.id = id;
@@ -41,7 +42,12 @@ public class BlogDTOBuilder {
     return this;
   }
 
+  public BlogDTOBuilder imageUrl(String imageURL) {
+    this.imageURL = imageURL;
+    return this;
+  }
+
   public BlogDTO build() {
-    return new BlogDTO(id, link, description, name, feedURL, publishedDate);
+    return new BlogDTO(id, link, description, name, feedURL, publishedDate, imageURL);
   }
 }

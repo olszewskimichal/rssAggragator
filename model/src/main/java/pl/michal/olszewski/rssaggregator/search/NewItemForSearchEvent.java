@@ -10,7 +10,7 @@ public class NewItemForSearchEvent implements Serializable {
   private final String itemTitle;
   private final String itemDescription;
 
-  NewItemForSearchEvent(String linkUrl, String itemTitle, String itemDescription) {
+  public NewItemForSearchEvent(String linkUrl, String itemTitle, String itemDescription) {
     this.linkUrl = linkUrl;
     this.itemTitle = itemTitle;
     this.itemDescription = itemDescription;

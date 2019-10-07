@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
+public
 interface BlogSyncRepository extends MongoRepository<Blog, String> {
 
   @Query("{ 'active' : true}")

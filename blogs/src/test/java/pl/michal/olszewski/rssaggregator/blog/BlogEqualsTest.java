@@ -4,6 +4,7 @@ import static nl.jqno.equalsverifier.Warning.NONFINAL_FIELDS;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogInfo;
 
 class BlogEqualsTest {
 
@@ -49,6 +50,13 @@ class BlogEqualsTest {
   @Test
   void createBlogDtoEqualsContractTest() {
     EqualsVerifier.forClass(CreateBlogDTO.class)
+        .suppress(NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  void ogTagBlogInfoEqualsContractTest() {
+    EqualsVerifier.forClass(OgTagBlogInfo.class)
         .suppress(NONFINAL_FIELDS)
         .verify();
   }

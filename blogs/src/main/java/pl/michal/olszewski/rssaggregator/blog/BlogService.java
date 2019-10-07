@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogUpdater;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -16,14 +17,21 @@ public class BlogService {
   private final BlogFinder blogFinder;
   private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
+  private final BlogValidation blogValidation;
+  private final OgTagBlogUpdater ogTagBlogUpdater;
 
   BlogService(
       BlogFinder blogFinder,
       BlogWorker blogUpdater,
-      @Qualifier("blogCache") Cache<String, BlogDTO> blogCache) {
+      @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
+      BlogValidation blogValidation,
+      OgTagBlogUpdater ogTagBlogUpdater
+  ) {
     this.blogFinder = blogFinder;
     this.blogUpdater = blogUpdater;
     this.blogCache = blogCache;
+    this.blogValidation = blogValidation;
+    this.ogTagBlogUpdater = ogTagBlogUpdater;
   }
 
   public Flux<BlogDTO> getAllBlogDTOs() {
@@ -41,8 +49,14 @@ public class BlogService {
     log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
     return blogFinder.findByFeedURL(blogDTO.getFeedURL())
         .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO)))
-        .map(blog -> new BlogDTOBuilder().id(blog.getId()).link(blog.getBlogURL()).description(blog.getDescription()).name(blog.getName()).feedURL(blog.getFeedURL())
-            .publishedDate(blog.getPublishedDate()).build());
+        .map(blog -> new BlogDTO(
+            blog.getId(),
+            blog.getBlogURL(),
+            blog.getDescription(),
+            blog.getName(),
+            blog.getFeedURL(),
+            blog.getPublishedDate(),
+            blog.getImageUrl()));
   }
 
   Mono<Void> deleteBlog(String id) {
@@ -77,38 +91,49 @@ public class BlogService {
     blogCache.invalidateAll();
   }
 
-  Mono<BlogDTO> updateBlog(UpdateBlogDTO blogDTO) {
+  Mono<BlogDTO> updateBlog(UpdateBlogDTO blogDTO, String blogId) {
     log.debug("Aktualizacja bloga {}", blogDTO.getName());
-    return getBlogByFeedUrl(blogDTO.getFeedURL())
+    blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
+    return blogFinder.findById(blogId).cache()
+        .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId)))
         .flatMap(blog -> updateBlog(blog, blogDTO))
-        .map(blog -> new BlogDTOBuilder().id(blog.getId()).link(blog.getBlogURL()).description(blog.getDescription()).name(blog.getName()).feedURL(blog.getFeedURL())
-            .publishedDate(blog.getPublishedDate()).build())
+        .map(blog -> new BlogDTO(
+            blog.getId(),
+            blog.getBlogURL(),
+            blog.getDescription(),
+            blog.getName(),
+            blog.getFeedURL(),
+            blog.getPublishedDate(),
+            blog.getImageUrl()))
         .doOnSuccess(updatedBlog -> blogCache.invalidate(updatedBlog.getId()));
   }
 
   private void putToCache(Blog updatedBlog) {
     blogCache.put(
         updatedBlog.getId(),
-        new BlogDTOBuilder().id(updatedBlog.getId()).link(updatedBlog.getBlogURL()).description(updatedBlog.getDescription()).name(updatedBlog.getName()).feedURL(updatedBlog.getFeedURL())
-            .publishedDate(updatedBlog.getPublishedDate()).build()
+        new BlogDTO(
+            updatedBlog.getId(),
+            updatedBlog.getBlogURL(),
+            updatedBlog.getDescription(),
+            updatedBlog.getName(),
+            updatedBlog.getFeedURL(),
+            updatedBlog.getPublishedDate(),
+            updatedBlog.getImageUrl())
     );
   }
 
   private Mono<Blog> createBlog(CreateBlogDTO blogDTO) {
+    blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     return blogUpdater.createNewBlog(blogDTO)
+        .map(ogTagBlogUpdater::updateBlogByOgTagInfo)
         .doOnNext(this::putToCache);
-  }
-
-  private Mono<Blog> getBlogByFeedUrl(String feedUrl) {
-    log.debug("getBlogByFeedUrl feedUrl {}", feedUrl);
-    return blogFinder.findByFeedURL(feedUrl)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(feedUrl)));
   }
 
   private Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogDTO blogInfoFromRSS) {
     log.debug("aktualizuje bloga {}", blogFromDb.getName());
     return blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS)
+        .map(ogTagBlogUpdater::updateBlogByOgTagInfo)
         .doOnNext(this::putToCache);
   }
 }

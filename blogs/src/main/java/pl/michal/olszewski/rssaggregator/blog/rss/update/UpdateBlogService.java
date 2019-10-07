@@ -36,11 +36,7 @@ class UpdateBlogService {
     this.blogFinder = blogFinder;
     this.rssExtractorService = new RssExtractorService(feedFetcher);
     this.blogService = blogService;
-    if (registry != null) {
-      this.executor = monitor(registry, executor, "prod_pool");
-    } else {
-      this.executor = executor;
-    }
+    this.executor = monitor(registry, executor, "prod_pool");
   }
 
   Flux<Boolean> updateAllActiveBlogsByRss() {
