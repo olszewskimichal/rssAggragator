@@ -83,10 +83,6 @@ public class Blog {
     return publishedDate;
   }
 
-  public Instant getLastUpdateDate() {
-    return lastUpdateDate;
-  }
-
   public String getImageUrl() {
     return imageUrl;
   }

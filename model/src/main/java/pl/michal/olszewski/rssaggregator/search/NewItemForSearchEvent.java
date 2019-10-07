@@ -29,12 +29,12 @@ public class NewItemForSearchEvent implements Serializable {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     return EqualsBuilder.reflectionEquals(this, o);
   }
 }

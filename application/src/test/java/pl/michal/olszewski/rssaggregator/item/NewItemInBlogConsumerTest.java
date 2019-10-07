@@ -27,7 +27,7 @@ class NewItemInBlogConsumerTest extends IntegrationTestBase {
         .title("title")
         .blogId("id")
         .build();
-    eventConsumer.receiveMessage(new NewItemInBlogEvent(item, "id"));
+    eventConsumer.receiveMessage(new NewItemInBlogEvent(item));
     //then
     assertThat(itemRepository.count().block()).isEqualTo(1L);
   }

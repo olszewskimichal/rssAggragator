@@ -42,11 +42,6 @@ public class BlogDTOBuilder {
     return this;
   }
 
-  public BlogDTOBuilder imageUrl(String imageURL) {
-    this.imageURL = imageURL;
-    return this;
-  }
-
   public BlogDTO build() {
     return new BlogDTO(id, link, description, name, feedURL, publishedDate, imageURL);
   }

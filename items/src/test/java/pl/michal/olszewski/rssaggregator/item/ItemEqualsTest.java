@@ -3,6 +3,7 @@ package pl.michal.olszewski.rssaggregator.item;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
+import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 
 class ItemEqualsTest {
 
@@ -55,4 +56,19 @@ class ItemEqualsTest {
         .suppress(Warning.NONFINAL_FIELDS)
         .verify();
   }
+
+  @Test
+  void newItemInBlogEventEqualsContractTest() {
+    EqualsVerifier.forClass(NewItemInBlogEvent.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  void newItemForSearchEventEqualsContractTest() {
+    EqualsVerifier.forClass(NewItemForSearchEvent.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
+
 }

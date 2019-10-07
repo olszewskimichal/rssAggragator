@@ -48,7 +48,7 @@ public class UpdateBlogWithItemsService {
     if (itemCache.getIfPresent(itemLink) == null) {
       log.debug("addItemToBlog {} to blog {}", item.getLink(), blog.getBlogURL());
       itemCache.put(itemLink, item);
-      producer.writeEventToQueue(new NewItemInBlogEvent(item, blog.getId()));
+      producer.writeEventToQueue(new NewItemInBlogEvent(item));
       itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(item.getLink(), item.getTitle(), item.getDescription()));
     }
   }

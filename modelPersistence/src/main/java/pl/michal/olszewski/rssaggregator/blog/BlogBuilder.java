@@ -38,18 +38,8 @@ public class BlogBuilder {
     return this;
   }
 
-  public BlogBuilder publishedDate(Instant publishedDate) {
-    this.publishedDate = publishedDate;
-    return this;
-  }
-
   public BlogBuilder lastUpdateDate(Instant lastUpdateDate) {
     this.lastUpdateDate = lastUpdateDate;
-    return this;
-  }
-
-  public BlogBuilder imageURL(String imageURL) {
-    this.imageURL = imageURL;
     return this;
   }
 

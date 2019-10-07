@@ -8,28 +8,22 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 public class NewItemInBlogEvent implements Serializable {
 
   private final ItemDTO itemDTO;
-  private final String blogId;
 
-  public NewItemInBlogEvent(ItemDTO itemDTO, String blogId) {
+  public NewItemInBlogEvent(ItemDTO itemDTO) {
     this.itemDTO = itemDTO;
-    this.blogId = blogId;
   }
 
   public ItemDTO getItemDTO() {
     return itemDTO;
   }
 
-  public String getBlogId() {
-    return blogId;
-  }
-
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     return EqualsBuilder.reflectionEquals(this, o);
   }
 
