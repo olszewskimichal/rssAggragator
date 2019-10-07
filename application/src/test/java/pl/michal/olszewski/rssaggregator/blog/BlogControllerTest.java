@@ -60,7 +60,6 @@ class BlogControllerTest extends IntegrationTestBase {
   void should_get_one_blog() {
     //given
     Blog blog = givenBlog().createAndSaveNewBlog();
-    blogService.evictAndRecreateBlogCache();
     BlogDTO expected =
         BlogDTO.builder()
             .id(blog.getId())
