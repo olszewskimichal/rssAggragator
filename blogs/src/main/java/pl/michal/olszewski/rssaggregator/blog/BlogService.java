@@ -42,7 +42,7 @@ public class BlogService {
     PageRequest pageRequest = PageRequest.of(pageable.getPageForSearch(), pageable.getLimit());
     Mono<Long> count = Mono.just(blogCache.estimatedSize());
     Mono<List<BlogDTO>> pagedBlog = Flux.fromIterable(blogCache.asMap().values())
-        .buffer(pageRequest.getPageSize(), pageRequest.getPageNumber() + 1)
+        .buffer(pageRequest.getPageSize())
         .elementAt(pageRequest.getPageNumber(), new ArrayList<>());
     return count.zipWith(pagedBlog, (countBlogs, blogs) -> new PageBlogDTO(blogs, countBlogs));
   }
@@ -91,7 +91,7 @@ public class BlogService {
   void evictAndRecreateBlogCache() {
     log.debug("Czyszcze cache dla blogów");
     blogCache.invalidateAll();
-    blogFinder.findAll()
+    List<Blog> block = blogFinder.findAll()
         .doOnNext(this::putToCache)
         .collectList()
         .block();

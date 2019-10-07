@@ -42,6 +42,25 @@ class BlogItemsControllerTest extends IntegrationTestBase {
   }
 
   @Test
+  void should_get_2page_of_all_items_for_blog() {
+    //given
+    String id = randomUUID().toString();
+    blogRepository.save(Blog.builder().id(id).build());
+    givenItems()
+        .buildNumberOfItemsAndSave(5, id);
+    //when
+    BodySpec<PageBlogItemDTO, ?> result = thenGetBlogsItemsFromApi(id, 2, 3);
+    //then
+    result.value(
+        pageBlogItemDTO -> {
+          assertThat(pageBlogItemDTO.getTotalElements()).isEqualTo(5L);
+          assertThat(pageBlogItemDTO.getContent()).hasSize(2);
+        }
+    );
+  }
+
+
+  @Test
   void should_return_404_for_blog_that_not_exists() {
     //given
     String id = randomUUID().toString();
@@ -58,6 +77,13 @@ class BlogItemsControllerTest extends IntegrationTestBase {
         .exchange()
         .expectStatus().isNotFound()
         .expectBody();
+  }
+
+  private BodySpec<PageBlogItemDTO, ?> thenGetBlogsItemsFromApi(String id, int page, int limit) {
+    return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs/{id}/items?page={page}&limit={limit}", port, id, page, limit)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(PageBlogItemDTO.class);
   }
 
   private BodySpec<PageBlogItemDTO, ?> thenGetBlogsItemsFromApi(String id) {

@@ -44,6 +44,23 @@ class BlogControllerTest extends IntegrationTestBase {
   }
 
   @Test
+  void should_get_secondPage_of_all_blogs() {
+    //given
+    givenBlog()
+        .buildNumberOfBlogsAndSave(5);
+    blogService.evictAndRecreateBlogCache();
+    //when
+    BodySpec<PageBlogDTO, ?> pagedblog = thenGetBlogsFromApi(2, 3);
+
+    //then
+    pagedblog.value(pageBlogDTO -> {
+          assertThat(pageBlogDTO.getTotalElements()).isEqualTo(5L);
+          assertThat(pageBlogDTO.getContent()).hasSize(2);
+        }
+    );
+  }
+
+  @Test
   void should_get_all_blogs() {
     //given
     givenBlog()
@@ -142,6 +159,12 @@ class BlogControllerTest extends IntegrationTestBase {
     return new BlogListFactory(blogRepository);
   }
 
+  private BodySpec<PageBlogDTO, ?> thenGetBlogsFromApi(int page, int limit) {
+    return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs?page={page}&limit={limit}", port, page, limit)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(PageBlogDTO.class);
+  }
 
   private BodySpec<PageBlogDTO, ?> thenGetBlogsFromApi() {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs", port)

@@ -49,12 +49,12 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_limit_three_items() {
     givenItem()
-        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
+        .buildNumberOfItemsAndSave(5, UUID.randomUUID().toString());
 
     BodySpec<PageItemDTO, ?> result = thenGetNumberItemsFromApiWithLimit(3);
 
     result.value(pageItemDTO -> {
-      assertThat(pageItemDTO.getTotalElements()).isEqualTo(6L);
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(5L);
       assertThat(pageItemDTO.getContent()).hasSize(3);
     });
   }
@@ -62,13 +62,13 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_second_page_of_items() {
     givenItem()
-        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
+        .buildNumberOfItemsAndSave(5, UUID.randomUUID().toString());
 
     BodySpec<PageItemDTO, ?> result = thenGetNumberItemsFromApiWithLimitAndPage(3, 2);
 
     result.value(pageItemDTO -> {
-      assertThat(pageItemDTO.getTotalElements()).isEqualTo(6L);
-      assertThat(pageItemDTO.getContent()).hasSize(3);
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(5L);
+      assertThat(pageItemDTO.getContent()).hasSize(2);
     });
   }
 
@@ -101,12 +101,12 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_limit_three_items_sorted_by_createdAt() {
     givenItem()
-        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
+        .buildNumberOfItemsAndSave(5, UUID.randomUUID().toString());
 
     BodySpec<PageItemDTO, ?> result = thenGetItemsSortedByCreatedAtWithLimitFromApi(3);
 
     result.value(pageItemDTO -> {
-      assertThat(pageItemDTO.getTotalElements()).isEqualTo(6L);
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(5L);
       assertThat(pageItemDTO.getContent()).hasSize(3);
     });
   }
@@ -114,13 +114,13 @@ class NewestItemsControllerTest extends IntegrationTestBase {
   @Test
   void should_get_second_page_of_items_sorted_by_createdAt() {
     givenItem()
-        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
+        .buildNumberOfItemsAndSave(5, UUID.randomUUID().toString());
 
     BodySpec<PageItemDTO, ?> result = thenGetItemsSortedByCreatedAtForPageAndLimitFromApi(3, 2);
 
     result.value(pageItemDTO -> {
-      assertThat(pageItemDTO.getTotalElements()).isEqualTo(6L);
-      assertThat(pageItemDTO.getContent()).hasSize(3);
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(5L);
+      assertThat(pageItemDTO.getContent()).hasSize(2);
     });
   }
 
