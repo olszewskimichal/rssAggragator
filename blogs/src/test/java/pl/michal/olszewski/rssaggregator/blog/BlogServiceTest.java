@@ -9,7 +9,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import java.time.Instant;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +53,6 @@ class BlogServiceTest {
         (blogUrl, feedUrl) -> {
         },
         ogTagBlogUpdater);
-    blogService.evictBlogCache();
   }
 
   @Test

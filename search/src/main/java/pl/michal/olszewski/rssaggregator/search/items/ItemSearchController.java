@@ -25,9 +25,6 @@ class ItemSearchController {
       @RequestParam(value = "text") String searchText,
       @RequestParam(value = "limit", required = false) Integer limit) {
     log.info("Search items matching by {} with limit {}", searchText, limit);
-    return itemTextSearchRepository.findMatching(
-        searchText,
-        limit == null ? 10 : limit
-    );
+    return itemTextSearchRepository.findMatching(searchText, limit == null ? 10 : limit);
   }
 }

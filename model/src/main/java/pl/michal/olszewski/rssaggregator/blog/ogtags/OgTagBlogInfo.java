@@ -45,13 +45,4 @@ public class OgTagBlogInfo {
         Objects.equals(imageUrl, that.imageUrl);
   }
 
-  @Override
-  public String toString() {
-    return "OgTagBlogInfo{" +
-        "title='" + title + '\'' +
-        ", description='" + description + '\'' +
-        ", imageUrl='" + imageUrl + '\'' +
-        '}';
-  }
-
 }

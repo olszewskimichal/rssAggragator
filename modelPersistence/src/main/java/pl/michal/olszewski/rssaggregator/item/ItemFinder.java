@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.item;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.BlogNotFoundException;
+import pl.michal.olszewski.rssaggregator.util.Page;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -27,6 +29,10 @@ class ItemFinder {
     this.itemRepository = itemRepository;
     this.itemRepositorySync = itemRepositorySync;
     this.mongoTemplate = mongoTemplate;
+  }
+
+  Mono<Long> countAllItems() {
+    return itemRepository.count().cache();
   }
 
   Mono<Item> findItemById(String id) {
@@ -45,14 +51,19 @@ class ItemFinder {
     return itemRepository.findAllOrderByCreatedAt(limit, page);
   }
 
-  Flux<BlogItemDTO> getBlogItemsForBlog(String blogId) {
+  Mono<PageBlogItemDTO> getBlogItemsForBlog(String blogId, Integer limit, Integer page) {
+    Page pageable = new Page(limit, page);
     log.debug("getBlogItemsForBlog {}", blogId);
     boolean exists = mongoTemplate.exists(new Query().addCriteria(Criteria.where("_id").is(blogId)), "blog");
     if (!exists) {
       throw new BlogNotFoundException(blogId);
     }
     return itemRepository.findAllByBlogId(blogId)
-        .map(ItemToDtoMapper::mapToBlogItemDTO);
+        .collectList()
+        .map(result -> new PageBlogItemDTO(
+            result.stream().skip(pageable.getLimit() * pageable.getPageForSearch()).limit(pageable.getLimit()).map(ItemToDtoMapper::mapToBlogItemDTO).collect(Collectors.toList()),
+            result.size())
+        );
   }
 
   List<Item> findItemsFromDateOrderByCreatedAt(Instant from) {

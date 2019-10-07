@@ -29,12 +29,4 @@ public final class BlogItemLink {
     return Objects.equals(blogId, that.blogId) &&
         Objects.equals(linkUrl, that.linkUrl);
   }
-
-  @Override
-  public String toString() {
-    return "BlogItemLink{" +
-        "blogId='" + blogId + '\'' +
-        ", linkUrl='" + linkUrl + '\'' +
-        '}';
-  }
 }

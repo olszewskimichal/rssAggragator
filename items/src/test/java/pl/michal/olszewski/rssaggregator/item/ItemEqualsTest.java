@@ -27,4 +27,32 @@ class ItemEqualsTest {
         .suppress(Warning.NONFINAL_FIELDS)
         .verify();
   }
+
+  @Test
+  void blogItemDtoEqualsContractTest() {
+    EqualsVerifier.forClass(BlogItemDTO.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  void pageBlogItemDtoEqualsContractTest() {
+    EqualsVerifier.forClass(PageBlogItemDTO.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  void itemDtoEqualsContractTest() {
+    EqualsVerifier.forClass(ItemDTO.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
+
+  @Test
+  void pageItemDtoEqualsContractTest() {
+    EqualsVerifier.forClass(PageItemDTO.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
 }

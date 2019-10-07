@@ -31,5 +31,4 @@ public final class BlogAggregationDTO {
   public boolean equals(Object o) {
     return EqualsBuilder.reflectionEquals(this, o);
   }
-
 }

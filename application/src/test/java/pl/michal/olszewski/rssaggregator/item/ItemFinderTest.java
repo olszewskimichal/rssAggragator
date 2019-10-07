@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.blog.BlogBuilder;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 class ItemFinderTest extends IntegrationTestBase {
@@ -120,10 +121,10 @@ class ItemFinderTest extends IntegrationTestBase {
     ));
 
     //when
-    Flux<BlogItemDTO> byBlogId = itemFinder.getBlogItemsForBlog("id1");
+    Mono<PageBlogItemDTO> byBlogId = itemFinder.getBlogItemsForBlog("id1", null, null);
     //then
     StepVerifier.create(byBlogId)
-        .expectNextCount(2L)
+        .assertNext(pageBlogItemDTO -> assertThat(pageBlogItemDTO.getTotalElements()).isEqualTo(2L))
         .expectComplete()
         .verify();
   }
