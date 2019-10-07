@@ -61,4 +61,11 @@ class BlogEqualsTest {
         .verify();
   }
 
+  @Test
+  void pageBlogDtoEqualsContractTest() {
+    EqualsVerifier.forClass(PageBlogDTO.class)
+        .suppress(NONFINAL_FIELDS)
+        .verify();
+  }
+
 }

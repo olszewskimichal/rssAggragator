@@ -1,10 +1,14 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import com.github.benmanes.caffeine.cache.Cache;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogUpdater;
+import pl.michal.olszewski.rssaggregator.util.Page;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,15 +36,15 @@ public class BlogService {
     this.ogTagBlogUpdater = ogTagBlogUpdater;
   }
 
-  public Flux<BlogDTO> getAllBlogDTOs() {
-    log.debug("pobieram wszystkie blogi w postaci DTO");
-    var dtoFlux = Flux.fromIterable(blogCache.asMap().values())
-        .switchIfEmpty(Flux.defer(() -> blogFinder.findAll()
-            .map(BlogToDtoMapper::mapToBlogDto)
-            .doOnNext(blog -> blogCache.put(blog.getId(), blog)))
-            .cache());
-    return dtoFlux
-        .doOnEach(blogDTO -> log.trace("getAllBlogDTOs {}", blogDTO));
+  public Mono<PageBlogDTO> getAllBlogDTOs(Integer limit, Integer page) {
+    Page pageable = new Page(limit, page);
+    log.debug("pobieram wszystkie blogi w postaci DTO {}", pageable);
+    PageRequest pageRequest = PageRequest.of(pageable.getPageForSearch(), pageable.getLimit());
+    Mono<Long> count = Mono.just(blogCache.estimatedSize());
+    Mono<List<BlogDTO>> pagedBlog = Flux.fromIterable(blogCache.asMap().values())
+        .buffer(pageRequest.getPageSize())
+        .elementAt(pageRequest.getPageNumber(), new ArrayList<>());
+    return count.zipWith(pagedBlog, (countBlogs, blogs) -> new PageBlogDTO(blogs, countBlogs));
   }
 
   Mono<BlogDTO> getBlogOrCreate(CreateBlogDTO blogDTO) {
@@ -84,26 +88,30 @@ public class BlogService {
             .doOnSuccess(result -> blogCache.put(result.getId(), result))));
   }
 
-  void evictBlogCache() {
+  void evictAndRecreateBlogCache() {
     log.debug("Czyszcze cache dla blogów");
     blogCache.invalidateAll();
+    List<Blog> block = blogFinder.findAll()
+        .doOnNext(this::putToCache)
+        .collectList()
+        .block();
   }
 
   Mono<BlogDTO> updateBlog(UpdateBlogDTO blogDTO, String blogId) {
     log.debug("Aktualizacja bloga {}", blogDTO.getName());
     blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
-    return blogFinder.findById(blogId).cache()
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId)))
-        .flatMap(blog -> updateBlog(blog, blogDTO))
-        .map(blog -> new BlogDTO(
-            blog.getId(),
-            blog.getBlogURL(),
-            blog.getDescription(),
-            blog.getName(),
-            blog.getFeedURL(),
-            blog.getPublishedDate(),
-            blog.getImageUrl()))
-        .doOnSuccess(updatedBlog -> blogCache.invalidate(updatedBlog.getId()));
+    return Mono.justOrEmpty(blogCache.getIfPresent(blogId))
+        .switchIfEmpty(Mono.defer(() -> blogFinder.findById(blogId).cache()
+            .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId)))
+            .flatMap(blog -> updateBlog(blog, blogDTO))
+            .map(blog -> new BlogDTO(
+                blog.getId(),
+                blog.getBlogURL(),
+                blog.getDescription(),
+                blog.getName(),
+                blog.getFeedURL(),
+                blog.getPublishedDate(),
+                blog.getImageUrl()))));
   }
 
   private void putToCache(Blog updatedBlog) {

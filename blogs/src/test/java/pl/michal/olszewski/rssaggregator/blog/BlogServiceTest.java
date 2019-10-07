@@ -54,7 +54,6 @@ class BlogServiceTest {
         (blogUrl, feedUrl) -> {
         },
         ogTagBlogUpdater);
-    blogService.evictBlogCache();
   }
 
   @Test

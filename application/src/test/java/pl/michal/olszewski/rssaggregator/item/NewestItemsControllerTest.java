@@ -1,11 +1,13 @@
 package pl.michal.olszewski.rssaggregator.item;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
+import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
 class NewestItemsControllerTest extends IntegrationTestBase {
@@ -26,9 +28,9 @@ class NewestItemsControllerTest extends IntegrationTestBase {
     givenItem()
         .buildNumberOfItemsAndSave(0, UUID.randomUUID().toString());
 
-    ListBodySpec<ItemDTO> items = thenGetItemsFromApi();
+    BodySpec<PageItemDTO, ?> result = thenGetItemsFromApi();
 
-    items.hasSize(0);
+    result.value(pageItemDTO -> assertThat(pageItemDTO.getTotalElements()).isEqualTo(0L));
   }
 
   @Test
@@ -36,29 +38,38 @@ class NewestItemsControllerTest extends IntegrationTestBase {
     givenItem()
         .buildNumberOfItemsAndSave(3, UUID.randomUUID().toString());
 
-    ListBodySpec<ItemDTO> items = thenGetItemsFromApi();
+    BodySpec<PageItemDTO, ?> result = thenGetItemsFromApi();
 
-    items.hasSize(3);
+    result.value(pageItemDTO -> {
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(3L);
+      assertThat(pageItemDTO.getContent()).hasSize(3);
+    });
   }
 
   @Test
   void should_get_limit_three_items() {
     givenItem()
-        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
+        .buildNumberOfItemsAndSave(5, UUID.randomUUID().toString());
 
-    ListBodySpec<ItemDTO> itemDTOS = thenGetNumberItemsFromApiWithLimit(3);
+    BodySpec<PageItemDTO, ?> result = thenGetNumberItemsFromApiWithLimit(3);
 
-    itemDTOS.hasSize(3);
+    result.value(pageItemDTO -> {
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(5L);
+      assertThat(pageItemDTO.getContent()).hasSize(3);
+    });
   }
 
   @Test
   void should_get_second_page_of_items() {
     givenItem()
-        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
+        .buildNumberOfItemsAndSave(5, UUID.randomUUID().toString());
 
-    ListBodySpec<ItemDTO> itemDTOS = thenGetNumberItemsFromApiWithLimitAndPage(3, 2);
+    BodySpec<PageItemDTO, ?> result = thenGetNumberItemsFromApiWithLimitAndPage(3, 2);
 
-    itemDTOS.hasSize(3);
+    result.value(pageItemDTO -> {
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(5L);
+      assertThat(pageItemDTO.getContent()).hasSize(2);
+    });
   }
 
   @Test
@@ -66,9 +77,12 @@ class NewestItemsControllerTest extends IntegrationTestBase {
     givenItem()
         .buildNumberOfItemsAndSave(0, UUID.randomUUID().toString());
 
-    ListBodySpec<ItemDTO> items = thenGetItemsSortedByCreatedAtFromApi();
+    BodySpec<PageItemDTO, ?> result = thenGetItemsSortedByCreatedAtFromApi();
 
-    items.hasSize(0);
+    result.value(pageItemDTO -> {
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(0L);
+      assertThat(pageItemDTO.getContent()).hasSize(0);
+    });
   }
 
   @Test
@@ -76,75 +90,84 @@ class NewestItemsControllerTest extends IntegrationTestBase {
     givenItem()
         .buildNumberOfItemsAndSave(3, UUID.randomUUID().toString());
 
-    ListBodySpec<ItemDTO> items = thenGetItemsSortedByCreatedAtFromApi();
+    BodySpec<PageItemDTO, ?> result = thenGetItemsSortedByCreatedAtFromApi();
 
-    items.hasSize(3);
+    result.value(pageItemDTO -> {
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(3L);
+      assertThat(pageItemDTO.getContent()).hasSize(3);
+    });
   }
 
   @Test
   void should_get_limit_three_items_sorted_by_createdAt() {
     givenItem()
-        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
+        .buildNumberOfItemsAndSave(5, UUID.randomUUID().toString());
 
-    ListBodySpec<ItemDTO> itemDTOS = thenGetItemsSortedByCreatedAtWithLimitFromApi(3);
+    BodySpec<PageItemDTO, ?> result = thenGetItemsSortedByCreatedAtWithLimitFromApi(3);
 
-    itemDTOS.hasSize(3);
+    result.value(pageItemDTO -> {
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(5L);
+      assertThat(pageItemDTO.getContent()).hasSize(3);
+    });
   }
 
   @Test
   void should_get_second_page_of_items_sorted_by_createdAt() {
     givenItem()
-        .buildNumberOfItemsAndSave(6, UUID.randomUUID().toString());
+        .buildNumberOfItemsAndSave(5, UUID.randomUUID().toString());
 
-    ListBodySpec<ItemDTO> itemDTOS = thenGetItemsSortedByCreatedAtForPageAndLimitFromApi(3, 2);
+    BodySpec<PageItemDTO, ?> result = thenGetItemsSortedByCreatedAtForPageAndLimitFromApi(3, 2);
 
-    itemDTOS.hasSize(3);
+    result.value(pageItemDTO -> {
+      assertThat(pageItemDTO.getTotalElements()).isEqualTo(5L);
+      assertThat(pageItemDTO.getContent()).hasSize(2);
+    });
   }
 
   private ItemListFactory givenItem() {
     return new ItemListFactory(mongoTemplate);
   }
 
-  private ListBodySpec<ItemDTO> thenGetItemsFromApi() {
+  private BodySpec<PageItemDTO, ?> thenGetItemsFromApi() {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/items", port)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(ItemDTO.class);
+        .expectBody(PageItemDTO.class);
   }
 
-  private ListBodySpec<ItemDTO> thenGetNumberItemsFromApiWithLimit(int number) {
+  private BodySpec<PageItemDTO, ?> thenGetNumberItemsFromApiWithLimit(int number) {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/items?limit={number}", port, number)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(ItemDTO.class);
+        .expectBody(PageItemDTO.class);
   }
 
-  private ListBodySpec<ItemDTO> thenGetNumberItemsFromApiWithLimitAndPage(int number, int page) {
+  private BodySpec<PageItemDTO, ?> thenGetNumberItemsFromApiWithLimitAndPage(int number, int page) {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/items?limit={number}&page={page}", port, number, page)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(ItemDTO.class);
+        .expectBody(PageItemDTO.class);
   }
 
-  private ListBodySpec<ItemDTO> thenGetItemsSortedByCreatedAtFromApi() {
+  private BodySpec<PageItemDTO, ?> thenGetItemsSortedByCreatedAtFromApi() {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/items/createdAt", port)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(ItemDTO.class);
+        .expectBody(PageItemDTO.class);
   }
 
-  private ListBodySpec<ItemDTO> thenGetItemsSortedByCreatedAtWithLimitFromApi(int number) {
+  private BodySpec<PageItemDTO, ?> thenGetItemsSortedByCreatedAtWithLimitFromApi(int number) {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/items/createdAt?limit={number}", port, number)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(ItemDTO.class);
+        .expectBody(PageItemDTO.class);
   }
 
-  private ListBodySpec<ItemDTO> thenGetItemsSortedByCreatedAtForPageAndLimitFromApi(int number, int page) {
+  private BodySpec<PageItemDTO, ?> thenGetItemsSortedByCreatedAtForPageAndLimitFromApi(int number, int page) {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/items/createdAt?limit={number}&page={page}", port, number, page)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(ItemDTO.class);
+        .expectBody(PageItemDTO.class);
   }
 
 }

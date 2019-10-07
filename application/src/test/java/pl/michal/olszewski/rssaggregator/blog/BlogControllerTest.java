@@ -10,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
-import org.springframework.test.web.reactive.server.WebTestClient.ListBodySpec;
 import org.springframework.web.reactive.function.BodyInserters;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import pl.michal.olszewski.rssaggregator.item.ItemListFactory;
 import reactor.test.StepVerifier;
 
 class BlogControllerTest extends IntegrationTestBase {
@@ -31,18 +29,35 @@ class BlogControllerTest extends IntegrationTestBase {
   void setUp() {
     blogRepository.deleteAll().block();
     mongoTemplate.remove(new Query(), "item");
-    blogService.evictBlogCache();
   }
 
   @Test
   void should_get_empty_list_of_blogs() {
     //given
+    blogService.evictAndRecreateBlogCache();
 
     //when
-    ListBodySpec<BlogDTO> blogs = thenGetBlogsFromApi();
+    BodySpec<PageBlogDTO, ?> pagedblog = thenGetBlogsFromApi();
 
     //then
-    blogs.hasSize(0);
+    pagedblog.value(pageBlogDTO -> assertThat(pageBlogDTO.getTotalElements()).isEqualTo(0L));
+  }
+
+  @Test
+  void should_get_secondPage_of_all_blogs() {
+    //given
+    givenBlog()
+        .buildNumberOfBlogsAndSave(5);
+    blogService.evictAndRecreateBlogCache();
+    //when
+    BodySpec<PageBlogDTO, ?> pagedblog = thenGetBlogsFromApi(2, 3);
+
+    //then
+    pagedblog.value(pageBlogDTO -> {
+          assertThat(pageBlogDTO.getTotalElements()).isEqualTo(5L);
+          assertThat(pageBlogDTO.getContent()).hasSize(2);
+        }
+    );
   }
 
   @Test
@@ -50,12 +65,12 @@ class BlogControllerTest extends IntegrationTestBase {
     //given
     givenBlog()
         .buildNumberOfBlogsAndSave(3);
-
+    blogService.evictAndRecreateBlogCache();
     //when
-    ListBodySpec<BlogDTO> blogs = thenGetBlogsFromApi();
+    BodySpec<PageBlogDTO, ?> pagedblog = thenGetBlogsFromApi();
 
     //then
-    blogs.hasSize(3);
+    pagedblog.value(pageBlogDTO -> assertThat(pageBlogDTO.getTotalElements()).isEqualTo(3L));
   }
 
   @Test
@@ -132,21 +147,6 @@ class BlogControllerTest extends IntegrationTestBase {
   }
 
   @Test
-  void should_get_one_blogWith2Items() {
-    //given
-    Blog blog = givenBlog()
-        .createAndSaveNewBlog();
-
-    givenItems()
-        .buildNumberOfItemsAndSave(2, blog.getId());
-
-    //when
-    BodySpec<BlogDTO, ?> blogDTO = thenGetOneBlogFromApiById(blog.getId());
-    //then
-    blogDTO.value(dto -> assertThat(dto).isNotNull());
-  }
-
-  @Test
   void shouldThrowExceptionOnDuplicateKey() {
     //given
     givenBlog()
@@ -159,16 +159,18 @@ class BlogControllerTest extends IntegrationTestBase {
     return new BlogListFactory(blogRepository);
   }
 
-  private ItemListFactory givenItems() {
-    return new ItemListFactory(mongoTemplate);
+  private BodySpec<PageBlogDTO, ?> thenGetBlogsFromApi(int page, int limit) {
+    return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs?page={page}&limit={limit}", port, page, limit)
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(PageBlogDTO.class);
   }
 
-
-  private ListBodySpec<BlogDTO> thenGetBlogsFromApi() {
+  private BodySpec<PageBlogDTO, ?> thenGetBlogsFromApi() {
     return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs", port)
         .exchange()
         .expectStatus().isOk()
-        .expectBodyList(BlogDTO.class);
+        .expectBody(PageBlogDTO.class);
   }
 
   private BodySpec<BlogDTO, ?> thenGetOneBlogFromApiById(String id) {

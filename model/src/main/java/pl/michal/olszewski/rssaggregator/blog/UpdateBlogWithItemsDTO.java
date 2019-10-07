@@ -35,18 +35,6 @@ public final class UpdateBlogWithItemsDTO {
     this.itemsList = Optional.ofNullable(itemsList).orElse(List.of());
   }
 
-  public String getDescription() {
-    return description;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getFeedURL() {
-    return feedURL;
-  }
-
   public Instant getPublishedDate() {
     return publishedDate;
   }
