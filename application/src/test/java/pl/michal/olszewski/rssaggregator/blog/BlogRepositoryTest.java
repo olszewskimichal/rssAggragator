@@ -114,7 +114,7 @@ class BlogRepositoryTest {
     //then
     StepVerifier
         .create(byName)
-        .assertNext(v -> assertThat(v.getName()).isEqualTo("url"))
+        .assertNext(blog -> assertThat(blog.getName()).isEqualTo("url"))
         .expectComplete()
         .verify();
   }

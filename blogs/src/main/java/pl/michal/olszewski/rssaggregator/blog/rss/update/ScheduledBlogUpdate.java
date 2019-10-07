@@ -16,7 +16,7 @@ class ScheduledBlogUpdate {
   private static final Logger log = LoggerFactory.getLogger(ScheduledBlogUpdate.class);
   private final UpdateBlogService updateBlogService;
 
-  ScheduledBlogUpdate(UpdateBlogService updateBlogService) {
+  private ScheduledBlogUpdate(UpdateBlogService updateBlogService) {
     this.updateBlogService = updateBlogService;
   }
 

@@ -12,14 +12,8 @@ import reactor.core.publisher.Mono;
 class ReactiveAggregationBlogRepositoryImpl implements ReactiveAggregationBlogRepository {
 
   private static final String ITEMS = "items";
-  private static final String NAME = "name";
-  private static final String BLOG_URL = "blogURL";
-  private static final String DESCRIPTION = "description";
   private static final String ID = "id";
-  private static final String FEED_URL = "feedURL";
-  private static final String PUBLISHED_DATE = "publishedDate";
   private static final String BLOG_ID = "blogId";
-  private static final String LINK = "link";
   private static final String SIZE = "size";
   private static final String BLOG_ITEMS_COUNT = "blogItemsCount";
   private final ReactiveMongoTemplate reactiveMongoTemplate;
@@ -40,12 +34,7 @@ class ReactiveAggregationBlogRepositoryImpl implements ReactiveAggregationBlogRe
         lookupOperation,
         Aggregation.project()
             .and(ITEMS).project(SIZE).as(BLOG_ITEMS_COUNT)
-            .and(ID).as(BLOG_ID)
-            .and(NAME).as(NAME)
-            .and(DESCRIPTION).as(DESCRIPTION)
-            .and(FEED_URL).as(FEED_URL)
-            .and(PUBLISHED_DATE).as(PUBLISHED_DATE)
-            .and(BLOG_URL).as(LINK),
+            .and(ID).as(BLOG_ID),
         Aggregation.sort(Direction.DESC, BLOG_ITEMS_COUNT)
     ), Blog.class, BlogAggregationDTO.class).single();
   }

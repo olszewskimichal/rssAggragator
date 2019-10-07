@@ -60,7 +60,9 @@ final class BlogDTO {
     return publishedDate;
   }
 
-
+  public String getImageURL() {
+    return imageURL;
+  }
 
   @Override
   public int hashCode() {

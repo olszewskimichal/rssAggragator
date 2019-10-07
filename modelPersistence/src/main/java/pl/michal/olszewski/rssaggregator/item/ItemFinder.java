@@ -23,7 +23,7 @@ class ItemFinder {
   private final ItemRepositorySync itemRepositorySync;
   private final MongoTemplate mongoTemplate;
 
-  ItemFinder(ItemRepository itemRepository, ItemRepositorySync itemRepositorySync, MongoTemplate mongoTemplate) {
+  private ItemFinder(ItemRepository itemRepository, ItemRepositorySync itemRepositorySync, MongoTemplate mongoTemplate) {
     this.itemRepository = itemRepository;
     this.itemRepositorySync = itemRepositorySync;
     this.mongoTemplate = mongoTemplate;

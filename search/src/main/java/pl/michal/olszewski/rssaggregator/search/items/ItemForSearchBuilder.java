@@ -5,7 +5,6 @@ public class ItemForSearchBuilder {
   private String title;
   private String description;
   private String link;
-  private float score;
 
   public ItemForSearchBuilder title(String title) {
     this.title = title;
@@ -22,12 +21,7 @@ public class ItemForSearchBuilder {
     return this;
   }
 
-  public ItemForSearchBuilder score(float score) {
-    this.score = score;
-    return this;
-  }
-
   public ItemForSearch build() {
-    return new ItemForSearch(title, description, link, score);
+    return new ItemForSearch(title, description, link, 0f);
   }
 }

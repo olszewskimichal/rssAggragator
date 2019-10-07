@@ -11,7 +11,7 @@ class ItemSearchService {
   private static final Logger log = LoggerFactory.getLogger(ItemSearchService.class);
   private final ReactiveElasticsearchOperations reactiveElasticsearchTemplate;
 
-  ItemSearchService(ReactiveElasticsearchOperations reactiveElasticsearchTemplate) {
+  private ItemSearchService(ReactiveElasticsearchOperations reactiveElasticsearchTemplate) {
     this.reactiveElasticsearchTemplate = reactiveElasticsearchTemplate;
   }
 

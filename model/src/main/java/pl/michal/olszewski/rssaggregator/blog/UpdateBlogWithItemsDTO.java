@@ -17,7 +17,7 @@ public final class UpdateBlogWithItemsDTO {
   private final Instant publishedDate;
   private final List<ItemDTO> itemsList;
 
-  public UpdateBlogWithItemsDTO(
+  UpdateBlogWithItemsDTO(
       String link,
       String description,
       String name,
@@ -31,18 +31,6 @@ public final class UpdateBlogWithItemsDTO {
     this.feedURL = feedURL;
     this.publishedDate = publishedDate;
     this.itemsList = Optional.ofNullable(itemsList).orElse(List.of());
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getFeedURL() {
-    return feedURL;
   }
 
   public Instant getPublishedDate() {

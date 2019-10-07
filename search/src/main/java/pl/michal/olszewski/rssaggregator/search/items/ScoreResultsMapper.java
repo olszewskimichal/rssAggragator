@@ -4,7 +4,7 @@ import java.util.Map;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.data.elasticsearch.core.DefaultResultMapper;
 
-public class ScoreResultsMapper extends DefaultResultMapper {
+class ScoreResultsMapper extends DefaultResultMapper {
 
   @Override
   public <T> T mapSearchHit(SearchHit searchHit, Class<T> type) {

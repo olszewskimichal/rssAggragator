@@ -21,7 +21,7 @@ class DuplicateItemsFixer {
   private final MongoTemplate mongoTemplate;
   private final Cache<BlogItemLink, ItemDTO> itemCache;
 
-  public DuplicateItemsFixer(
+  DuplicateItemsFixer(
       ItemFinder itemFinder,
       MongoTemplate mongoTemplate,
       @Qualifier("itemCache") Cache<BlogItemLink, ItemDTO> itemCache

@@ -15,7 +15,7 @@ class FeedFetcherCacheImpl implements com.rometools.fetcher.impl.FeedFetcherCach
 
   private final Cache<String, SyndFeedInfo> feedCacheProd;
 
-  public FeedFetcherCacheImpl(@Qualifier("feedCache") Cache<String, SyndFeedInfo> feedCacheProd) {
+  private FeedFetcherCacheImpl(@Qualifier("feedCache") Cache<String, SyndFeedInfo> feedCacheProd) {
     this.feedCacheProd = feedCacheProd;
   }
 

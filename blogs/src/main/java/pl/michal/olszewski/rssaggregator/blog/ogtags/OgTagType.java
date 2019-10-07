@@ -20,7 +20,4 @@ enum OgTagType {
         .orElse(null);
   }
 
-  String getName() {
-    return name;
-  }
 }

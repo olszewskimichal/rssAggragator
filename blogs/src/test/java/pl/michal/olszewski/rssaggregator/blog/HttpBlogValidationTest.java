@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class HttpBlogValidationTest {
 
-  BlogValidation blogValidation = new HttpBlogValidation();
+  private final BlogValidation blogValidation = new HttpBlogValidation();
 
   @Test
   void shouldThrowExceptionWhenLinkUrlIsNull() {

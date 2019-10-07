@@ -18,7 +18,6 @@ import pl.michal.olszewski.rssaggregator.blog.Blog;
 @Service
 public class OgTagBlogUpdater {
 
-  private static final Logger log = LoggerFactory.getLogger(OgTagBlogUpdater.class);
   private static final String META = "meta";
   private static final String PROPERTY = "property";
   private static final String CONTENT = "content";
@@ -38,7 +37,7 @@ public class OgTagBlogUpdater {
     return mongoTemplate.save(blog);
   }
 
-  OgTagBlogInfo getBlogInfoFromMetaTags(String url) {
+  private OgTagBlogInfo getBlogInfoFromMetaTags(String url) {
     return Optional.ofNullable(pageInfoExtractor.getPageInfoFromUrl(url))
         .map(document -> of(document.getElementsByTag(META))
             .flatMap(Collection::stream)

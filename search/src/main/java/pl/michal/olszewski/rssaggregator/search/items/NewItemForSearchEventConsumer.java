@@ -11,7 +11,7 @@ class NewItemForSearchEventConsumer {
   private static final Logger log = LoggerFactory.getLogger(NewItemForSearchEventConsumer.class);
   private final ItemSearchService itemSearchService;
 
-  NewItemForSearchEventConsumer(ItemSearchService itemSearchService) {
+  private NewItemForSearchEventConsumer(ItemSearchService itemSearchService) {
     this.itemSearchService = itemSearchService;
   }
 

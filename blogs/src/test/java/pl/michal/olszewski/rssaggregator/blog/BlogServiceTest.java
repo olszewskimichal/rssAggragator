@@ -93,7 +93,6 @@ class BlogServiceTest {
   @Test
   void shouldCreateBlogWithCorrectProperties() {
     //given
-    Instant now = Instant.now();
     CreateBlogDTO blogDTO = new CreateBlogDTOBuilder()
         .name("nazwa1")
         .description("desc")

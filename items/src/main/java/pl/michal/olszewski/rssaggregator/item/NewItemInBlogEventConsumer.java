@@ -11,7 +11,7 @@ class NewItemInBlogEventConsumer {
   private static final Logger log = LoggerFactory.getLogger(NewItemInBlogEventConsumer.class);
   private final ItemSaver itemSaver;
 
-  NewItemInBlogEventConsumer(ItemSaver itemSaver) {
+  private NewItemInBlogEventConsumer(ItemSaver itemSaver) {
     this.itemSaver = itemSaver;
   }
 
