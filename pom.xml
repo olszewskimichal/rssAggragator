@@ -22,12 +22,6 @@
       <groupId>io.micrometer</groupId>
       <version>${micrometer.version}</version>
     </dependency>
-
-    <dependency>
-      <artifactId>lombok</artifactId>
-      <groupId>org.projectlombok</groupId>
-      <optional>true</optional>
-    </dependency>
     <dependency>
       <artifactId>commons-lang3</artifactId>
       <groupId>org.apache.commons</groupId>

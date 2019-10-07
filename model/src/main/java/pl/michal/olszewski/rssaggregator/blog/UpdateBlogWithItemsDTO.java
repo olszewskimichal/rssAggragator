@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import lombok.Builder;
-import lombok.Singular;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
@@ -19,14 +17,13 @@ public final class UpdateBlogWithItemsDTO {
   private final Instant publishedDate;
   private final List<ItemDTO> itemsList;
 
-  @Builder
   public UpdateBlogWithItemsDTO(
       String link,
       String description,
       String name,
       String feedURL,
       Instant publishedDate,
-      @Singular("item") List<ItemDTO> itemsList
+      List<ItemDTO> itemsList
   ) {
     this.link = link;
     this.description = description;
@@ -71,12 +68,6 @@ public final class UpdateBlogWithItemsDTO {
   }
 
   public UpdateBlogDTO toUpdateBlogDto() {
-    return new UpdateBlogDTO(
-        link,
-        description,
-        name,
-        feedURL,
-        getPublishedDate()
-    );
+    return new UpdateBlogDTOBuilder().link(link).description(description).name(name).feedURL(feedURL).publishedDate(getPublishedDate()).build();
   }
 }

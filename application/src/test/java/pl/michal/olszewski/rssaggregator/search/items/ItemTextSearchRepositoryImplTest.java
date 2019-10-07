@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.search.items;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static pl.michal.olszewski.rssaggregator.search.items.ItemForSearch.builder;
 
 import java.io.IOException;
 import java.util.stream.Stream;
@@ -37,9 +36,9 @@ class ItemTextSearchRepositoryImplTest extends ElasticIntegrationTestBase {
   void shouldFindItemWhereTitleMatchingToQuery() {
     //given
     Stream.of(
-        builder().link("URL1").title("TDD in JAVA").description("TDD").build(),
-        builder().link("URL2").title("TDD in PYTHON").description("TDD").build(),
-        builder().link("URL3").title("TDD in JAVASCRIPT").description("TDD").build()
+        new ItemForSearchBuilder().link("URL1").title("TDD in JAVA").description("TDD").build(),
+        new ItemForSearchBuilder().link("URL2").title("TDD in PYTHON").description("TDD").build(),
+        new ItemForSearchBuilder().link("URL3").title("TDD in JAVASCRIPT").description("TDD").build()
     ).map(itemForSearch -> elasticsearchOperations.save(itemForSearch))
         .forEach(Mono::block);
     //when
@@ -53,9 +52,9 @@ class ItemTextSearchRepositoryImplTest extends ElasticIntegrationTestBase {
   void shouldFindItemWhereDescriptionMatchingToQuery() {
     //given
     Stream.of(
-        builder().link("URL1").description("TDD in JAVA").title("TDD").build(),
-        builder().link("URL2").description("TDD in PYTHON").title("TDD").build(),
-        builder().link("URL3").description("TDD in JAVASCRIPT").title("TDD").build()
+        new ItemForSearchBuilder().link("URL1").description("TDD in JAVA").title("TDD").build(),
+        new ItemForSearchBuilder().link("URL2").description("TDD in PYTHON").title("TDD").build(),
+        new ItemForSearchBuilder().link("URL3").description("TDD in JAVASCRIPT").title("TDD").build()
     ).map(itemForSearch -> elasticsearchOperations.save(itemForSearch))
         .forEach(Mono::block);
 

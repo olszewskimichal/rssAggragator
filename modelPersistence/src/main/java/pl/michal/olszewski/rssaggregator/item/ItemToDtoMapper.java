@@ -3,14 +3,7 @@ package pl.michal.olszewski.rssaggregator.item;
 class ItemToDtoMapper {
 
   static ItemDTO mapItemToItemDTO(Item item) {
-    return new ItemDTO(
-        item.getTitle(),
-        item.getDescription(),
-        item.getLink(),
-        item.getDate(),
-        item.getAuthor(),
-        item.getBlogId()
-    );
+    return new ItemDTOBuilder().title(item.getTitle()).description(item.getDescription()).link(item.getLink()).date(item.getDate()).author(item.getAuthor()).blogId(item.getBlogId()).build();
   }
 
   static BlogItemDTO mapToBlogItemDTO(Item item) {

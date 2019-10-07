@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static pl.michal.olszewski.rssaggregator.item.ItemDTO.builder;
 
 import com.mongodb.MongoWriteException;
 import java.time.Instant;
@@ -39,13 +38,13 @@ class ItemRepositoryTest {
   void shouldFind2NewestPublishedItems() {
     //given
     Instant instant = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-    Item newestItem = new Item(builder().link("newestItem").date(instant.plusSeconds(10)).build());
-    Item presentItem = new Item(builder().link("presentItem").date(instant).build());
+    Item newestItem = new Item(new ItemDTOBuilder().link("newestItem").date(instant.plusSeconds(10)).build());
+    Item presentItem = new Item(new ItemDTOBuilder().link("presentItem").date(instant).build());
 
     mongoTemplate.insertAll(Arrays.asList(
         presentItem,
         newestItem,
-        new Item(builder().link("title2").date(instant.minusSeconds(10)).build())
+        new Item(new ItemDTOBuilder().link("title2").date(instant.minusSeconds(10)).build())
     ));
     //when
     Flux<Item> items = itemRepository.findAllOrderByPublishedDate(2, 0);
@@ -61,9 +60,9 @@ class ItemRepositoryTest {
   @Test
   void shouldFind2NewestPersistedItems() {
     //given
-    mongoTemplate.save(new Item(builder().link("title2").build()));
-    Item title1 = mongoTemplate.save(new Item(builder().link("title1").build()));
-    Item title3 = mongoTemplate.save(new Item(builder().link("title3").build()));
+    mongoTemplate.save(new Item(new ItemDTOBuilder().link("title2").build()));
+    Item title1 = mongoTemplate.save(new Item(new ItemDTOBuilder().link("title1").build()));
+    Item title3 = mongoTemplate.save(new Item(new ItemDTOBuilder().link("title3").build()));
 
     //when
     Flux<Item> items = itemRepository.findAllOrderByCreatedAt(2, 0);
@@ -80,9 +79,9 @@ class ItemRepositoryTest {
   void shouldFindItemsWhenDateIsNull() {
     //given
     mongoTemplate.insertAll(Arrays.asList(
-        new Item(builder().link("title1").build()),
-        new Item(builder().link("title2").build()),
-        new Item(builder().link("title3").build())
+        new Item(new ItemDTOBuilder().link("title1").build()),
+        new Item(new ItemDTOBuilder().link("title2").build()),
+        new Item(new ItemDTOBuilder().link("title3").build())
     ));
 
     //when
@@ -97,17 +96,17 @@ class ItemRepositoryTest {
   @Test
   void shouldNotCreateItemByUniqueConstraint() {
     //given
-    mongoTemplate.save(new Item(builder().link("title1").build()));
+    mongoTemplate.save(new Item(new ItemDTOBuilder().link("title1").build()));
 
     //expect
-    assertThatThrownBy(() -> mongoTemplate.save(new Item(builder().link("title1").build())))
+    assertThatThrownBy(() -> mongoTemplate.save(new Item(new ItemDTOBuilder().link("title1").build())))
         .hasMessageContaining("duplicate key error collection")
         .hasCauseInstanceOf(MongoWriteException.class);
   }
 
   @Test
   void shouldSetCreatedDateOnPersistNewItem() {
-    Item save = mongoTemplate.save(new Item(builder().link("title1").build()));
+    Item save = mongoTemplate.save(new Item(new ItemDTOBuilder().link("title1").build()));
 
     assertThat(save.getCreatedAt()).isNotNull();
   }
@@ -116,9 +115,9 @@ class ItemRepositoryTest {
   void shouldFindByBlogId() {
     //given
     mongoTemplate.insertAll(Arrays.asList(
-        new Item(builder().blogId("id1").link("link1").build()),
-        new Item(builder().blogId("id1").link("link2").build()),
-        new Item(builder().blogId("id2").link("link3").build())
+        new Item(new ItemDTOBuilder().blogId("id1").link("link1").build()),
+        new Item(new ItemDTOBuilder().blogId("id1").link("link2").build()),
+        new Item(new ItemDTOBuilder().blogId("id2").link("link3").build())
     ));
 
     //when

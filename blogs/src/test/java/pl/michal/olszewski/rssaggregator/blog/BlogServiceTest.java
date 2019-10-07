@@ -53,7 +53,7 @@ class BlogServiceTest {
   void shouldCreateBlogFromDTO() {
     //given
     given(blogRepository.findByFeedURL("feedUrl1")).willReturn(Mono.empty());
-    CreateBlogDTO blogDTO = CreateBlogDTO.builder()
+    CreateBlogDTO blogDTO = new CreateBlogDTOBuilder()
         .feedURL("feedUrl1")
         .name("test")
         .build();
@@ -68,9 +68,9 @@ class BlogServiceTest {
   @Test
   void shouldNotTryCreatingBlogWhenExist() {
     //given
-    given(blogRepository.findByFeedURL("nazwa")).willReturn(Mono.just(Blog.builder().build()));
+    given(blogRepository.findByFeedURL("nazwa")).willReturn(Mono.just(new BlogBuilder().build()));
 
-    CreateBlogDTO blogDTO = CreateBlogDTO.builder()
+    CreateBlogDTO blogDTO = new CreateBlogDTOBuilder()
         .feedURL("nazwa")
         .build();
 
@@ -86,7 +86,7 @@ class BlogServiceTest {
   void shouldCreateBlogWithCorrectProperties() {
     //given
     Instant now = Instant.now();
-    CreateBlogDTO blogDTO = CreateBlogDTO.builder()
+    CreateBlogDTO blogDTO = new CreateBlogDTOBuilder()
         .name("nazwa1")
         .description("desc")
         .feedURL("feedUrl3")
@@ -114,9 +114,9 @@ class BlogServiceTest {
   @Test
   void shouldUpdateBlogWhenDescriptionChanged() {
     //given
-    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
+    Blog blog = new BlogBuilder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
 
-    UpdateBlogDTO blogDTO = UpdateBlogDTO.builder()
+    UpdateBlogDTO blogDTO = new UpdateBlogDTOBuilder()
         .feedURL("url")
         .description("desc")
         .name("url")
@@ -140,7 +140,7 @@ class BlogServiceTest {
   @Test
   void shouldDeleteBlogById() {
     given(blogRepository.deleteById("1")).willReturn(Mono.empty());
-    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(BlogAggregationDTO.builder().blogId("1").blogItemsCount(0L).build()));
+    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(new BlogAggregationDTOBuilder().blogId("1").blogItemsCount(0L).build()));
 
     StepVerifier.create(blogService.deleteBlog("1"))
         .expectComplete()
@@ -157,10 +157,9 @@ class BlogServiceTest {
 
   @Test
   void shouldChangeActivityBlogWhenWeTryDeleteBlogWithItems() {
-    Blog blog = Blog.builder()
-        .build();
+    Blog blog = new BlogBuilder().build();
     given(blogRepository.findById("1")).willReturn(Mono.just(blog));
-    BlogAggregationDTO aggregationDTO = BlogAggregationDTO.builder().blogItemsCount(1L).build();
+    BlogAggregationDTO aggregationDTO = new BlogAggregationDTOBuilder().blogItemsCount(1L).build();
     given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(aggregationDTO));
 
     //when

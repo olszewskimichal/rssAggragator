@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
-import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
+import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEventBuilder;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -46,21 +46,15 @@ public class UpdateBlogWithItemsService {
     if (itemCache.getIfPresent(item.getLink()) == null) {
       itemCache.put(item.getLink(), item);
       producer.writeEventToQueue(new NewItemInBlogEvent(item, blog.getId()));
-      itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(item.getLink(), item.getTitle(), item.getDescription()));
+      itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEventBuilder().linkUrl(item.getLink()).itemTitle(item.getTitle()).itemDescription(item.getDescription()).build());
     }
   }
 
   private void putToCache(Blog updatedBlog) {
     blogCache.put(
         updatedBlog.getId(),
-        new BlogDTO(
-            updatedBlog.getId(),
-            updatedBlog.getBlogURL(),
-            updatedBlog.getDescription(),
-            updatedBlog.getName(),
-            updatedBlog.getFeedURL(),
-            updatedBlog.getPublishedDate()
-        )
+        new BlogDTOBuilder().id(updatedBlog.getId()).link(updatedBlog.getBlogURL()).description(updatedBlog.getDescription()).name(updatedBlog.getName()).feedURL(updatedBlog.getFeedURL())
+            .publishedDate(updatedBlog.getPublishedDate()).build()
     );
   }
 

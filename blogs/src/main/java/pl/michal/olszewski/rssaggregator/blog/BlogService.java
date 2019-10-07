@@ -41,14 +41,8 @@ public class BlogService {
     log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
     return blogFinder.findByFeedURL(blogDTO.getFeedURL())
         .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO)))
-        .map(blog -> new BlogDTO(
-            blog.getId(),
-            blog.getBlogURL(),
-            blog.getDescription(),
-            blog.getName(),
-            blog.getFeedURL(),
-            blog.getPublishedDate()
-        ));
+        .map(blog -> new BlogDTOBuilder().id(blog.getId()).link(blog.getBlogURL()).description(blog.getDescription()).name(blog.getName()).feedURL(blog.getFeedURL())
+            .publishedDate(blog.getPublishedDate()).build());
   }
 
   Mono<Void> deleteBlog(String id) {
@@ -87,28 +81,16 @@ public class BlogService {
     log.debug("Aktualizacja bloga {}", blogDTO.getName());
     return getBlogByFeedUrl(blogDTO.getFeedURL())
         .flatMap(blog -> updateBlog(blog, blogDTO))
-        .map(blog -> new BlogDTO(
-            blog.getId(),
-            blog.getBlogURL(),
-            blog.getDescription(),
-            blog.getName(),
-            blog.getFeedURL(),
-            blog.getPublishedDate()
-        ))
+        .map(blog -> new BlogDTOBuilder().id(blog.getId()).link(blog.getBlogURL()).description(blog.getDescription()).name(blog.getName()).feedURL(blog.getFeedURL())
+            .publishedDate(blog.getPublishedDate()).build())
         .doOnSuccess(updatedBlog -> blogCache.invalidate(updatedBlog.getId()));
   }
 
   private void putToCache(Blog updatedBlog) {
     blogCache.put(
         updatedBlog.getId(),
-        new BlogDTO(
-            updatedBlog.getId(),
-            updatedBlog.getBlogURL(),
-            updatedBlog.getDescription(),
-            updatedBlog.getName(),
-            updatedBlog.getFeedURL(),
-            updatedBlog.getPublishedDate()
-        )
+        new BlogDTOBuilder().id(updatedBlog.getId()).link(updatedBlog.getBlogURL()).description(updatedBlog.getDescription()).name(updatedBlog.getName()).feedURL(updatedBlog.getFeedURL())
+            .publishedDate(updatedBlog.getPublishedDate()).build()
     );
   }
 

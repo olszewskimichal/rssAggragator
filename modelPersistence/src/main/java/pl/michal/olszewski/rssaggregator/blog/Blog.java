@@ -3,7 +3,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -22,7 +21,6 @@ public class Blog {
   private Instant lastUpdateDate;
   private boolean active = true;
 
-  @Builder
   public Blog(
       String id,
       String blogURL,

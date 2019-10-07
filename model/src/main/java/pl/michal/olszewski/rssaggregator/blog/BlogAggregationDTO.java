@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
 import java.util.Optional;
-import lombok.Builder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -16,8 +15,7 @@ public final class BlogAggregationDTO {
   private final Instant publishedDate;
   private final Long blogItemsCount;
 
-  @Builder
-  public BlogAggregationDTO(String blogId, String link, String description, String name, String feedURL, Instant publishedDate, Long blogItemsCount) {
+  BlogAggregationDTO(String blogId, String link, String description, String name, String feedURL, Instant publishedDate, Long blogItemsCount) {
     this.blogId = blogId;
     this.link = link;
     this.description = description;

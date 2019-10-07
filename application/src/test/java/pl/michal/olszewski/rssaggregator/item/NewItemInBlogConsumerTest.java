@@ -23,7 +23,7 @@ class NewItemInBlogConsumerTest extends IntegrationTestBase {
   @Test
   void shouldPersistNewEventAndNewItemToDbOnEvent() {
     //given
-    ItemDTO item = ItemDTO.builder().link("link")
+    ItemDTO item = new ItemDTOBuilder().link("link")
         .title("title")
         .blogId("id")
         .build();

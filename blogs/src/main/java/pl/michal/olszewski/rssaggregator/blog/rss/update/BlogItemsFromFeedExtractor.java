@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriUtils;
 import pl.michal.olszewski.rssaggregator.blog.RssInfo;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
+import pl.michal.olszewski.rssaggregator.item.ItemDTOBuilder;
 
 class BlogItemsFromFeedExtractor {
 
@@ -27,13 +28,8 @@ class BlogItemsFromFeedExtractor {
     log.trace("getItemsForBlog {} lastUpdatedDate {}", rssInfo.getBlogId(), rssInfo.getLastUpdateDate());
     return syndFeed.getEntries().parallelStream()
         .filter(entry -> entry.getPublishedDate().toInstant().isAfter(rssInfo.getLastUpdateDate()))
-        .map(entry -> new ItemDTO(
-            entry.getTitle(),
-            entry.getDescription() != null ? HtmlTagRemover.removeHtmlTagFromDescription(entry.getDescription().getValue()) : "",
-            getFinalURL(convertURLToAscii(entry.getLink())),
-            entry.getPublishedDate().toInstant(),
-            entry.getAuthor(),
-            rssInfo.getBlogId()))
+        .map(entry -> new ItemDTOBuilder().title(entry.getTitle()).description(entry.getDescription() != null ? HtmlTagRemover.removeHtmlTagFromDescription(entry.getDescription().getValue()) : "")
+            .link(getFinalURL(convertURLToAscii(entry.getLink()))).date(entry.getPublishedDate().toInstant()).author(entry.getAuthor()).blogId(rssInfo.getBlogId()).build())
         .collect(Collectors.toSet());
   }
 

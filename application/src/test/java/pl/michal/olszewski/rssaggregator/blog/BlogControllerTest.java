@@ -63,7 +63,7 @@ class BlogControllerTest extends IntegrationTestBase {
     //given
     Blog blog = givenBlog().createAndSaveNewBlog();
     BlogDTO expected =
-        BlogDTO.builder()
+        new BlogDTOBuilder()
             .id(blog.getId())
             .feedURL(blog.getFeedURL())
             .publishedDate(blog.getPublishedDate())
@@ -99,7 +99,7 @@ class BlogControllerTest extends IntegrationTestBase {
 
     Blog blog = givenBlog().createAndSaveNewBlog();
 
-    BlogDTO blogDTO = BlogDTO.builder()
+    BlogDTO blogDTO = new BlogDTOBuilder()
         .link(blog.getBlogURL())
         .description(expectedDescription)
         .name(blog.getName())
@@ -182,7 +182,7 @@ class BlogControllerTest extends IntegrationTestBase {
   private void thenCreateBlogByApi(String link) {
     webTestClient.post()
         .uri("http://localhost:{port}/api/v1/blogs", port)
-        .body(BodyInserters.fromObject(BlogDTO.builder().link(link).build()))
+        .body(BodyInserters.fromObject(new BlogDTOBuilder().link(link).build()))
         .exchange()
         .expectStatus().isNoContent();
   }
@@ -190,7 +190,7 @@ class BlogControllerTest extends IntegrationTestBase {
   private void thenThrowExceptionOnCreateBlogByApi(String link) {
     webTestClient.post()
         .uri("http://localhost:{port}/api/v1/blogs", port)
-        .body(BodyInserters.fromObject(BlogDTO.builder().link(link).build()))
+        .body(BodyInserters.fromObject(new BlogDTOBuilder().link(link).build()))
         .exchange()
         .expectStatus().is5xxServerError();
   }

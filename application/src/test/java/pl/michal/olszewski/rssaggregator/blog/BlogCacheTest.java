@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static pl.michal.olszewski.rssaggregator.blog.Blog.builder;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,7 @@ class BlogCacheTest extends IntegrationTestBase {
   @BeforeEach
   void setUp() {
     mongoTemplate.remove(new Query(), "blog");
-    blog = mongoTemplate.save(builder().blogURL("nazwa").feedURL("nazwa").name("nazwa").build());
+    blog = mongoTemplate.save(new BlogBuilder().blogURL("nazwa").feedURL("nazwa").name("nazwa").build());
     service.evictBlogCache();
   }
 
@@ -63,7 +62,7 @@ class BlogCacheTest extends IntegrationTestBase {
     List<BlogDTO> blogList = allBlogs.collectList().block();
 
     //when
-    service.getBlogOrCreate(CreateBlogDTO.builder().name("nazwa2").build()).block();
+    service.getBlogOrCreate(new CreateBlogDTOBuilder().name("nazwa2").build()).block();
     Flux<BlogDTO> blogs = service.getAllBlogDTOs();
 
     //then

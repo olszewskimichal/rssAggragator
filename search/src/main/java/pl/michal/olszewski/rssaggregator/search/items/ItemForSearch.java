@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.search.items;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -19,8 +18,7 @@ final class ItemForSearch {
   private final float score;
 
   @JsonCreator
-  @Builder
-  public ItemForSearch(
+  ItemForSearch(
       @JsonProperty("title") String title,
       @JsonProperty("description") String description,
       @JsonProperty("link") String link,

@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
-import lombok.Builder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -13,7 +12,6 @@ final class UpdateBlogDTO {
   private final String feedURL;
   private final Instant publishedDate;
 
-  @Builder
   UpdateBlogDTO(
       String link,
       String description,

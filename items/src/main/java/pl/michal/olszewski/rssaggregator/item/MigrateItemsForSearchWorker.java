@@ -3,7 +3,7 @@ package pl.michal.olszewski.rssaggregator.item;
 import static pl.michal.olszewski.rssaggregator.item.LinkExtractor.getFinalURL;
 
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
+import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEventBuilder;
 
 @Service
 class MigrateItemsForSearchWorker {
@@ -18,7 +18,7 @@ class MigrateItemsForSearchWorker {
 
   void migrateItemsForSearch() {
     itemFinder.findAllOrderByPublishedDateBlocking(Integer.MAX_VALUE, 0)
-        .forEach(item -> newItemForSearchEventProducer.writeEventToQueue(NewItemForSearchEvent.builder()
+        .forEach(item -> newItemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEventBuilder()
             .itemDescription(item.getDescription())
             .itemTitle(item.getTitle())
             .linkUrl(getFinalURL(item.getLink()))

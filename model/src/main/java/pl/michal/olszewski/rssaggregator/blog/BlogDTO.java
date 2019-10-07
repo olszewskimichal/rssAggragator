@@ -3,7 +3,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
-import lombok.Builder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -17,7 +16,6 @@ final class BlogDTO {
   private final String feedURL;
   private final Instant publishedDate;
 
-  @Builder
   @JsonCreator
   BlogDTO(
       @JsonProperty("id") String id,

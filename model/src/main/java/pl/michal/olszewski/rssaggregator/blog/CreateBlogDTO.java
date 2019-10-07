@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -14,7 +13,6 @@ final class CreateBlogDTO {
   private final String name;
   private final String feedURL;
 
-  @Builder
   @JsonCreator
   CreateBlogDTO(
       @JsonProperty("link") String link,

@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.time.Instant;
-import lombok.Builder;
 
-@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemDTO implements Serializable {
 

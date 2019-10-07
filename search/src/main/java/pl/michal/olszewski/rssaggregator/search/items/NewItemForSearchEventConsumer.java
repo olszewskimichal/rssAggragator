@@ -18,7 +18,7 @@ class NewItemForSearchEventConsumer {
   @JmsListener(destination = "searchItems")
   public void receiveMessage(NewItemForSearchEvent event) {
     log.info("Received <{}>", event);
-    itemSearchService.saveItemForSearch(ItemForSearch.builder()
+    itemSearchService.saveItemForSearch(new ItemForSearchBuilder()
         .link(event.getLinkUrl())
         .title(event.getItemTitle())
         .description(event.getItemDescription())

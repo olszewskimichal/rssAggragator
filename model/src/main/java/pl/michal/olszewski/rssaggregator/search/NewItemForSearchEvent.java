@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.search;
 
 import java.io.Serializable;
-import lombok.Builder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -11,8 +10,7 @@ public class NewItemForSearchEvent implements Serializable {
   private final String itemTitle;
   private final String itemDescription;
 
-  @Builder
-  public NewItemForSearchEvent(String linkUrl, String itemTitle, String itemDescription) {
+  NewItemForSearchEvent(String linkUrl, String itemTitle, String itemDescription) {
     this.linkUrl = linkUrl;
     this.itemTitle = itemTitle;
     this.itemDescription = itemDescription;
