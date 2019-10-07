@@ -63,7 +63,7 @@ class BlogEqualsTest {
 
   @Test
   void pageBlogDtoEqualsContractTest() {
-    EqualsVerifier.forClass(OgTagBlogInfo.class)
+    EqualsVerifier.forClass(PageBlogDTO.class)
         .suppress(NONFINAL_FIELDS)
         .verify();
   }

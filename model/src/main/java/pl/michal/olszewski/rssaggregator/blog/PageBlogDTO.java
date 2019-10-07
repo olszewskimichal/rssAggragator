@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Objects;
 
-class PageBlogDTO {
+final class PageBlogDTO {
 
   private final List<BlogDTO> content;
   private final long totalElements;
@@ -28,12 +28,12 @@ class PageBlogDTO {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(content, totalElements);
   }
 
   @Override
-  public boolean equals(Object o) {
+  public final boolean equals(Object o) {
     if (this == o) {
       return true;
     }
