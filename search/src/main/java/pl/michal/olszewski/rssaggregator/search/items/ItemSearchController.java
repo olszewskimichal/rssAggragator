@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.search.items;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -9,8 +10,9 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("/api/v1/items/search")
-@Slf4j
 class ItemSearchController {
+
+  private static final Logger log = LoggerFactory.getLogger(ItemSearchController.class);
 
   private final ItemTextSearchRepository itemTextSearchRepository;
 

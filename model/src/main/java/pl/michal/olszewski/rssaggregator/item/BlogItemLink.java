@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.item;
 
-import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public final class BlogItemLink {
 
@@ -12,29 +13,21 @@ public final class BlogItemLink {
     this.linkUrl = linkUrl;
   }
 
+  public String getBlogId() {
+    return blogId;
+  }
+
+  public String getLinkUrl() {
+    return linkUrl;
+  }
+
   @Override
-  public int hashCode() {
-    return Objects.hash(blogId, linkUrl);
+  public final int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BlogItemLink that = (BlogItemLink) o;
-    return Objects.equals(blogId, that.blogId) &&
-        Objects.equals(linkUrl, that.linkUrl);
-  }
-
-  @Override
-  public String toString() {
-    return "BlogItemLink{" +
-        "blogId='" + blogId + '\'' +
-        ", linkUrl='" + linkUrl + '\'' +
-        '}';
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 }

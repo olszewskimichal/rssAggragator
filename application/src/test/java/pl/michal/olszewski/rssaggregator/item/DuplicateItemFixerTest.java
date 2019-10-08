@@ -31,11 +31,11 @@ class DuplicateItemFixerTest extends IntegrationTestBase {
     //given
     mongoTemplate.insertAll(
         Arrays.asList(
-            new Item(ItemDTO.builder()
+            new Item(new ItemDTOBuilder()
                 .blogId("blogId")
                 .link("https://lafkblogs.wordpress.com/2019/09/29/biggest-error-in-your-maven-project-mvn-clean-install/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers")
                 .build()),
-            new Item(ItemDTO.builder()
+            new Item(new ItemDTOBuilder()
                 .blogId("blogId")
                 .link("https://lafkblogs.wordpress.com/2019/09/29/biggest-error-in-your-maven-project-mvn-clean-install/")
                 .build())
@@ -57,11 +57,11 @@ class DuplicateItemFixerTest extends IntegrationTestBase {
     //given
     mongoTemplate.insertAll(
         Arrays.asList(
-            new Item(ItemDTO.builder()
+            new Item(new ItemDTOBuilder()
                 .blogId("blogId")
                 .link("https://lafkblogs.wordpress.com/2019/09/29/biggest-error-in-your-maven-project-mvn-clean-install/?utm_source=jvm-bloggers.com&utm_medium=link&utm_campaign=jvm-bloggers")
                 .build()),
-            new Item(ItemDTO.builder()
+            new Item(new ItemDTOBuilder()
                 .blogId("blogId2")
                 .link("https://lafkblogs.wordpress.com/2019/09/29/biggest-error-in-your-maven-project-mvn-clean-install/")
                 .build())

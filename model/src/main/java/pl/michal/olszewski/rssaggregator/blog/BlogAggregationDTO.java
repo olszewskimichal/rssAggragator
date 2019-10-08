@@ -1,37 +1,34 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import java.util.Objects;
 import java.util.Optional;
-import lombok.Builder;
-import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-@Getter
 public final class BlogAggregationDTO {
 
   private final String blogId;
   private final Long blogItemsCount;
 
-  @Builder
-  public BlogAggregationDTO(String blogId, Long blogItemsCount) {
+  BlogAggregationDTO(String blogId, Long blogItemsCount) {
     this.blogId = blogId;
     this.blogItemsCount = Optional.ofNullable(blogItemsCount).orElse(0L);
   }
 
+  public String getBlogId() {
+    return blogId;
+  }
+
+  public Long getBlogItemsCount() {
+    return blogItemsCount;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(blogId, blogItemsCount);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BlogAggregationDTO that = (BlogAggregationDTO) o;
-    return Objects.equals(blogId, that.blogId) &&
-        Objects.equals(blogItemsCount, that.blogItemsCount);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 }

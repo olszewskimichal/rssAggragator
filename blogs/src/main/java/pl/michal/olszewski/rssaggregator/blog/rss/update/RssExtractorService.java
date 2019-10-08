@@ -16,15 +16,17 @@ import java.util.ArrayList;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.RssInfo;
 import pl.michal.olszewski.rssaggregator.blog.UpdateBlogWithItemsDTO;
+import pl.michal.olszewski.rssaggregator.blog.UpdateBlogWithItemsDTOBuilder;
 
 @Service
-@Slf4j
 class RssExtractorService {
 
+  private static final Logger log = LoggerFactory.getLogger(RssExtractorService.class);
   private final FeedFetcher feedFetcher;
 
   RssExtractorService(FeedFetcher feedFetcher) {
@@ -56,13 +58,9 @@ class RssExtractorService {
 
   private UpdateBlogWithItemsDTO getBlogInfo(SyndFeed syndFeed, String feedURL, String blogURL) {
     log.trace("getBlogInfo feedURL {} blogURL {}", feedURL, blogURL);
-    return new UpdateBlogWithItemsDTO(
-        syndFeed.getLink() != null ? syndFeed.getLink() : blogURL,
-        HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()),
-        syndFeed.getTitle(),
-        feedURL,
-        syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now(),
-        new ArrayList<>());
+    return new UpdateBlogWithItemsDTOBuilder().link(syndFeed.getLink() != null ? syndFeed.getLink() : blogURL).description(HtmlTagRemover.removeHtmlTagFromDescription(syndFeed.getDescription()))
+        .name(syndFeed.getTitle()).feedURL(feedURL).publishedDate(syndFeed.getPublishedDate() != null ? syndFeed.getPublishedDate().toInstant() : Instant.now()).itemsList(new ArrayList<>())
+        .build();
   }
 
 }

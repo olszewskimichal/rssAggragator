@@ -9,12 +9,12 @@ import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.fromName;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 
-@Slf4j
 @Service
 public class OgTagBlogUpdater {
 
@@ -37,7 +37,7 @@ public class OgTagBlogUpdater {
     return mongoTemplate.save(blog);
   }
 
-  OgTagBlogInfo getBlogInfoFromMetaTags(String url) {
+  private OgTagBlogInfo getBlogInfoFromMetaTags(String url) {
     return Optional.ofNullable(pageInfoExtractor.getPageInfoFromUrl(url))
         .map(document -> of(document.getElementsByTag(META))
             .flatMap(Collection::stream)

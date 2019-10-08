@@ -12,6 +12,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import pl.michal.olszewski.rssaggregator.integration.ElasticIntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
+import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEventBuilder;
 import reactor.test.StepVerifier;
 
 class NewItemForSearchEventConsumerTest extends ElasticIntegrationTestBase {
@@ -34,7 +35,7 @@ class NewItemForSearchEventConsumerTest extends ElasticIntegrationTestBase {
   @Test
   void shouldPersistNewEventToDbOnEvent() {
     //given
-    NewItemForSearchEvent event = NewItemForSearchEvent.builder()
+    NewItemForSearchEvent event = new NewItemForSearchEventBuilder()
         .linkUrl("link")
         .itemTitle("title")
         .itemDescription("desc")

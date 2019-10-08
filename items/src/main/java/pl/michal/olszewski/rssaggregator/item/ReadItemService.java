@@ -1,11 +1,9 @@
 package pl.michal.olszewski.rssaggregator.item;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-@Slf4j
 class ReadItemService {
 
   private final ItemFinder itemFinder;

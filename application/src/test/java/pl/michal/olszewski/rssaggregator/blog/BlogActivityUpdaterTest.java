@@ -26,7 +26,7 @@ class BlogActivityUpdaterTest extends IntegrationTestBase {
   @Test
   void shouldActivateBlog() {
     //given
-    Blog blog = Blog.builder().build();
+    Blog blog = new BlogBuilder().build();
     blog.deactivate();
     Blog saved = mongoTemplate.save(blog);
 
@@ -41,7 +41,7 @@ class BlogActivityUpdaterTest extends IntegrationTestBase {
   @Test
   void shouldDeactivateBlog() {
     //given
-    Blog saved = mongoTemplate.save(Blog.builder().build());
+    Blog saved = mongoTemplate.save(new BlogBuilder().build());
 
     //when
     //then

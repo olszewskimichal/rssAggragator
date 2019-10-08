@@ -7,7 +7,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Executor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
@@ -17,15 +18,15 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
-@Slf4j
 class UpdateBlogService {
 
+  private static final Logger log = LoggerFactory.getLogger(UpdateBlogService.class);
   private final BlogFinder blogFinder;
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
   private final UpdateBlogWithItemsService blogService;
 
-  public UpdateBlogService(
+  private UpdateBlogService(
       BlogFinder blogFinder,
       Executor executor,
       MeterRegistry registry,

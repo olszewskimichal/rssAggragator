@@ -4,7 +4,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -17,14 +18,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-@Slf4j
 class ItemFinder {
+  private static final Logger log = LoggerFactory.getLogger(ItemFinder.class);
 
   private final ItemRepository itemRepository;
   private final ItemRepositorySync itemRepositorySync;
   private final MongoTemplate mongoTemplate;
 
-  ItemFinder(ItemRepository itemRepository, ItemRepositorySync itemRepositorySync, MongoTemplate mongoTemplate) {
+  private ItemFinder(ItemRepository itemRepository, ItemRepositorySync itemRepositorySync, MongoTemplate mongoTemplate) {
     this.itemRepository = itemRepository;
     this.itemRepositorySync = itemRepositorySync;
     this.mongoTemplate = mongoTemplate;

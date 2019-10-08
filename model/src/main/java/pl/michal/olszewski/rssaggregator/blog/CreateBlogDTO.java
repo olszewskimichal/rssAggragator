@@ -2,11 +2,10 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Objects;
-import lombok.Builder;
-import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@Getter
 final class CreateBlogDTO {
 
   private final String link;
@@ -14,7 +13,6 @@ final class CreateBlogDTO {
   private final String name;
   private final String feedURL;
 
-  @Builder
   @JsonCreator
   CreateBlogDTO(
       @JsonProperty("link") String link,
@@ -28,33 +26,34 @@ final class CreateBlogDTO {
     this.feedURL = feedURL;
   }
 
+  public String getLink() {
+    return link;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getFeedURL() {
+    return feedURL;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(link, description, name, feedURL);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    CreateBlogDTO that = (CreateBlogDTO) o;
-    return Objects.equals(link, that.link) &&
-        Objects.equals(description, that.description) &&
-        Objects.equals(name, that.name) &&
-        Objects.equals(feedURL, that.feedURL);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 
   @Override
   public String toString() {
-    return "CreateBlogDTO{" +
-        "link='" + link + '\'' +
-        ", description='" + description + '\'' +
-        ", name='" + name + '\'' +
-        ", feedURL='" + feedURL + '\'' +
-        '}';
+    return ToStringBuilder.reflectionToString(this);
   }
 }

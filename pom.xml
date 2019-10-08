@@ -22,11 +22,10 @@
       <groupId>io.micrometer</groupId>
       <version>${micrometer.version}</version>
     </dependency>
-
     <dependency>
-      <artifactId>lombok</artifactId>
-      <groupId>org.projectlombok</groupId>
-      <optional>true</optional>
+      <artifactId>commons-lang3</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <version>3.9</version>
     </dependency>
     <dependency>
       <artifactId>jackson-datatype-jsr310</artifactId>

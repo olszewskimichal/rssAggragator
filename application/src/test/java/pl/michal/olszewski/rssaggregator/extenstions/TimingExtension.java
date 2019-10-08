@@ -1,15 +1,17 @@
 package pl.michal.olszewski.rssaggregator.extenstions;
 
 import java.lang.reflect.Method;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
 class TimingExtension implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
+
+  private static final Logger log = LoggerFactory.getLogger(TimingExtension.class);
 
   @Override
   public void beforeTestExecution(ExtensionContext context) {

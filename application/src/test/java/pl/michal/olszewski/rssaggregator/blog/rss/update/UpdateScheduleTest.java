@@ -28,6 +28,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
 import pl.michal.olszewski.rssaggregator.blog.BlogAggregationDTO;
+import pl.michal.olszewski.rssaggregator.blog.BlogBuilder;
 import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
@@ -70,7 +71,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     SyndFeedImpl syndFeed = buildSyndFeed();
     given(feedFetcher.retrieveFeed(anyString(), any())).willReturn(syndFeed);
 
-    Blog blog = Blog.builder()
+    Blog blog = new BlogBuilder()
         .blogURL("https://spring.io/")
         .name("spring")
         .feedURL("https://spring.blog.test/")
@@ -102,7 +103,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
     given(feedFetcher.retrieveFeed(anyString(), any())).willReturn(syndFeed);
 
-    Blog blog = Blog.builder()
+    Blog blog = new BlogBuilder()
         .blogURL("https://devstyle.pl")
         .name("devstyle.pl")
         .feedURL("https://devstyle.pl/feed")
@@ -131,7 +132,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
   @Test
   void shouldReturnFalseOnTimeout() {
-    Blog blog = Blog.builder()
+    Blog blog = new BlogBuilder()
         .blogURL("https://spring.io/")
         .name("spring")
         .feedURL("https://xcasdasda.io/")
@@ -149,7 +150,7 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
   void shouldReturnFalseWhenFetcherFailed() throws FetcherException, IOException, FeedException {
     given(feedFetcher.retrieveFeed(anyString(), any())).willThrow(new FeedException("some exception"));
 
-    Blog blog = Blog.builder()
+    Blog blog = new BlogBuilder()
         .blogURL("https://devstyle.pl")
         .name("devstyle.pl")
         .feedURL("https://devstyle.xxx/feed")

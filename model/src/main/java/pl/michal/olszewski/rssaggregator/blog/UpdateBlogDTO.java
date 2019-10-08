@@ -1,8 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
-import java.util.Objects;
-import lombok.Builder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 final class UpdateBlogDTO {
 
@@ -12,7 +12,6 @@ final class UpdateBlogDTO {
   private final String feedURL;
   private final Instant publishedDate;
 
-  @Builder
   UpdateBlogDTO(
       String link,
       String description,
@@ -49,24 +48,12 @@ final class UpdateBlogDTO {
 
   @Override
   public int hashCode() {
-    return Objects.hash(link, description, name, feedURL, publishedDate);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    UpdateBlogDTO that = (UpdateBlogDTO) o;
-    return Objects.equals(link, that.link) &&
-        Objects.equals(description, that.description) &&
-        Objects.equals(name, that.name) &&
-        Objects.equals(feedURL, that.feedURL) &&
-        Objects.equals(publishedDate, that.publishedDate);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 
 }

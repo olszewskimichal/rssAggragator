@@ -5,7 +5,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,10 +25,9 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/blogs")
-@Slf4j
 @CrossOrigin
 class BlogController {
-
+  private static final Logger log = LoggerFactory.getLogger(BlogController.class);
   private final BlogService blogService;
 
   public BlogController(BlogService blogService) {

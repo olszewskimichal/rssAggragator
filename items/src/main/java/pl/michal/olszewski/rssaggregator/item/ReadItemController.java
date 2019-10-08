@@ -1,7 +1,8 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,10 +14,10 @@ import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
 import reactor.core.publisher.Mono;
 
 @RestController()
-@Slf4j
 @CrossOrigin
 class ReadItemController {
 
+  private static final Logger log = LoggerFactory.getLogger(ReadItemController.class);
   private final ReadItemService readItemService;
 
   ReadItemController(ReadItemService readItemService) {

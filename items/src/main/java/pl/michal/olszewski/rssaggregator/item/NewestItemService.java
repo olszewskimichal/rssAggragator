@@ -1,17 +1,18 @@
 package pl.michal.olszewski.rssaggregator.item;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.util.Page;
 import reactor.core.publisher.Mono;
 
 @Service
-@Slf4j
 class NewestItemService {
 
+  private static final Logger log = LoggerFactory.getLogger(NewestItemService.class);
   private final ItemFinder itemFinder;
 
-  NewestItemService(ItemFinder itemFinder) {
+  private NewestItemService(ItemFinder itemFinder) {
     this.itemFinder = itemFinder;
   }
 

@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
+import pl.michal.olszewski.rssaggregator.item.ItemDTOBuilder;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Mono;
@@ -59,14 +60,14 @@ class UpdateBlogWithItemsServiceTest {
   @Test
   void shouldUpdateBlogWhenNewItemAdd() {
     //given
-    Blog blog = Blog.builder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
+    Blog blog = new BlogBuilder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
     given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
 
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1)
-        .mapToObj(number -> ItemDTO.builder().date(Instant.now()).author("autor").description("desc").title(number + "").link("link" + number).build()) //TODO
+        .mapToObj(number -> new ItemDTOBuilder().date(Instant.now()).author("autor").description("desc").title(number + "").link("link" + number).build()) //TODO
         .collect(Collectors.toList());
 
-    UpdateBlogWithItemsDTO blogDTO = UpdateBlogWithItemsDTO.builder()
+    UpdateBlogWithItemsDTO blogDTO = new UpdateBlogWithItemsDTOBuilder()
         .name("url")
         .feedURL("url")
         .itemsList(itemsList)
@@ -87,19 +88,19 @@ class UpdateBlogWithItemsServiceTest {
   @Test
   void shouldAddItemToBlogOnlyOnce() {
     //given
-    ItemDTO itemDTO = ItemDTO.builder()
+    ItemDTO itemDTO = new ItemDTOBuilder()
         .title("title")
         .link("url")
         .date(Instant.now())
         .build();
 
-    Blog blog = Blog.builder()
+    Blog blog = new BlogBuilder()
         .id(UUID.randomUUID().toString())
         .feedURL("url")
         .name("url")
         .build();
 
-    UpdateBlogWithItemsDTO blogDTO = UpdateBlogWithItemsDTO.builder()
+    UpdateBlogWithItemsDTO blogDTO = new UpdateBlogWithItemsDTOBuilder()
         .name("url")
         .feedURL("url")
         .itemsList(Arrays.asList(itemDTO, itemDTO))

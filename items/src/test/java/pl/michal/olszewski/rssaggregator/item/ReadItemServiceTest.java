@@ -41,7 +41,7 @@ class ReadItemServiceTest {
   @Test
   void shouldMarkItemAsRead() {
     given(itemRepository.findItemById("itemId")).willReturn(Mono.just(new Item()));
-    var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(true).build();
+    var readItemDTO = new ReadItemDTO("itemId", true);
 
     Mono<Void> result = readItemService.processRequest(readItemDTO);
 
@@ -54,7 +54,7 @@ class ReadItemServiceTest {
   @Test
   void shouldMarkItemAsUnread() {
     given(itemRepository.findItemById("itemId")).willReturn(Mono.just(new Item()));
-    var readItemDTO = ReadItemDTO.builder().itemId("itemId").read(false).build();
+    var readItemDTO = new ReadItemDTO("itemId", false);
 
     Mono<Void> result = readItemService.processRequest(readItemDTO);
 
@@ -68,7 +68,7 @@ class ReadItemServiceTest {
   @Test
   void shouldThrowExceptionWhenItemByIdNotExists() {
     given(itemRepository.findItemById("itemId2")).willReturn(Mono.empty());
-    var readItemDTO = ReadItemDTO.builder().itemId("itemId2").read(false).build();
+    var readItemDTO = new ReadItemDTO("itemId2", false);
 
     Mono<Void> result = readItemService.processRequest(readItemDTO);
 

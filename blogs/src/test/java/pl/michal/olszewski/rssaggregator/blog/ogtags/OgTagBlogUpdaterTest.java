@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
+import pl.michal.olszewski.rssaggregator.blog.BlogBuilder;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -32,7 +33,7 @@ class OgTagBlogUpdaterTest {
   @Test
   void shouldUpdateBlogByOgTag() {
     //given
-    Blog blog = Blog.builder().blogURL("url").build();
+    Blog blog = new BlogBuilder().blogURL("url").build();
     //when
     updater.updateBlogByOgTagInfo(blog);
     //then
@@ -44,7 +45,7 @@ class OgTagBlogUpdaterTest {
   @Test
   void shouldOnlyUpdateImageUrlByOgTagWhenBlogHasInfoAboutDescriptionAndName() {
     //given
-    Blog blog = Blog.builder().description("desc").name("name").blogURL("url").build();
+    Blog blog = new BlogBuilder().description("desc").name("name").blogURL("url").build();
     //when
     updater.updateBlogByOgTagInfo(blog);
     //then

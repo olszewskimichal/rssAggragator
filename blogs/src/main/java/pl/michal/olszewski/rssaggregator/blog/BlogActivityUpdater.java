@@ -1,17 +1,18 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
-@Slf4j
 class BlogActivityUpdater {
 
+  private static final Logger log = LoggerFactory.getLogger(BlogActivityUpdater.class);
   private final BlogFinder blogReactiveRepository;
   private final BlogWorker blogUpdater;
 
-  BlogActivityUpdater(BlogFinder blogReactiveRepository, BlogWorker blogUpdater) {
+  private BlogActivityUpdater(BlogFinder blogReactiveRepository, BlogWorker blogUpdater) {
     this.blogReactiveRepository = blogReactiveRepository;
     this.blogUpdater = blogUpdater;
   }

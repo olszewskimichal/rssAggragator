@@ -5,7 +5,8 @@ import static pl.michal.olszewski.rssaggregator.item.LinkExtractor.getFinalURL;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import java.time.Instant;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -13,14 +14,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 class DuplicateItemsFixer {
 
+  private static final Logger log = LoggerFactory.getLogger(DuplicateItemsFixer.class);
   private final ItemFinder itemFinder;
   private final MongoTemplate mongoTemplate;
   private final Cache<BlogItemLink, ItemDTO> itemCache;
 
-  public DuplicateItemsFixer(
+  DuplicateItemsFixer(
       ItemFinder itemFinder,
       MongoTemplate mongoTemplate,
       @Qualifier("itemCache") Cache<BlogItemLink, ItemDTO> itemCache

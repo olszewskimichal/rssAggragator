@@ -19,4 +19,5 @@ enum OgTagType {
         .findAny()
         .orElse(null);
   }
+
 }

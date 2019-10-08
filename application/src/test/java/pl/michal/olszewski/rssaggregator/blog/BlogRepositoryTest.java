@@ -2,7 +2,6 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static pl.michal.olszewski.rssaggregator.blog.Blog.builder;
 
 import com.mongodb.MongoWriteException;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,7 +96,7 @@ class BlogRepositoryTest {
     givenBlog()
         .withURL("url");
     //then
-    assertThatThrownBy(() -> entityManager.save(builder().blogURL("url").build()))
+    assertThatThrownBy(() -> entityManager.save(new BlogBuilder().blogURL("url").build()))
         .hasCauseInstanceOf(MongoWriteException.class)
         .isInstanceOf(DuplicateKeyException.class)
         .hasMessageContaining("duplicate key error collection");
@@ -115,7 +114,7 @@ class BlogRepositoryTest {
     //then
     StepVerifier
         .create(byName)
-        .assertNext(v -> assertThat(v.getName()).isEqualTo("url"))
+        .assertNext(blog -> assertThat(blog.getName()).isEqualTo("url"))
         .expectComplete()
         .verify();
   }

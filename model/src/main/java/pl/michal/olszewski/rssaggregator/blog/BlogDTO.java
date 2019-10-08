@@ -3,11 +3,10 @@ package pl.michal.olszewski.rssaggregator.blog;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
-import java.util.Objects;
-import lombok.Builder;
-import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@Getter
 final class BlogDTO {
 
   private final String id;
@@ -18,7 +17,6 @@ final class BlogDTO {
   private final Instant publishedDate;
   private final String imageURL;
 
-  @Builder
   @JsonCreator
   BlogDTO(
       @JsonProperty("id") String id,
@@ -27,7 +25,8 @@ final class BlogDTO {
       @JsonProperty("name") String name,
       @JsonProperty("feedURL") String feedURL,
       @JsonProperty("publishedDate") Instant publishedDate,
-      @JsonProperty("imageURL") String imageURL) {
+      @JsonProperty("imageURL") String imageURL
+  ) {
     this.id = id;
     this.link = link;
     this.description = description;
@@ -37,39 +36,46 @@ final class BlogDTO {
     this.imageURL = imageURL;
   }
 
+  public String getId() {
+    return id;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getFeedURL() {
+    return feedURL;
+  }
+
+  public Instant getPublishedDate() {
+    return publishedDate;
+  }
+
+  public String getImageURL() {
+    return imageURL;
+  }
+
   @Override
   public int hashCode() {
-    return Objects.hash(id, link, description, name, feedURL, publishedDate, imageURL);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    BlogDTO blogDTO = (BlogDTO) o;
-    return Objects.equals(id, blogDTO.id) &&
-        Objects.equals(link, blogDTO.link) &&
-        Objects.equals(description, blogDTO.description) &&
-        Objects.equals(name, blogDTO.name) &&
-        Objects.equals(feedURL, blogDTO.feedURL) &&
-        Objects.equals(imageURL, blogDTO.imageURL) &&
-        Objects.equals(publishedDate, blogDTO.publishedDate);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 
   @Override
   public String toString() {
-    return "BlogDTO{" +
-        "id='" + id + '\'' +
-        ", link='" + link + '\'' +
-        ", description='" + description + '\'' +
-        ", name='" + name + '\'' +
-        ", feedURL='" + feedURL + '\'' +
-        ", publishedDate=" + publishedDate +
-        ", imageURL='" + imageURL + '\'' +
-        '}';
+    return ToStringBuilder.reflectionToString(this);
   }
 }

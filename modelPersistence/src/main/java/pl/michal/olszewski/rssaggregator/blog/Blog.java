@@ -5,24 +5,17 @@ import static org.springframework.util.StringUtils.isEmpty;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogInfo;
 
 @Document
-@Getter
-@NoArgsConstructor
-@Slf4j
 public class Blog {
 
   @Id
-  @Setter
   private String id;
   @Indexed(unique = true)
   private String blogURL;
@@ -34,7 +27,6 @@ public class Blog {
   private String imageUrl;
   private boolean active = true;
 
-  @Builder
   public Blog(
       String id,
       String blogURL,
@@ -62,6 +54,41 @@ public class Blog {
     this.feedURL = blogDTO.getFeedURL();
   }
 
+  public Blog() {
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public String getBlogURL() {
+    return blogURL;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getFeedURL() {
+    return feedURL;
+  }
+
+  public Instant getPublishedDate() {
+    return publishedDate;
+  }
+
+  public String getImageUrl() {
+    return imageUrl;
+  }
+
   public boolean isActive() {
     return active;
   }
@@ -74,28 +101,16 @@ public class Blog {
     return new RssInfo(feedURL, blogURL, id, lastUpdateDate);
   }
 
-  @Override
-  public final int hashCode() {
-    return Objects.hash(blogURL, description, name, feedURL, publishedDate, lastUpdateDate, active, imageUrl);
-  }
-
-  @Override
-  public final boolean equals(Object o) {
-    if (this == o) {
-      return true;
+  public void updateBlogByOgTagInfo(OgTagBlogInfo blogInfo) {
+    if (isEmpty(name) && blogInfo.getTitle() != null) {
+      name = blogInfo.getTitle();
     }
-    if (!(o instanceof Blog)) {
-      return false;
+    if (isEmpty(description) && blogInfo.getDescription() != null) {
+      description = blogInfo.getDescription();
     }
-    Blog blog = (Blog) o;
-    return active == blog.active &&
-        Objects.equals(blogURL, blog.blogURL) &&
-        Objects.equals(description, blog.description) &&
-        Objects.equals(name, blog.name) &&
-        Objects.equals(feedURL, blog.feedURL) &&
-        Objects.equals(publishedDate, blog.publishedDate) &&
-        Objects.equals(imageUrl, blog.imageUrl) &&
-        Objects.equals(lastUpdateDate, blog.lastUpdateDate);
+    if (blogInfo.getImageUrl() != null) {
+      imageUrl = blogInfo.getImageUrl();
+    }
   }
 
   void updateFromDto(UpdateBlogDTO blogDTO) {
@@ -109,15 +124,13 @@ public class Blog {
     active = true;
   }
 
-  public void updateBlogByOgTagInfo(OgTagBlogInfo blogInfo) {
-    if (isEmpty(name) && blogInfo.getTitle() != null) {
-      name = blogInfo.getTitle();
-    }
-    if (isEmpty(description) && blogInfo.getDescription() != null) {
-      description = blogInfo.getDescription();
-    }
-    if (blogInfo.getImageUrl() != null) {
-      imageUrl = blogInfo.getImageUrl();
-    }
+  @Override
+  public final int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this,"id");
+  }
+
+  @Override
+  public final boolean equals(Object o) {
+    return EqualsBuilder.reflectionEquals(this, o,"id");
   }
 }

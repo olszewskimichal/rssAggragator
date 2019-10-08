@@ -6,11 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import lombok.Builder;
-import lombok.Getter;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@Getter
-@Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class ItemDTO implements Serializable {
 
@@ -37,37 +36,42 @@ public final class ItemDTO implements Serializable {
     this.blogId = blogId;
   }
 
+  public String getTitle() {
+    return title;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getLink() {
+    return link;
+  }
+
+  public Instant getDate() {
+    return date;
+  }
+
+  public String getAuthor() {
+    return author;
+  }
+
+  public String getBlogId() {
+    return blogId;
+  }
+
   @Override
-  public int hashCode() {
-    return Objects.hash(title, description, link, date, author, blogId);
+  public final int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof ItemDTO)) {
-      return false;
-    }
-    ItemDTO itemDTO = (ItemDTO) o;
-    return Objects.equals(title, itemDTO.title) &&
-        Objects.equals(description, itemDTO.description) &&
-        Objects.equals(link, itemDTO.link) &&
-        Objects.equals(date, itemDTO.date) &&
-        Objects.equals(author, itemDTO.author) &&
-        Objects.equals(blogId, itemDTO.blogId);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 
   @Override
   public String toString() {
-    return "ItemDTO{" +
-        "title='" + title + '\'' +
-        ", description='" + description + '\'' +
-        ", link='" + link + '\'' +
-        ", date=" + date +
-        ", author='" + author + '\'' +
-        ", blogId='" + blogId + '\'' +
-        '}';
+    return ToStringBuilder.reflectionToString(this);
   }
 }

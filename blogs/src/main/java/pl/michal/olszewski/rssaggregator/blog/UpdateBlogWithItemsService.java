@@ -1,8 +1,8 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import java.time.Instant;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.item.BlogItemLink;
@@ -12,8 +12,9 @@ import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Mono;
 
 @Service
-@Slf4j
 public class UpdateBlogWithItemsService {
+
+  private static final Logger log = LoggerFactory.getLogger(UpdateBlogWithItemsService.class);
 
   private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
@@ -21,7 +22,7 @@ public class UpdateBlogWithItemsService {
   private final NewItemInBlogEventProducer producer;
   private final NewItemForSearchEventProducer itemForSearchEventProducer;
 
-  public UpdateBlogWithItemsService(
+  UpdateBlogWithItemsService(
       BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
       @Qualifier("itemCache") Cache<BlogItemLink, ItemDTO> itemCache,
@@ -47,8 +48,8 @@ public class UpdateBlogWithItemsService {
     if (itemCache.getIfPresent(itemLink) == null) {
       log.debug("addItemToBlog {} to blog {}", item.getLink(), blog.getBlogURL());
       itemCache.put(itemLink, item);
-      producer.writeEventToQueue(new NewItemInBlogEvent(Instant.now(), item, blog.getId()));
-      itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(Instant.now(), item.getLink(), item.getTitle(), item.getDescription()));
+      producer.writeEventToQueue(new NewItemInBlogEvent(item));
+      itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(item.getLink(), item.getTitle(), item.getDescription()));
     }
   }
 

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
-import pl.michal.olszewski.rssaggregator.blog.Blog;
+import pl.michal.olszewski.rssaggregator.blog.BlogBuilder;
 import pl.michal.olszewski.rssaggregator.blog.BlogSyncRepository;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
@@ -30,7 +30,7 @@ class BlogItemsControllerTest extends IntegrationTestBase {
   void should_get_all_items_for_blog() {
     //given
     String id = randomUUID().toString();
-    blogRepository.save(Blog.builder().id(id).build());
+    blogRepository.save(new BlogBuilder().id(id).build());
     givenItems()
         .buildNumberOfItemsAndSave(2, id);
     //when
@@ -45,7 +45,7 @@ class BlogItemsControllerTest extends IntegrationTestBase {
   void should_get_2page_of_all_items_for_blog() {
     //given
     String id = randomUUID().toString();
-    blogRepository.save(Blog.builder().id(id).build());
+    blogRepository.save(new BlogBuilder().id(id).build());
     givenItems()
         .buildNumberOfItemsAndSave(5, id);
     //when

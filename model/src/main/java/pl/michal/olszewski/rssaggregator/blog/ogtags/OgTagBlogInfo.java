@@ -1,6 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog.ogtags;
 
-import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class OgTagBlogInfo {
 
@@ -28,21 +29,11 @@ public class OgTagBlogInfo {
 
   @Override
   public final int hashCode() {
-    return Objects.hash(title, description, imageUrl);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public final boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof OgTagBlogInfo)) {
-      return false;
-    }
-    OgTagBlogInfo that = (OgTagBlogInfo) o;
-    return Objects.equals(title, that.title) &&
-        Objects.equals(description, that.description) &&
-        Objects.equals(imageUrl, that.imageUrl);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
-
 }

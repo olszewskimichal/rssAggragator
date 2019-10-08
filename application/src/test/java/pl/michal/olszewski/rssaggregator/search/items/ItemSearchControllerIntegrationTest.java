@@ -1,7 +1,5 @@
 package pl.michal.olszewski.rssaggregator.search.items;
 
-import static pl.michal.olszewski.rssaggregator.search.items.ItemForSearch.builder;
-
 import java.io.IOException;
 import java.util.stream.Stream;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -32,9 +30,9 @@ class ItemSearchControllerIntegrationTest extends ElasticIntegrationTestBase {
   @Test
   void shouldReturnSearchResultByMatchingTextWithoutLimit() {
     Stream.of(
-        builder().link("link1").title("AAA").build(),
-        builder().link("link2").title("BBB").build(),
-        builder().link("link3").title("CCC").build()
+        new ItemForSearchBuilder().link("link1").title("AAA").build(),
+        new ItemForSearchBuilder().link("link2").title("BBB").build(),
+        new ItemForSearchBuilder().link("link3").title("CCC").build()
     ).map(itemForSearch -> elasticsearchOperations.save(itemForSearch))
         .forEach(Mono::block);
 
@@ -46,9 +44,9 @@ class ItemSearchControllerIntegrationTest extends ElasticIntegrationTestBase {
   @Test
   void shouldReturnSearchResultByMatchingTextWithLimit() {
     Stream.of(
-        builder().link("link1").title("BBB").build(),
-        builder().link("link2").title("BBB").build(),
-        builder().link("link3").title("CCC").build()
+        new ItemForSearchBuilder().link("link1").title("BBB").build(),
+        new ItemForSearchBuilder().link("link2").title("BBB").build(),
+        new ItemForSearchBuilder().link("link3").title("CCC").build()
     ).map(itemForSearch -> elasticsearchOperations.save(itemForSearch))
         .forEach(Mono::block);
 

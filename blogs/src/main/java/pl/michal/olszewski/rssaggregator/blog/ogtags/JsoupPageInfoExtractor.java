@@ -1,16 +1,18 @@
 package pl.michal.olszewski.rssaggregator.blog.ogtags;
 
 import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 @Profile("!integration")
-@Slf4j
 class JsoupPageInfoExtractor implements PageInfoExtractor {
+
+  private static final Logger log = LoggerFactory.getLogger(JsoupPageInfoExtractor.class);
 
   public Document getPageInfoFromUrl(String url) {
     try {

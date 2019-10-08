@@ -1,9 +1,7 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.time.Instant;
-import lombok.Getter;
 
-@Getter
 public class RssInfo {
 
   private final String feedURL;
@@ -16,5 +14,21 @@ public class RssInfo {
     this.blogURL = blogURL;
     this.blogId = blogId;
     this.lastUpdateDate = lastUpdateDate == null ? Instant.MIN : lastUpdateDate;
+  }
+
+  public String getFeedURL() {
+    return feedURL;
+  }
+
+  public String getBlogURL() {
+    return blogURL;
+  }
+
+  public String getBlogId() {
+    return blogId;
+  }
+
+  public Instant getLastUpdateDate() {
+    return lastUpdateDate;
   }
 }
