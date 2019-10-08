@@ -2,6 +2,9 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 class BlogToDtoMapper {
 
+  private BlogToDtoMapper() {
+  }
+
   static BlogDTO mapToBlogDto(Blog blog) {
     return new BlogDTO(
         blog.getId(),

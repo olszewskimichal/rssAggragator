@@ -93,7 +93,7 @@ class BlogService {
   void evictAndRecreateBlogCache() {
     log.debug("Czyszcze cache dla blogów");
     blogCache.invalidateAll();
-    List<Blog> block = blogFinder.findAll()
+    blogFinder.findAll()
         .doOnNext(this::putToCache)
         .collectList()
         .block();

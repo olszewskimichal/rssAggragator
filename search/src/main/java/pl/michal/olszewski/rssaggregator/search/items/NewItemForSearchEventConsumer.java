@@ -8,10 +8,11 @@ import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 
 @Component
 class NewItemForSearchEventConsumer {
+
   private static final Logger log = LoggerFactory.getLogger(NewItemForSearchEventConsumer.class);
   private final ItemSearchService itemSearchService;
 
-  private NewItemForSearchEventConsumer(ItemSearchService itemSearchService) {
+  NewItemForSearchEventConsumer(ItemSearchService itemSearchService) {
     this.itemSearchService = itemSearchService;
   }
 

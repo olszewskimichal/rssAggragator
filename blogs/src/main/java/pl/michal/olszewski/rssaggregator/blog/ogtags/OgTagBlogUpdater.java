@@ -9,8 +9,6 @@ import static pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagType.fromName;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;

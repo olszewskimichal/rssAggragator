@@ -10,7 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LinkExtractor {
+
   private static final Logger log = LoggerFactory.getLogger(LinkExtractor.class);
+
+  private LinkExtractor() {
+  }
 
   public static String getFinalURL(String linkUrl) {
     try {
@@ -39,7 +43,7 @@ public class LinkExtractor {
     }
   }
 
-  static private String getUrlWithoutParameters(String url) throws URISyntaxException {
+  private static String getUrlWithoutParameters(String url) throws URISyntaxException {
     var uri = new URI(url);
     return new URI(uri.getScheme(),
         uri.getAuthority(),

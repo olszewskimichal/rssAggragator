@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import pl.michal.olszewski.rssaggregator.blog.BlogBuilder;
 import pl.michal.olszewski.rssaggregator.blog.BlogSyncRepository;
@@ -72,8 +71,8 @@ class BlogItemsControllerTest extends IntegrationTestBase {
     return new ItemListFactory(mongoTemplate);
   }
 
-  private BodyContentSpec thenGet404FromApi(String id) {
-    return webTestClient.get().uri("http://localhost:{port}/api/v1/blogs/{id}/items", port, id)
+  private void thenGet404FromApi(String id) {
+    webTestClient.get().uri("http://localhost:{port}/api/v1/blogs/{id}/items", port, id)
         .exchange()
         .expectStatus().isNotFound()
         .expectBody();
