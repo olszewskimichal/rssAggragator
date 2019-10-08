@@ -9,9 +9,7 @@ public class BlogBuilder {
   private String description;
   private String name;
   private String feedURL;
-  private Instant publishedDate;
   private Instant lastUpdateDate;
-  private String imageURL;
 
   public BlogBuilder id(String id) {
     this.id = id;
@@ -44,6 +42,6 @@ public class BlogBuilder {
   }
 
   public Blog build() {
-    return new Blog(id, blogURL, description, name, feedURL, publishedDate, lastUpdateDate, imageURL);
+    return new Blog(id, blogURL, description, name, feedURL, null, lastUpdateDate, null);
   }
 }

@@ -338,8 +338,6 @@ ij_markdown_toc_generate_structure = 0
 ij_markdown_toc_generate_text_only = false
 ij_markdown_toc_heading_levels = 12
 ij_markdown_toc_title = Table
-of
-Contents
 ij_markdown_toc_title_level = 1
 ij_markdown_toc_update_on_doc_format = 1
 ij_markdown_unescape_special_chars_on_wrap = true

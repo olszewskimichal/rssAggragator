@@ -26,7 +26,7 @@ class UpdateBlogService {
   private final RssExtractorService rssExtractorService;
   private final UpdateBlogWithItemsService blogService;
 
-  private UpdateBlogService(
+  UpdateBlogService(
       BlogFinder blogFinder,
       Executor executor,
       MeterRegistry registry,

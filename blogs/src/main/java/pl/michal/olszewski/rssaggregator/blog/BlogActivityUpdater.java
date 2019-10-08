@@ -12,7 +12,7 @@ class BlogActivityUpdater {
   private final BlogFinder blogReactiveRepository;
   private final BlogWorker blogUpdater;
 
-  private BlogActivityUpdater(BlogFinder blogReactiveRepository, BlogWorker blogUpdater) {
+  BlogActivityUpdater(BlogFinder blogReactiveRepository, BlogWorker blogUpdater) {
     this.blogReactiveRepository = blogReactiveRepository;
     this.blogUpdater = blogUpdater;
   }

@@ -19,13 +19,14 @@ import reactor.core.publisher.Mono;
 
 @Service
 class ItemFinder {
+
   private static final Logger log = LoggerFactory.getLogger(ItemFinder.class);
 
   private final ItemRepository itemRepository;
   private final ItemRepositorySync itemRepositorySync;
   private final MongoTemplate mongoTemplate;
 
-  private ItemFinder(ItemRepository itemRepository, ItemRepositorySync itemRepositorySync, MongoTemplate mongoTemplate) {
+  ItemFinder(ItemRepository itemRepository, ItemRepositorySync itemRepositorySync, MongoTemplate mongoTemplate) {
     this.itemRepository = itemRepository;
     this.itemRepositorySync = itemRepositorySync;
     this.mongoTemplate = mongoTemplate;

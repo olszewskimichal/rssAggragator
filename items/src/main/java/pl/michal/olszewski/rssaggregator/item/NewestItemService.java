@@ -12,7 +12,7 @@ class NewestItemService {
   private static final Logger log = LoggerFactory.getLogger(NewestItemService.class);
   private final ItemFinder itemFinder;
 
-  private NewestItemService(ItemFinder itemFinder) {
+  NewestItemService(ItemFinder itemFinder) {
     this.itemFinder = itemFinder;
   }
 
