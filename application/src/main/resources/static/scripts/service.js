@@ -8,7 +8,7 @@ App.factory('Service', ['$http', '$q', function ($http, $q) {
       return $http.get('/api/v1/items?limit=50')
       .then(
           function (response) {
-            return response.data;
+            return response.data.content;
           },
           function (errResponse) {
             console.error('Error while fetching users');
