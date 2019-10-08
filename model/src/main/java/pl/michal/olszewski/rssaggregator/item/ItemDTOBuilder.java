@@ -10,6 +10,18 @@ public class ItemDTOBuilder {
   private Instant date;
   private String author;
   private String blogId;
+  private String imageURL;
+
+
+  public ItemDTOBuilder from(ItemDTO itemDTO) {
+    return new ItemDTOBuilder()
+        .title(itemDTO.getTitle())
+        .description(itemDTO.getDescription())
+        .link(itemDTO.getLink())
+        .date(itemDTO.getDate())
+        .author(itemDTO.getAuthor())
+        .blogId(itemDTO.getBlogId());
+  }
 
   public ItemDTOBuilder title(String title) {
     this.title = title;
@@ -41,7 +53,12 @@ public class ItemDTOBuilder {
     return this;
   }
 
+  public ItemDTOBuilder imageURL(String imageURL) {
+    this.imageURL = imageURL;
+    return this;
+  }
+
   public ItemDTO build() {
-    return new ItemDTO(title, description, link, date, author, blogId);
+    return new ItemDTO(title, description, link, date, author, blogId, imageURL);
   }
 }

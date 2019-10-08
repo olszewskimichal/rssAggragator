@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.ogtags;
+package pl.michal.olszewski.rssaggregator.ogtags;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,18 +11,18 @@ class OgTagPropertiesScheduler {
 
   private static final Logger log = LoggerFactory.getLogger(OgTagPropertiesScheduler.class);
   private final BlogSyncRepository blogSyncRepository;
-  private final OgTagBlogUpdater ogTagBlogUpdater;
+  private final OgTagInfoUpdater ogTagInfoUpdater;
 
-  OgTagPropertiesScheduler(BlogSyncRepository blogSyncRepository, OgTagBlogUpdater ogTagBlogUpdater) {
+  OgTagPropertiesScheduler(BlogSyncRepository blogSyncRepository, OgTagInfoUpdater ogTagInfoUpdater) {
     this.blogSyncRepository = blogSyncRepository;
-    this.ogTagBlogUpdater = ogTagBlogUpdater;
+    this.ogTagInfoUpdater = ogTagInfoUpdater;
   }
 
   @Scheduled(cron = "0 0 7 * * ?")
   void updateBlogPropertiesFromOgTagsInfo() {
     log.info("updateBlogPropertiesFromOgTagsInfo STARTED");
     blogSyncRepository.findAll()
-        .forEach(ogTagBlogUpdater::updateBlogByOgTagInfo);
+        .forEach(ogTagInfoUpdater::updateItemByOgTagInfo);
     log.info("updateBlogPropertiesFromOgTagsInfo FINISHED");
   }
 }

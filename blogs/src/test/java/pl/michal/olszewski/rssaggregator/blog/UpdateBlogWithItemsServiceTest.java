@@ -24,6 +24,7 @@ import org.springframework.jms.core.JmsTemplate;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.ItemDTOBuilder;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
+import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -40,6 +41,9 @@ class UpdateBlogWithItemsServiceTest {
   @Mock
   private BlogReactiveRepository blogRepository;
 
+  @Mock
+  private OgTagInfoUpdater ogTagBlogUpdater;
+
   @BeforeEach
   void setUp() {
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
@@ -48,13 +52,14 @@ class UpdateBlogWithItemsServiceTest {
           return Mono.just(argument);
         }
     );
+    given(ogTagBlogUpdater.updateItemByOgTagInfo(any(ItemDTO.class))).willAnswer(i -> i.getArgument(0));
     blogService = new UpdateBlogWithItemsService(
         new BlogWorker(blogRepository),
         Caffeine.newBuilder().build(),
         Caffeine.newBuilder().build(),
         new NewItemInBlogEventProducer(jmsTemplate),
-        new NewItemForSearchEventProducer(jmsTemplate)
-    );
+        new NewItemForSearchEventProducer(jmsTemplate),
+        ogTagBlogUpdater);
   }
 
   @Test

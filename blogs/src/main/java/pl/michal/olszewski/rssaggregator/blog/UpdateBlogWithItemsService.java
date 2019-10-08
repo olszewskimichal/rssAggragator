@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.item.BlogItemLink;
 import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
+import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 import reactor.core.publisher.Mono;
 
@@ -21,18 +22,20 @@ public class UpdateBlogWithItemsService {
   private final Cache<BlogItemLink, ItemDTO> itemCache;
   private final NewItemInBlogEventProducer producer;
   private final NewItemForSearchEventProducer itemForSearchEventProducer;
+  private final OgTagInfoUpdater ogTagInfoUpdater;
 
   UpdateBlogWithItemsService(
       BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
       @Qualifier("itemCache") Cache<BlogItemLink, ItemDTO> itemCache,
       NewItemInBlogEventProducer producer,
-      NewItemForSearchEventProducer itemForSearchEventProducer) {
+      NewItemForSearchEventProducer itemForSearchEventProducer, OgTagInfoUpdater ogTagInfoUpdater) {
     this.blogUpdater = blogUpdater;
     this.blogCache = blogCache;
     this.itemCache = itemCache;
     this.producer = producer;
     this.itemForSearchEventProducer = itemForSearchEventProducer;
+    this.ogTagInfoUpdater = ogTagInfoUpdater;
   }
 
   public Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogWithItemsDTO blogInfoFromRSS) {
@@ -47,6 +50,7 @@ public class UpdateBlogWithItemsService {
     BlogItemLink itemLink = new BlogItemLink(blog.getId(), item.getLink());
     if (itemCache.getIfPresent(itemLink) == null) {
       log.debug("addItemToBlog {} to blog {}", item.getLink(), blog.getBlogURL());
+      item = ogTagInfoUpdater.updateItemByOgTagInfo(item);
       itemCache.put(itemLink, item);
       producer.writeEventToQueue(new NewItemInBlogEvent(item));
       itemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEvent(item.getLink(), item.getTitle(), item.getDescription()));

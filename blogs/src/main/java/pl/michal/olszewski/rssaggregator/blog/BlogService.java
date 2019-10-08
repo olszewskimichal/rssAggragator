@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogUpdater;
+import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
 import pl.michal.olszewski.rssaggregator.util.Page;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,20 +22,20 @@ class BlogService {
   private final BlogWorker blogUpdater;
   private final Cache<String, BlogDTO> blogCache;
   private final BlogValidation blogValidation;
-  private final OgTagBlogUpdater ogTagBlogUpdater;
+  private final OgTagInfoUpdater ogTagInfoUpdater;
 
   BlogService(
       BlogFinder blogFinder,
       BlogWorker blogUpdater,
       @Qualifier("blogCache") Cache<String, BlogDTO> blogCache,
       BlogValidation blogValidation,
-      OgTagBlogUpdater ogTagBlogUpdater
+      OgTagInfoUpdater ogTagInfoUpdater
   ) {
     this.blogFinder = blogFinder;
     this.blogUpdater = blogUpdater;
     this.blogCache = blogCache;
     this.blogValidation = blogValidation;
-    this.ogTagBlogUpdater = ogTagBlogUpdater;
+    this.ogTagInfoUpdater = ogTagInfoUpdater;
   }
 
   public Mono<PageBlogDTO> getAllBlogDTOs(Integer limit, Integer page) {
@@ -134,14 +134,14 @@ class BlogService {
     blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     return blogUpdater.createNewBlog(blogDTO)
-        .map(ogTagBlogUpdater::updateBlogByOgTagInfo)
+        .map(ogTagInfoUpdater::updateItemByOgTagInfo)
         .doOnNext(this::putToCache);
   }
 
   private Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogDTO blogInfoFromRSS) {
     log.debug("aktualizuje bloga {}", blogFromDb.getName());
     return blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS)
-        .map(ogTagBlogUpdater::updateBlogByOgTagInfo)
+        .map(ogTagInfoUpdater::updateItemByOgTagInfo)
         .doOnNext(this::putToCache);
   }
 }
