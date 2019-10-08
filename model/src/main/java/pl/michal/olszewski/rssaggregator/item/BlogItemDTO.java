@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 final class BlogItemDTO {
@@ -62,12 +63,6 @@ final class BlogItemDTO {
 
   @Override
   public String toString() {
-    return "BlogItemDTO{" +
-        "id='" + id + '\'' +
-        ", title='" + title + '\'' +
-        ", link='" + link + '\'' +
-        ", date=" + date +
-        ", author='" + author + '\'' +
-        '}';
+    return ToStringBuilder.reflectionToString(this);
   }
 }

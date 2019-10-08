@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public final class ItemDTO implements Serializable {
@@ -71,13 +72,6 @@ public final class ItemDTO implements Serializable {
 
   @Override
   public String toString() {
-    return "ItemDTO{" +
-        "title='" + title + '\'' +
-        ", description='" + description + '\'' +
-        ", link='" + link + '\'' +
-        ", date=" + date +
-        ", author='" + author + '\'' +
-        ", blogId='" + blogId + '\'' +
-        '}';
+    return ToStringBuilder.reflectionToString(this);
   }
 }

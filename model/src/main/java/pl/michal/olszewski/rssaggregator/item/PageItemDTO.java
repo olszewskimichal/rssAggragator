@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -45,9 +46,6 @@ public final class PageItemDTO implements Serializable {
 
   @Override
   public String toString() {
-    return "PageItemDTO{" +
-        "content=" + content +
-        ", totalElements=" + totalElements +
-        '}';
+    return ToStringBuilder.reflectionToString(this);
   }
 }
