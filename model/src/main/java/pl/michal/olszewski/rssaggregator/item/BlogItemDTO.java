@@ -15,19 +15,22 @@ final class BlogItemDTO {
   private final String link;
   private final Instant date;
   private final String author;
+  private final String imageURL;
 
   public BlogItemDTO(
       @JsonProperty("id") String id,
       @JsonProperty("title") String title,
       @JsonProperty("link") String link,
       @JsonProperty("date") Instant date,
-      @JsonProperty("author") String author
+      @JsonProperty("author") String author,
+      @JsonProperty("imageURL") String imageURL
   ) {
     this.id = id;
     this.title = title;
     this.link = link;
     this.date = date;
     this.author = author;
+    this.imageURL = imageURL;
   }
 
   public String getId() {
@@ -48,6 +51,10 @@ final class BlogItemDTO {
 
   public String getAuthor() {
     return author;
+  }
+
+  public String getImageURL() {
+    return imageURL;
   }
 
   @Override

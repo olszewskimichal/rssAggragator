@@ -15,7 +15,8 @@ class ItemToDtoMapper {
         item.getTitle(),
         item.getLink(),
         item.getDate(),
-        item.getAuthor()
+        item.getAuthor(),
+        item.getImageURL()
     );
   }
 
