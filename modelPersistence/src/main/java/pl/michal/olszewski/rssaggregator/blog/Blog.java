@@ -9,7 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import pl.michal.olszewski.rssaggregator.blog.ogtags.OgTagBlogInfo;
+import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfo;
 
 @Document
 public class Blog {
@@ -100,7 +100,7 @@ public class Blog {
     return new RssInfo(feedURL, blogURL, id, lastUpdateDate);
   }
 
-  public void updateBlogByOgTagInfo(OgTagBlogInfo blogInfo) {
+  public void updateBlogByOgTagInfo(OgTagInfo blogInfo) {
     if (isEmpty(name) && blogInfo.getTitle() != null) {
       name = blogInfo.getTitle();
     }

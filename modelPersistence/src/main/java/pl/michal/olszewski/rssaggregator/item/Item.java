@@ -25,6 +25,7 @@ final class Item {
   @CreatedDate
   private Instant createdAt;
   private String blogId;
+  private String imageURL;
 
   public Item(ItemDTO itemDTO) {
     this.title = itemDTO.getTitle();
@@ -34,6 +35,7 @@ final class Item {
     this.author = itemDTO.getAuthor();
     this.read = false;
     this.blogId = itemDTO.getBlogId();
+    this.imageURL = itemDTO.getImageURL();
   }
 
   public Item() {
@@ -67,10 +69,6 @@ final class Item {
     return blogId;
   }
 
-  @Override
-  public String toString() {
-    return ToStringBuilder.reflectionToString(this);
-  }
 
   Instant getDate() {
     return date;
@@ -80,8 +78,22 @@ final class Item {
     return author;
   }
 
+  public String getImageURL() {
+    return imageURL;
+  }
+
   Item markAsRead() {
     this.read = true;
+    return this;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.reflectionToString(this);
+  }
+
+  Item markAsUnread() {
+    this.read = false;
     return this;
   }
 
@@ -93,11 +105,6 @@ final class Item {
   @Override
   public boolean equals(Object o) {
     return EqualsBuilder.reflectionEquals(this, o, "id", "createdAt", "read");
-  }
-
-  Item markAsUnread() {
-    this.read = false;
-    return this;
   }
 
   void updateLink(String newLink) {

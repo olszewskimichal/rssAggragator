@@ -1,15 +1,15 @@
-package pl.michal.olszewski.rssaggregator.blog.ogtags;
+package pl.michal.olszewski.rssaggregator.ogtags;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-public class OgTagBlogInfo {
+public class OgTagInfo {
 
   private final String title;
   private final String description;
   private final String imageUrl;
 
-  public OgTagBlogInfo(String title, String description, String imageUrl) {
+  public OgTagInfo(String title, String description, String imageUrl) {
     this.title = title;
     this.description = description;
     this.imageUrl = imageUrl;

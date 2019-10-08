@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.ogtags;
+package pl.michal.olszewski.rssaggregator.ogtags;
 
 import java.io.IOException;
 import org.jsoup.Jsoup;

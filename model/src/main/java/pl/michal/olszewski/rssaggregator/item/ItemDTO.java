@@ -18,6 +18,7 @@ public final class ItemDTO implements Serializable {
   private final Instant date;
   private final String author;
   private final String blogId;
+  private final String imageURL;
 
   @JsonCreator
   public ItemDTO(
@@ -26,13 +27,15 @@ public final class ItemDTO implements Serializable {
       @JsonProperty("link") String link,
       @JsonProperty("date") Instant date,
       @JsonProperty("author") String author,
-      @JsonProperty("blogId") String blogId) {
+      @JsonProperty("blogId") String blogId,
+      @JsonProperty("imageURL") String imageURL) {
     this.title = title;
     this.description = description;
     this.link = link;
     this.date = date;
     this.author = author;
     this.blogId = blogId;
+    this.imageURL = imageURL;
   }
 
   public String getTitle() {
@@ -57,6 +60,10 @@ public final class ItemDTO implements Serializable {
 
   public String getBlogId() {
     return blogId;
+  }
+
+  public String getImageURL() {
+    return imageURL;
   }
 
   @Override

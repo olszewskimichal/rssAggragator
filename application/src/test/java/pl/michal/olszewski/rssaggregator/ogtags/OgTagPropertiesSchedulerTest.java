@@ -1,4 +1,4 @@
-package pl.michal.olszewski.rssaggregator.blog.ogtags;
+package pl.michal.olszewski.rssaggregator.ogtags;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
