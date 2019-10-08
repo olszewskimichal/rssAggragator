@@ -2,6 +2,8 @@ package pl.michal.olszewski.rssaggregator.item;
 
 import java.time.Instant;
 import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -86,25 +88,12 @@ final class Item {
 
   @Override
   public final int hashCode() {
-    return Objects.hash(title, description, link, date, author, blogId);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
-  public final boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof Item)) {
-      return false;
-    }
-    Item item = (Item) o;
-    return
-        Objects.equals(title, item.title) &&
-            Objects.equals(description, item.description) &&
-            Objects.equals(link, item.link) &&
-            Objects.equals(date, item.date) &&
-            Objects.equals(blogId, item.blogId) &&
-            Objects.equals(author, item.author);
+  public boolean equals(Object o) {
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 
   Item markAsUnread() {

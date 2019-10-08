@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -32,21 +34,13 @@ public final class PageItemDTO implements Serializable {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(content, totalElements);
+  public final int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof PageItemDTO)) {
-      return false;
-    }
-    PageItemDTO that = (PageItemDTO) o;
-    return totalElements == that.totalElements &&
-        Objects.equals(content, that.content);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 
   @Override

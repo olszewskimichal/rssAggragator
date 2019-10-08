@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.Instant;
 import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 final class BlogItemDTO {
@@ -49,24 +51,13 @@ final class BlogItemDTO {
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hash(id, title, link, date, author);
+  public final int hashCode() {
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof BlogItemDTO)) {
-      return false;
-    }
-    BlogItemDTO that = (BlogItemDTO) o;
-    return Objects.equals(id, that.id) &&
-        Objects.equals(title, that.title) &&
-        Objects.equals(link, that.link) &&
-        Objects.equals(date, that.date) &&
-        Objects.equals(author, that.author);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 
   @Override

@@ -5,6 +5,8 @@ import static org.springframework.util.StringUtils.isEmpty;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -124,25 +126,11 @@ public class Blog {
 
   @Override
   public final int hashCode() {
-    return Objects.hash(blogURL, description, name, feedURL, publishedDate, lastUpdateDate, active, imageUrl);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
   public final boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof Blog)) {
-      return false;
-    }
-    Blog blog = (Blog) o;
-    return active == blog.active &&
-        Objects.equals(blogURL, blog.blogURL) &&
-        Objects.equals(description, blog.description) &&
-        Objects.equals(name, blog.name) &&
-        Objects.equals(feedURL, blog.feedURL) &&
-        Objects.equals(publishedDate, blog.publishedDate) &&
-        Objects.equals(imageUrl, blog.imageUrl) &&
-        Objects.equals(lastUpdateDate, blog.lastUpdateDate);
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 final class PageBlogItemDTO {
 
@@ -28,20 +30,12 @@ final class PageBlogItemDTO {
 
   @Override
   public final int hashCode() {
-    return Objects.hash(content, totalElements);
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
-  public final boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof PageBlogItemDTO)) {
-      return false;
-    }
-    PageBlogItemDTO that = (PageBlogItemDTO) o;
-    return totalElements == that.totalElements &&
-        Objects.equals(content, that.content);
+  public boolean equals(Object o) {
+    return EqualsBuilder.reflectionEquals(this, o);
   }
 
   @Override
