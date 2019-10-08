@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import java.time.Instant;
-import java.util.Objects;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -88,12 +87,12 @@ final class Item {
 
   @Override
   public final int hashCode() {
-    return HashCodeBuilder.reflectionHashCode(this);
+    return HashCodeBuilder.reflectionHashCode(this, "id", "createdAt", "read");
   }
 
   @Override
   public boolean equals(Object o) {
-    return EqualsBuilder.reflectionEquals(this, o);
+    return EqualsBuilder.reflectionEquals(this, o, "id", "createdAt", "read");
   }
 
   Item markAsUnread() {
