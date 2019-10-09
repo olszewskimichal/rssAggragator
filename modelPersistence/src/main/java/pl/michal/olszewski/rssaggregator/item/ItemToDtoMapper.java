@@ -6,7 +6,15 @@ class ItemToDtoMapper {
   }
 
   static ItemDTO mapItemToItemDTO(Item item) {
-    return new ItemDTOBuilder().title(item.getTitle()).description(item.getDescription()).link(item.getLink()).date(item.getDate()).author(item.getAuthor()).blogId(item.getBlogId()).build();
+    return new ItemDTOBuilder()
+        .title(item.getTitle())
+        .description(item.getDescription())
+        .link(item.getLink())
+        .date(item.getDate())
+        .author(item.getAuthor())
+        .blogId(item.getBlogId())
+        .imageURL(item.getImageURL())
+        .build();
   }
 
   static BlogItemDTO mapToBlogItemDTO(Item item) {
