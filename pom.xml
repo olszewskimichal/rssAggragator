@@ -146,6 +146,7 @@
     <module>search</module>
     <module>cache</module>
     <module>modelPersistence</module>
+    <!--<module>migrator</module>-->
   </modules>
   <name>rss-aggregator</name>
 

@@ -87,14 +87,19 @@ final class Item {
     return this;
   }
 
+
+  Item markAsUnread() {
+    this.read = false;
+    return this;
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder.reflectionToString(this);
   }
 
-  Item markAsUnread() {
-    this.read = false;
-    return this;
+  void updateLink(String newLink) {
+    this.link = newLink;
   }
 
   @Override
@@ -107,7 +112,8 @@ final class Item {
     return EqualsBuilder.reflectionEquals(this, o, "id", "createdAt", "read");
   }
 
-  void updateLink(String newLink) {
-    this.link = newLink;
+  void updateImageUrl(String imageURL) {
+    this.imageURL = imageURL;
   }
+
 }
