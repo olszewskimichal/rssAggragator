@@ -1,38 +1,31 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 public class BlogFinder {
 
-  private final BlogReactiveRepository blogReactiveRepository;
-  private final BlogSyncRepository blogSyncRepository;
+  private final BlogRepository blogRepository;
 
-  BlogFinder(BlogReactiveRepository blogReactiveRepository, BlogSyncRepository blogSyncRepository) {
-    this.blogReactiveRepository = blogReactiveRepository;
-    this.blogSyncRepository = blogSyncRepository;
+  BlogFinder(BlogRepository blogRepository) {
+    this.blogRepository = blogRepository;
   }
 
-  public Flux<Blog> findAll() {
-    return blogReactiveRepository.findAll();
+  public List<Blog> findAll() {
+    return blogRepository.findAll();
   }
 
-  public Mono<BlogAggregationDTO> getBlogWithCount(String id) {
-    return blogReactiveRepository.getBlogWithCount(id);
+  public Optional<BlogAggregationDTO> getBlogWithCount(String id) {
+    return blogRepository.getBlogWithCount(id);
   }
 
-  List<Blog> findAllSync() {
-    return blogSyncRepository.findAll();
+  Optional<Blog> findByFeedURL(String url) {
+    return blogRepository.findByFeedURL(url);
   }
 
-  Mono<Blog> findByFeedURL(String url) {
-    return blogReactiveRepository.findByFeedURL(url);
-  }
-
-  Mono<Blog> findById(String id) {
-    return blogReactiveRepository.findById(id);
+  Optional<Blog> findById(String id) {
+    return blogRepository.findById(id);
   }
 }

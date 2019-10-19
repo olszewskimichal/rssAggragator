@@ -20,14 +20,14 @@ class BlogActivityUpdater {
   Mono<Blog> activateBlog(String id) {
     log.debug("Activate blog by id {}", id);
     return blogReactiveRepository.findById(id)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .flatMap(blogUpdater::activateBlog);
+        .map(blogUpdater::activateBlog)
+        .orElseGet(() -> Mono.error(new BlogNotFoundException(id)));
   }
 
   Mono<Blog> deactivateBlog(String id) {
     log.debug("Deactivate blog by id {}", id);
     return blogReactiveRepository.findById(id)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .flatMap(blogUpdater::deactivateBlog);
+        .map(blogUpdater::deactivateBlog)
+        .orElseGet(() -> Mono.error(new BlogNotFoundException(id)));
   }
 }

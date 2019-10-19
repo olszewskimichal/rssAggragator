@@ -51,69 +51,58 @@ class BlogService {
 
   Mono<BlogDTO> getBlogOrCreate(CreateBlogDTO blogDTO) {
     log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
-    return blogFinder.findByFeedURL(blogDTO.getFeedURL())
-        .switchIfEmpty(Mono.defer(() -> createBlog(blogDTO)))
-        .map(blog -> new BlogDTO(
-            blog.getId(),
-            blog.getBlogURL(),
-            blog.getDescription(),
-            blog.getName(),
-            blog.getFeedURL(),
-            blog.getPublishedDate(),
-            blog.getImageUrl()));
+    Blog blog = blogFinder.findByFeedURL(blogDTO.getFeedURL())
+        .orElseGet(() -> createBlog(blogDTO));
+    return Mono.justOrEmpty(BlogToDtoMapper.mapToBlogDto(blog));
   }
 
-  Mono<Void> deleteBlog(String id) {
+  void deleteBlog(String id) {
     log.debug("Usuwam bloga o id {}", id);
-    return blogFinder.getBlogWithCount(id)
-        .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
-        .flatMap(blog -> {
-          if (blog.getBlogItemsCount() == 0) {
-            return blogUpdater.deleteBlogById(blog.getBlogId())
-                .doOnSuccess(v -> blogCache.invalidate(id));
-          }
-          return blogFinder.findById(id)
-              .flatMap(blogById -> {
-                blogById.deactivate();
-                return Mono.empty();
-              });
-        });
+    BlogAggregationDTO blogAggregationDTO = blogFinder.getBlogWithCount(id)
+        .orElseThrow(() -> new BlogNotFoundException(id));
+    if (blogAggregationDTO.getBlogItemsCount() == 0) {
+      blogUpdater.deleteBlogById(blogAggregationDTO.getBlogId());
+      blogCache.invalidate(id);
+      return;
+    }
+    blogFinder.findById(id).ifPresent(Blog::deactivate);
   }
 
   Mono<BlogDTO> getBlogDTOById(String id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
     return Mono.justOrEmpty(blogCache.getIfPresent(id))
-        .switchIfEmpty(Mono.defer(() -> blogFinder.findById(id).cache()
-            .switchIfEmpty(Mono.error(new BlogNotFoundException(id)))
+        .switchIfEmpty(Mono.defer(() -> blogFinder.findById(id)
             .map(BlogToDtoMapper::mapToBlogDto)
-            .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id))
-            .doOnSuccess(result -> blogCache.put(result.getId(), result))));
+            .map(Mono::just)
+            .orElseGet(() -> Mono.error(new BlogNotFoundException(id)))));
+           /* .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id))
+            .doOnSuccess(result -> blogCache.put(result.getId(), result))));*/
   }
 
   void evictAndRecreateBlogCache() {
     log.debug("Czyszcze cache dla blogów");
     blogCache.invalidateAll();
     blogFinder.findAll()
-        .doOnNext(this::putToCache)
-        .collectList()
-        .block();
+        .forEach(this::putToCache);
   }
 
   Mono<BlogDTO> updateBlog(UpdateBlogDTO blogDTO, String blogId) {
     log.debug("Aktualizacja bloga {}", blogDTO.getName());
     blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
     return Mono.justOrEmpty(blogCache.getIfPresent(blogId))
-        .switchIfEmpty(Mono.defer(() -> blogFinder.findById(blogId).cache()
-            .switchIfEmpty(Mono.error(new BlogNotFoundException(blogId)))
-            .flatMap(blog -> updateBlog(blog, blogDTO))
-            .map(blog -> new BlogDTO(
-                blog.getId(),
-                blog.getBlogURL(),
-                blog.getDescription(),
-                blog.getName(),
-                blog.getFeedURL(),
-                blog.getPublishedDate(),
-                blog.getImageUrl()))));
+        .switchIfEmpty(Mono.defer(() -> blogFinder.findById(blogId)
+            .map(blog -> updateBlog(blog, blogDTO))
+            .map(blog ->
+                blog.map(monoblog -> new BlogDTO(
+                    monoblog.getId(),
+                    monoblog.getBlogURL(),
+                    monoblog.getDescription(),
+                    monoblog.getName(),
+                    monoblog.getFeedURL(),
+                    monoblog.getPublishedDate(),
+                    monoblog.getImageUrl()))
+            )
+            .orElseGet(() -> Mono.error(new BlogNotFoundException(blogId)))));
   }
 
   private void putToCache(Blog updatedBlog) {
@@ -130,12 +119,12 @@ class BlogService {
     );
   }
 
-  private Mono<Blog> createBlog(CreateBlogDTO blogDTO) {
+  private Blog createBlog(CreateBlogDTO blogDTO) {
     blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
     return blogUpdater.createNewBlog(blogDTO)
         .map(ogTagInfoUpdater::updateItemByOgTagInfo)
-        .doOnNext(this::putToCache);
+        .doOnNext(this::putToCache).block();
   }
 
   private Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogDTO blogInfoFromRSS) {

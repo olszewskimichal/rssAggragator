@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,10 +29,7 @@ class BlogServiceTest {
   private BlogService blogService;
 
   @Mock
-  private BlogReactiveRepository blogRepository;
-
-  @Mock
-  private BlogSyncRepository blogSyncRepository;
+  private BlogRepository blogRepository;
 
   @Mock
   private OgTagInfoUpdater ogTagInfoUpdater;
@@ -41,13 +39,13 @@ class BlogServiceTest {
     given(ogTagInfoUpdater.updateItemByOgTagInfo(any(Blog.class)))
         .willAnswer(i -> i.getArgument(0));
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
-          Blog argument = i.getArgument(0);
-          argument.setId(UUID.randomUUID().toString());
-          return Mono.just(argument);
+      Blog argument = i.getArgument(0);
+      argument.setId(UUID.randomUUID().toString());
+      return argument;
         }
     );
     blogService = new BlogService(
-        new BlogFinder(blogRepository, blogSyncRepository),
+        new BlogFinder(blogRepository),
         new BlogWorker(blogRepository),
         Caffeine.newBuilder().build(),
         (blogUrl, feedUrl) -> {
@@ -58,7 +56,7 @@ class BlogServiceTest {
   @Test
   void shouldCreateBlogFromDTO() {
     //given
-    given(blogRepository.findByFeedURL("feedUrl1")).willReturn(Mono.empty());
+    given(blogRepository.findByFeedURL("feedUrl1")).willReturn(Optional.empty());
     CreateBlogDTO blogDTO = new CreateBlogDTOBuilder()
         .feedURL("feedUrl1")
         .name("test")
@@ -74,7 +72,7 @@ class BlogServiceTest {
   @Test
   void shouldNotTryCreatingBlogWhenExist() {
     //given
-    given(blogRepository.findByFeedURL("nazwa")).willReturn(Mono.just(new BlogBuilder().build()));
+    given(blogRepository.findByFeedURL("nazwa")).willReturn(Optional.of(new BlogBuilder().build()));
 
     CreateBlogDTO blogDTO = new CreateBlogDTOBuilder()
         .feedURL("nazwa")
@@ -97,7 +95,7 @@ class BlogServiceTest {
         .feedURL("feedUrl3")
         .link("blogUrl1")
         .build();
-    given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Mono.empty());
+    given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Optional.empty());
 
     //when
     Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO);
@@ -126,7 +124,7 @@ class BlogServiceTest {
         .description("desc")
         .name("url")
         .build();
-    given(blogRepository.findById("id")).willReturn(Mono.just(blog));
+    given(blogRepository.findById("id")).willReturn(Optional.of(blog));
 
     //when
     Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO, "id");
@@ -143,32 +141,22 @@ class BlogServiceTest {
   }
 
   @Test
-  void shouldDeleteBlogById() {
-    given(blogRepository.deleteById("1")).willReturn(Mono.empty());
-    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(new BlogAggregationDTOBuilder().blogId("1").blogItemsCount(0L).build()));
-
-    StepVerifier.create(blogService.deleteBlog("1"))
-        .expectComplete()
-        .verify();
-  }
-
-  @Test
   void shouldThrowExceptionOnDeleteWhenBlogNotExist() {
-    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.empty());
+    given(blogRepository.getBlogWithCount("1")).willReturn(Optional.empty());
 
-    assertThatThrownBy(() -> blogService.deleteBlog("1").block()).isNotNull().hasMessage("Nie znaleziono bloga = 1");
+    assertThatThrownBy(() -> blogService.deleteBlog("1")).isNotNull().hasMessage("Nie znaleziono bloga = 1");
   }
 
 
   @Test
   void shouldChangeActivityBlogWhenWeTryDeleteBlogWithItems() {
     Blog blog = new BlogBuilder().build();
-    given(blogRepository.findById("1")).willReturn(Mono.just(blog));
+    given(blogRepository.findById("1")).willReturn(Optional.of(blog));
     BlogAggregationDTO aggregationDTO = new BlogAggregationDTOBuilder().blogItemsCount(1L).build();
-    given(blogRepository.getBlogWithCount("1")).willReturn(Mono.just(aggregationDTO));
+    given(blogRepository.getBlogWithCount("1")).willReturn(Optional.of(aggregationDTO));
 
     //when
-    blogService.deleteBlog("1").block();
+    blogService.deleteBlog("1");
 
     //then
     assertThat(blog.isActive()).isFalse();

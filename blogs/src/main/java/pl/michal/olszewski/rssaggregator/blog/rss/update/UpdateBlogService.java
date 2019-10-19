@@ -39,7 +39,7 @@ class UpdateBlogService {
   }
 
   List<Boolean> updateAllBlogs() {
-    List<Blog> blogList = blogFinder.findAll().collectList().block();
+    List<Blog> blogList = blogFinder.findAll();
     List<CompletableFuture<Boolean>> futureList = blogList.stream()
         .map(blog -> getItemsFromRssAndUpdateBlogWithTimeout(blog, 5L))
         .collect(Collectors.toList());

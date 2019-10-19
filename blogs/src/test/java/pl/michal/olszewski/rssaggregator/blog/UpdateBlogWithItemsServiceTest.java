@@ -9,6 +9,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -39,19 +40,14 @@ class UpdateBlogWithItemsServiceTest {
   private JmsTemplate jmsTemplate;
 
   @Mock
-  private BlogReactiveRepository blogRepository;
+  private BlogRepository blogRepository;
 
   @Mock
   private OgTagInfoUpdater ogTagBlogUpdater;
 
   @BeforeEach
   void setUp() {
-    given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
-          Blog argument = i.getArgument(0);
-          argument.setId(UUID.randomUUID().toString());
-          return Mono.just(argument);
-        }
-    );
+    given(blogRepository.save(any(Blog.class))).willAnswer(i -> i.getArgument(0));
     given(ogTagBlogUpdater.updateItemByOgTagInfo(any(ItemDTO.class))).willAnswer(i -> i.getArgument(0));
     blogService = new UpdateBlogWithItemsService(
         new BlogWorker(blogRepository),
@@ -66,7 +62,7 @@ class UpdateBlogWithItemsServiceTest {
   void shouldUpdateBlogWhenNewItemAdd() {
     //given
     Blog blog = new BlogBuilder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
+    given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
 
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1)
         .mapToObj(number -> new ItemDTOBuilder().date(Instant.now()).author("autor").description("desc").title(number + "").link("link" + number).build()) //TODO
@@ -110,7 +106,7 @@ class UpdateBlogWithItemsServiceTest {
         .feedURL("url")
         .itemsList(Arrays.asList(itemDTO, itemDTO))
         .build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
+    given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
 
     //when
     Mono<Blog> updateBlog = blogService.updateBlog(blog, blogDTO);

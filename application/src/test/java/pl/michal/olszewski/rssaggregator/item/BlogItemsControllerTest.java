@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import pl.michal.olszewski.rssaggregator.blog.BlogBuilder;
-import pl.michal.olszewski.rssaggregator.blog.BlogSyncRepository;
+import pl.michal.olszewski.rssaggregator.blog.BlogRepository;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
 class BlogItemsControllerTest extends IntegrationTestBase {
@@ -18,7 +18,7 @@ class BlogItemsControllerTest extends IntegrationTestBase {
   private MongoTemplate mongoTemplate;
 
   @Autowired
-  private BlogSyncRepository blogRepository;
+  private BlogRepository blogRepository;
 
   @BeforeEach
   void setUp() {

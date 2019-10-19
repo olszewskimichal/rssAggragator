@@ -27,6 +27,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/v1/blogs")
 @CrossOrigin
 class BlogController {
+
   private static final Logger log = LoggerFactory.getLogger(BlogController.class);
   private final BlogService blogService;
 
@@ -103,10 +104,9 @@ class BlogController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @ApiOperation(value = "Sluzy do usuwania bloga o podanym id")
   @SwaggerDocumented
-  public Mono<Void> deleteBlog(@PathVariable("id") String blogId) {
+  public void deleteBlog(@PathVariable("id") String blogId) {
     log.debug("DELETE - deleteBlog id {}", blogId);
-    return blogService.deleteBlog(blogId)
-        .doOnSuccess(blog -> log.debug("END deleteBlog id {}", blogId))
-        .doOnError(error -> log.error("ERROR deleteBlog id {}", blogId, error));
+    blogService.deleteBlog(blogId);
+    log.debug("END deleteBlog id {}", blogId);
   }
 }
