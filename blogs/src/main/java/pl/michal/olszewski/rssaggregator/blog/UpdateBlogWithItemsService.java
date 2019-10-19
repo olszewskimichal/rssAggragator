@@ -46,6 +46,15 @@ public class UpdateBlogWithItemsService {
         .doOnNext(this::putToCache);
   }
 
+  public boolean updateBlogSync(Blog blogFromDb, UpdateBlogWithItemsDTO blogInfoFromRSS) {
+    log.debug("aktualizuje bloga {}", blogFromDb.getName());
+    blogInfoFromRSS.getItemsList()
+        .forEach(item -> addItemToBlog(blogFromDb, item));
+    blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS.toUpdateBlogDto())
+        .doOnNext(this::putToCache).block();
+    return true;
+  }
+
   private void addItemToBlog(Blog blog, ItemDTO item) {
     BlogItemLink itemLink = new BlogItemLink(blog.getId(), item.getLink());
     if (itemCache.getIfPresent(itemLink) == null) {

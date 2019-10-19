@@ -15,9 +15,10 @@ import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.io.FeedException;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,6 @@ import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -78,13 +78,9 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .build();
     mongoTemplate.save(blog);
 
-    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+    List<Boolean> result = updateBlogService.updateAllBlogs();
 
-    StepVerifier
-        .create(result)
-        .expectNext(true)
-        .expectComplete()
-        .verify();
+    assertThat(result).hasSize(1).contains(true);
 
     Mono<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
     StepVerifier
@@ -111,13 +107,9 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .build();
     mongoTemplate.save(blog);
 
-    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+    List<Boolean> result = updateBlogService.updateAllBlogs();
 
-    StepVerifier
-        .create(result)
-        .expectNext(true)
-        .expectComplete()
-        .verify();
+    assertThat(result).hasSize(1).contains(true);
 
     Mono<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
     StepVerifier
@@ -139,12 +131,10 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .build();
     mongoTemplate.save(blog);
 
-    Mono<Boolean> result = updateBlogService.updateRssBlogItems(blog);
-    StepVerifier.withVirtualTime(() -> result)
-        .thenAwait(Duration.ofSeconds(5))
-        .expectNext(false)
-        .verifyComplete();
+    CompletableFuture<Boolean> result = updateBlogService.getItemsFromRssAndUpdateBlogWithTimeout(blog, 0L);
+    assertThat(result.join()).isFalse();
   }
+
 
   @Test
   void shouldReturnFalseWhenFetcherFailed() throws FetcherException, IOException, FeedException {
@@ -158,12 +148,9 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
     mongoTemplate.save(blog);
 
-    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+    List<Boolean> result = updateBlogService.updateAllBlogs();
 
-    StepVerifier
-        .create(result)
-        .expectNext(false)
-        .verifyComplete();
+    assertThat(result).hasSize(1).contains(false);
   }
 
   private SyndFeedImpl buildSyndFeed() {

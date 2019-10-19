@@ -33,7 +33,7 @@ class RssExtractorService {
     this.feedFetcher = feedFetcher;
   }
 
-  UpdateBlogWithItemsDTO getBlog(RssInfo info) {
+  UpdateBlogWithItemsDTO getItemsFromRss(RssInfo info) {
     log.trace("getBlog START {}", info);
     try {
       SSLContext ctx = SSLContext.getInstance("TLS");

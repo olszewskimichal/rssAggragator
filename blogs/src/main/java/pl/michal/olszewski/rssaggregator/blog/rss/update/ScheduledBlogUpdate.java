@@ -20,15 +20,13 @@ class ScheduledBlogUpdate {
     this.updateBlogService = updateBlogService;
   }
 
-  @Scheduled(fixedDelayString = "${refresh.blog.milis}")
+  @Scheduled(initialDelayString = "${refresh.blog.milis}", fixedDelayString = "${refresh.blog.milis}")
   @Timed(longTask = true, value = "scheduledUpdate")
   void runScheduledUpdate() {
     log.debug("Rozpoczynam aktualizacje");
     Stopwatch stopwatch = Stopwatch.createStarted();
-    updateBlogService.updateAllActiveBlogsByRss()
-        .doOnComplete(() -> log.debug("Zakonczono w czasie {} milisekund", stopwatch.elapsed(TimeUnit.MILLISECONDS)))
-        .then()
-        .block();
+    updateBlogService.updateAllBlogs();
+    log.debug("Zakonczono w czasie {} milisekund", stopwatch.elapsed(TimeUnit.MILLISECONDS));
   }
 
 }

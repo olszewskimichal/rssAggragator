@@ -33,7 +33,7 @@ class ItemFinder {
   }
 
   Mono<Long> countAllItems() {
-    return itemRepository.count().cache();
+    return itemRepository.count();
   }
 
   Mono<Item> findItemById(String id) {
