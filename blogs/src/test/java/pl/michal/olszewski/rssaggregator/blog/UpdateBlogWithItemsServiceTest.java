@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
@@ -27,8 +28,6 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTOBuilder;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -75,13 +74,8 @@ class UpdateBlogWithItemsServiceTest {
         .build();
 
     //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blog, blogDTO);
-
     //then
-    StepVerifier.create(updateBlog)
-        .expectNextCount(1L)
-        .expectComplete()
-        .verify();
+    assertTrue(blogService.updateBlog(blog, blogDTO));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
@@ -109,13 +103,8 @@ class UpdateBlogWithItemsServiceTest {
     given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
 
     //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blog, blogDTO);
-
     //then
-    StepVerifier.create(updateBlog)
-        .expectNextCount(1)
-        .expectComplete()
-        .verify();
+    assertTrue(blogService.updateBlog(blog, blogDTO));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }

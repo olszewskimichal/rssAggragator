@@ -78,11 +78,9 @@ class BlogController {
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Mono<BlogDTO> updateBlog(@RequestBody UpdateBlogDTO blogDTO, @PathVariable String id) {
+  public BlogDTO updateBlog(@RequestBody UpdateBlogDTO blogDTO, @PathVariable String id) {
     log.debug("PUT - updateBlog {} {}", id, blogDTO);
-    return blogService.updateBlog(blogDTO, id)
-        .doOnSuccess(blog -> log.debug("END updateBlog"))
-        .doOnError(error -> log.error("ERROR updateBlog", error));
+    return blogService.updateBlog(blogDTO, id);
   }
 
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

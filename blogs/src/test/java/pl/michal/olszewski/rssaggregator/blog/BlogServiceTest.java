@@ -39,9 +39,9 @@ class BlogServiceTest {
     given(ogTagInfoUpdater.updateItemByOgTagInfo(any(Blog.class)))
         .willAnswer(i -> i.getArgument(0));
     given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
-      Blog argument = i.getArgument(0);
-      argument.setId(UUID.randomUUID().toString());
-      return argument;
+          Blog argument = i.getArgument(0);
+          argument.setId(UUID.randomUUID().toString());
+          return argument;
         }
     );
     blogService = new BlogService(
@@ -127,17 +127,14 @@ class BlogServiceTest {
     given(blogRepository.findById("id")).willReturn(Optional.of(blog));
 
     //when
-    Mono<BlogDTO> updateBlog = blogService.updateBlog(blogDTO, "id");
+    BlogDTO updateBlog = blogService.updateBlog(blogDTO, "id");
 
     //then
-    StepVerifier.create(updateBlog)
-        .assertNext(dto -> assertAll(
-            () -> assertThat(dto.getName()).isEqualTo("url"),
-            () -> assertThat(dto.getFeedURL()).isEqualTo("url"),
-            () -> assertThat(dto.getDescription()).isEqualTo("desc")
-        ))
-        .expectComplete()
-        .verify();
+    assertAll(
+        () -> assertThat(updateBlog.getName()).isEqualTo("url"),
+        () -> assertThat(updateBlog.getFeedURL()).isEqualTo("url"),
+        () -> assertThat(updateBlog.getDescription()).isEqualTo("desc")
+    );
   }
 
   @Test

@@ -49,7 +49,7 @@ class UpdateBlogService {
 
   CompletableFuture<Boolean> getItemsFromRssAndUpdateBlogWithTimeout(Blog blog, Long timeInSeconds) {
     return CompletableFuture.supplyAsync(() -> rssExtractorService.getItemsFromRss(blog.getRssInfo()), executor)
-        .thenApplyAsync(updateBlogWithItemsDTO -> blogService.updateBlogSync(blog, updateBlogWithItemsDTO))
+        .thenApplyAsync(updateBlogWithItemsDTO -> blogService.updateBlog(blog, updateBlogWithItemsDTO))
         .orTimeout(timeInSeconds, SECONDS)
         .exceptionally(ex -> {
           log.warn("Nie powiodlo sie pobieranie nowych danych dla bloga {}", blog.getName(), ex);

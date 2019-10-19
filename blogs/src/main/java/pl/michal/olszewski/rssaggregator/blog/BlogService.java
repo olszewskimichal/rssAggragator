@@ -86,23 +86,13 @@ class BlogService {
         .forEach(this::putToCache);
   }
 
-  Mono<BlogDTO> updateBlog(UpdateBlogDTO blogDTO, String blogId) {
-    log.debug("Aktualizacja bloga {}", blogDTO.getName());
-    blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
-    return Mono.justOrEmpty(blogCache.getIfPresent(blogId))
-        .switchIfEmpty(Mono.defer(() -> blogFinder.findById(blogId)
-            .map(blog -> updateBlog(blog, blogDTO))
-            .map(blog ->
-                blog.map(monoblog -> new BlogDTO(
-                    monoblog.getId(),
-                    monoblog.getBlogURL(),
-                    monoblog.getDescription(),
-                    monoblog.getName(),
-                    monoblog.getFeedURL(),
-                    monoblog.getPublishedDate(),
-                    monoblog.getImageUrl()))
-            )
-            .orElseGet(() -> Mono.error(new BlogNotFoundException(blogId)))));
+  BlogDTO updateBlog(UpdateBlogDTO updateBlogDTO, String blogId) {
+    log.debug("Aktualizacja bloga {}", updateBlogDTO.getName());
+    blogValidation.validate(updateBlogDTO.getLink(), updateBlogDTO.getFeedURL());
+    Blog blog = blogFinder.findById(blogId)
+        .orElseThrow(() -> new BlogNotFoundException(blogId));
+    Blog updatedBlog = updateBlog(blog, updateBlogDTO);
+    return BlogToDtoMapper.mapToBlogDto(updatedBlog);
   }
 
   private void putToCache(Blog updatedBlog) {
@@ -122,15 +112,16 @@ class BlogService {
   private Blog createBlog(CreateBlogDTO blogDTO) {
     blogValidation.validate(blogDTO.getLink(), blogDTO.getFeedURL());
     log.debug("Dodaje nowy blog o nazwie {}", blogDTO.getName());
-    return blogUpdater.createNewBlog(blogDTO)
-        .map(ogTagInfoUpdater::updateItemByOgTagInfo)
-        .doOnNext(this::putToCache).block();
+    Blog newBlog = ogTagInfoUpdater.updateItemByOgTagInfo(blogUpdater.createNewBlog(blogDTO));
+    putToCache(newBlog);
+    return newBlog;
   }
 
-  private Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogDTO blogInfoFromRSS) {
+  private Blog updateBlog(Blog blogFromDb, UpdateBlogDTO blogInfoFromRSS) {
     log.debug("aktualizuje bloga {}", blogFromDb.getName());
-    return blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS)
-        .map(ogTagInfoUpdater::updateItemByOgTagInfo)
-        .doOnNext(this::putToCache);
+    Blog blog = blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS);
+    ogTagInfoUpdater.updateItemByOgTagInfo(blog);
+    putToCache(blog);
+    return blog;
   }
 }

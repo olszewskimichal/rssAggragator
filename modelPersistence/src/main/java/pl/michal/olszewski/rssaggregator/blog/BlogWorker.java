@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 @Service
 class BlogWorker {
@@ -12,23 +11,23 @@ class BlogWorker {
     this.repository = repository;
   }
 
-  public Mono<Blog> activateBlog(Blog blog) {
+  public Blog activateBlog(Blog blog) {
     blog.activate();
-    return Mono.just(repository.save(blog));
+    return repository.save(blog);
   }
 
-  public Mono<Blog> deactivateBlog(Blog blog) {
+  public Blog deactivateBlog(Blog blog) {
     blog.deactivate();
-    return Mono.just(repository.save(blog));
+    return repository.save(blog);
   }
 
-  public Mono<Blog> createNewBlog(CreateBlogDTO blogDTO) {
-    return Mono.just(repository.save(new Blog(blogDTO)));
+  public Blog createNewBlog(CreateBlogDTO blogDTO) {
+    return repository.save(new Blog(blogDTO));
   }
 
-  Mono<Blog> updateBlogFromDTO(Blog blog, UpdateBlogDTO blogDTO) {
+  Blog updateBlogFromDTO(Blog blog, UpdateBlogDTO blogDTO) {
     blog.updateFromDto(blogDTO);
-    return Mono.just(repository.save(blog));
+    return repository.save(blog);
   }
 
   void deleteBlogById(String blogId) {
