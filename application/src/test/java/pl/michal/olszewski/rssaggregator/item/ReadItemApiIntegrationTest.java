@@ -1,15 +1,17 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.web.reactive.function.BodyInserters.fromObject;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import reactor.test.StepVerifier;
 
 class ReadItemApiIntegrationTest extends IntegrationTestBase {
 
@@ -26,25 +28,25 @@ class ReadItemApiIntegrationTest extends IntegrationTestBase {
 
   @Test
   void should_mark_item_as_read() {
-    Item link = itemRepository.save(new Item(new ItemDTOBuilder().link("link").build())).block();
+    Item item = itemRepository.save(new Item(new ItemDTOBuilder().link("item").build()));
 
-    thenMarkItemAsRead(link.getId());
+    thenMarkItemAsRead(item.getId());
 
-    StepVerifier.create(itemRepository.findById(link.getId()))
-        .assertNext(item -> assertThat(item.isRead()).isTrue())
-        .verifyComplete();
+    Optional<Item> itemRepositoryById = itemRepository.findById(item.getId());
+    assertThat(itemRepositoryById).isPresent();
+    assertTrue(itemRepositoryById.get().isRead());
   }
 
   @Test
   void should_mark_item_as_unread() {
     Item item = new Item(new ItemDTOBuilder().link("link").build());
-    itemRepository.save(item.markAsRead()).block();
+    itemRepository.save(item.markAsRead());
 
     thenMarkItemAsUnread(item.getId());
 
-    StepVerifier.create(itemRepository.findById(item.getId()))
-        .assertNext(itemFromDB -> assertThat(itemFromDB.isRead()).isFalse())
-        .verifyComplete();
+    Optional<Item> itemRepositoryById = itemRepository.findById(item.getId());
+    assertThat(itemRepositoryById).isPresent();
+    assertFalse(itemRepositoryById.get().isRead());
   }
 
 

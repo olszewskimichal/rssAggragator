@@ -1,10 +1,12 @@
 package pl.michal.olszewski.rssaggregator.item;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +15,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -31,49 +31,41 @@ class ReadItemServiceTest {
   @BeforeEach
   void setUp() {
     readItemService = new ReadItemService(itemRepository, itemUpdater);
-    given(itemUpdater.updateItem(any(Item.class))).willAnswer(i -> {
-          Item argument = i.getArgument(0);
-          return Mono.just(argument);
-        }
-    );
+    given(itemUpdater.updateItem(any(Item.class))).willAnswer(i -> i.getArgument(0));
   }
 
   @Test
   void shouldMarkItemAsRead() {
-    given(itemRepository.findItemById("itemId")).willReturn(Mono.just(new Item()));
+    given(itemRepository.findItemById("itemId")).willReturn(Optional.of(new Item()));
     var readItemDTO = new ReadItemDTO("itemId", true);
 
-    Mono<Void> result = readItemService.processRequest(readItemDTO);
+    //when
+    readItemService.processRequest(readItemDTO);
 
-    StepVerifier.create(result)
-        .expectComplete()
-        .verify();
+    //then
     verify(itemUpdater, times(1)).updateItem(Mockito.any(Item.class));
   }
 
   @Test
   void shouldMarkItemAsUnread() {
-    given(itemRepository.findItemById("itemId")).willReturn(Mono.just(new Item()));
+    given(itemRepository.findItemById("itemId")).willReturn(Optional.of(new Item()));
     var readItemDTO = new ReadItemDTO("itemId", false);
 
-    Mono<Void> result = readItemService.processRequest(readItemDTO);
+    //when
+    readItemService.processRequest(readItemDTO);
 
-    StepVerifier.create(result)
-        .expectComplete()
-        .verify();
+    //then
     verify(itemUpdater, times(1)).updateItem(Mockito.any(Item.class));
 
   }
 
   @Test
   void shouldThrowExceptionWhenItemByIdNotExists() {
-    given(itemRepository.findItemById("itemId2")).willReturn(Mono.empty());
+    given(itemRepository.findItemById("itemId2")).willReturn(Optional.empty());
     var readItemDTO = new ReadItemDTO("itemId2", false);
 
-    Mono<Void> result = readItemService.processRequest(readItemDTO);
-
-    StepVerifier.create(result)
-        .expectError(ItemNotFoundException.class)
-        .verify();
+    //when
+    //then
+    assertThrows(ItemNotFoundException.class, () -> readItemService.processRequest(readItemDTO));
   }
 }

@@ -1,27 +1,27 @@
 package pl.michal.olszewski.rssaggregator.item;
 
+import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 
 @Repository
-interface ItemRepository extends ReactiveMongoRepository<Item, String> {
+interface ItemRepository extends MongoRepository<Item, String> {
 
   String DATE = "date";
   String CREATED_AT = "createdAt";
 
-  Flux<Item> findAllBy(Pageable pageable);
+  List<Item> findAllBy(Pageable pageable);
 
-  Flux<Item> findAllByBlogId(String blogId);
+  List<Item> findAllByBlogId(String blogId);
 
-  default Flux<Item> findAllOrderByPublishedDate(Integer limit, Integer page) {
+  default List<Item> findAllOrderByPublishedDate(Integer limit, Integer page) {
     return findAllBy(PageRequest.of(page, limit, new Sort(Sort.Direction.DESC, DATE)));
   }
 
-  default Flux<Item> findAllOrderByCreatedAt(Integer limit, Integer page) {
+  default List<Item> findAllOrderByCreatedAt(Integer limit, Integer page) {
     return findAllBy(PageRequest.of(page, limit, new Sort(Sort.Direction.DESC, CREATED_AT)));
   }
 
