@@ -17,7 +17,7 @@ class MigrateItemsForSearchWorker {
   }
 
   void migrateItemsForSearch() {
-    itemFinder.findAllOrderByPublishedDateBlocking(Integer.MAX_VALUE, 0)
+    itemFinder.findAllOrderByPublishedDate(Integer.MAX_VALUE, 0)
         .forEach(item -> newItemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEventBuilder()
             .itemDescription(item.getDescription())
             .itemTitle(item.getTitle())
