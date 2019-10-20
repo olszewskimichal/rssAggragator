@@ -18,7 +18,7 @@
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+      <artifactId>spring-boot-starter-data-mongodb</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>
   </dependencies>
