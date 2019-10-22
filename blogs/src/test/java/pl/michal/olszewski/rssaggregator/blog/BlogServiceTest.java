@@ -19,8 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -63,7 +61,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO);
+    BlogDTO blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     assertThat(blog).isNotNull();
@@ -79,7 +77,7 @@ class BlogServiceTest {
         .build();
 
     //when
-    Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO);
+    BlogDTO blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
     assertThat(blog).isNotNull();
@@ -98,20 +96,16 @@ class BlogServiceTest {
     given(blogRepository.findByFeedURL("feedUrl3")).willReturn(Optional.empty());
 
     //when
-    Mono<BlogDTO> blog = blogService.getBlogOrCreate(blogDTO);
+    BlogDTO blog = blogService.getBlogOrCreate(blogDTO);
 
     //then
-    StepVerifier.create(blog)
-        .assertNext(dto -> assertAll(
-            () -> assertThat(dto).isNotNull(),
-            () -> assertThat(dto.getDescription()).isEqualTo("desc"),
-            () -> assertThat(dto.getName()).isEqualTo("nazwa1"),
-            () -> assertThat(dto.getFeedURL()).isEqualTo("feedUrl3"),
-            () -> assertThat(dto.getLink()).isEqualTo("blogUrl1")
-        ))
-        .expectComplete()
-        .verify();
-
+    assertAll(
+        () -> assertThat(blog).isNotNull(),
+        () -> assertThat(blog.getDescription()).isEqualTo("desc"),
+        () -> assertThat(blog.getName()).isEqualTo("nazwa1"),
+        () -> assertThat(blog.getFeedURL()).isEqualTo("feedUrl3"),
+        () -> assertThat(blog.getLink()).isEqualTo("blogUrl1")
+    );
   }
 
   @Test

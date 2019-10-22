@@ -1,8 +1,9 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,8 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
 import pl.michal.olszewski.rssaggregator.util.Page;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 class BlogService {
@@ -38,22 +37,23 @@ class BlogService {
     this.ogTagInfoUpdater = ogTagInfoUpdater;
   }
 
-  public Mono<PageBlogDTO> getAllBlogDTOs(Integer limit, Integer page) {
+  public PageBlogDTO getAllBlogDTOs(Integer limit, Integer page) {
     Page pageable = new Page(limit, page);
     log.debug("pobieram wszystkie blogi w postaci DTO {}", pageable);
     PageRequest pageRequest = PageRequest.of(pageable.getPageForSearch(), pageable.getLimit());
-    Mono<Long> count = Mono.just(blogCache.estimatedSize());
-    Mono<List<BlogDTO>> pagedBlog = Flux.fromIterable(blogCache.asMap().values())
-        .buffer(pageRequest.getPageSize())
-        .elementAt(pageRequest.getPageNumber(), new ArrayList<>());
-    return count.zipWith(pagedBlog, (countBlogs, blogs) -> new PageBlogDTO(blogs, countBlogs));
+    long count = blogCache.estimatedSize();
+    List<BlogDTO> blogDTOS = blogCache.asMap().values().stream()
+        .skip(pageRequest.getPageNumber() * pageRequest.getPageSize())
+        .limit(pageRequest.getPageSize())
+        .collect(Collectors.toList());
+    return new PageBlogDTO(blogDTOS, count);
   }
 
-  Mono<BlogDTO> getBlogOrCreate(CreateBlogDTO blogDTO) {
+  BlogDTO getBlogOrCreate(CreateBlogDTO blogDTO) {
     log.debug("Tworzenie nowego bloga {}", blogDTO.getFeedURL());
     Blog blog = blogFinder.findByFeedURL(blogDTO.getFeedURL())
         .orElseGet(() -> createBlog(blogDTO));
-    return Mono.justOrEmpty(BlogToDtoMapper.mapToBlogDto(blog));
+    return BlogToDtoMapper.mapToBlogDto(blog);
   }
 
   void deleteBlog(String id) {
@@ -68,22 +68,11 @@ class BlogService {
     blogFinder.findById(id).ifPresent(Blog::deactivate);
   }
 
-  Mono<BlogDTO> getBlogDTOById(String id) {
+  BlogDTO getBlogDTOById(String id) {
     log.debug("pobieram bloga w postaci DTO o id {}", id);
-    return Mono.justOrEmpty(blogCache.getIfPresent(id))
-        .switchIfEmpty(Mono.defer(() -> blogFinder.findById(id)
-            .map(BlogToDtoMapper::mapToBlogDto)
-            .map(Mono::just)
-            .orElseGet(() -> Mono.error(new BlogNotFoundException(id)))));
-           /* .doOnEach(blogDTO -> log.trace("getBlogDTObyId {}", id))
-            .doOnSuccess(result -> blogCache.put(result.getId(), result))));*/
-  }
-
-  void evictAndRecreateBlogCache() {
-    log.debug("Czyszcze cache dla blogów");
-    blogCache.invalidateAll();
-    blogFinder.findAll()
-        .forEach(this::putToCache);
+    return Optional.ofNullable(blogCache.getIfPresent(id))
+        .orElseGet(() -> blogFinder.findById(id).map(BlogToDtoMapper::mapToBlogDto)
+            .orElseThrow(() -> new BlogNotFoundException(id)));
   }
 
   BlogDTO updateBlog(UpdateBlogDTO updateBlogDTO, String blogId) {
@@ -93,6 +82,13 @@ class BlogService {
         .orElseThrow(() -> new BlogNotFoundException(blogId));
     Blog updatedBlog = updateBlog(blog, updateBlogDTO);
     return BlogToDtoMapper.mapToBlogDto(updatedBlog);
+  }
+
+  void evictAndRecreateBlogCache() {
+    log.debug("Czyszcze cache dla blogów");
+    blogCache.invalidateAll();
+    blogFinder.findAll()
+        .forEach(this::putToCache);
   }
 
   private void putToCache(Blog updatedBlog) {
