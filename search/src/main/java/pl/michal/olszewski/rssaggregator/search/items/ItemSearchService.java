@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.elasticsearch.core.ReactiveElasticsearchOperations;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 class ItemSearchService {
@@ -15,10 +16,8 @@ class ItemSearchService {
     this.reactiveElasticsearchTemplate = reactiveElasticsearchTemplate;
   }
 
-  void saveItemForSearch(ItemForSearch itemForSearch) {
+  Mono<ItemForSearch> saveItemForSearch(ItemForSearch itemForSearch) {
     log.debug("save item for search link {}", itemForSearch.getLink());
-    reactiveElasticsearchTemplate.save(itemForSearch)
-        .then()
-        .block();
+    return reactiveElasticsearchTemplate.save(itemForSearch);
   }
 }
