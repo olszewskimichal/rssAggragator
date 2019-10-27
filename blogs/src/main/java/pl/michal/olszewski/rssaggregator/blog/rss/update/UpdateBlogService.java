@@ -13,33 +13,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.Blog;
-import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
+import pl.michal.olszewski.rssaggregator.blog.BlogRepository;
 import pl.michal.olszewski.rssaggregator.blog.UpdateBlogWithItemsService;
 
 @Service
 class UpdateBlogService {
 
   private static final Logger log = LoggerFactory.getLogger(UpdateBlogService.class);
-  private final BlogFinder blogFinder;
+  private final BlogRepository blogRepository;
   private final Executor executor;
   private final RssExtractorService rssExtractorService;
   private final UpdateBlogWithItemsService blogService;
 
   UpdateBlogService(
-      BlogFinder blogFinder,
+      BlogRepository blogRepository,
       Executor executor,
       MeterRegistry registry,
       UpdateBlogWithItemsService blogService,
       FeedFetcher feedFetcher
   ) {
-    this.blogFinder = blogFinder;
+    this.blogRepository = blogRepository;
     this.rssExtractorService = new RssExtractorService(feedFetcher);
     this.blogService = blogService;
     this.executor = monitor(registry, executor, "prod_pool");
   }
 
   List<Boolean> updateAllBlogs() {
-    List<Blog> blogList = blogFinder.findAll();
+    List<Blog> blogList = blogRepository.findAll();
     List<CompletableFuture<Boolean>> futureList = blogList.stream()
         .map(blog -> getItemsFromRssAndUpdateBlogWithTimeout(blog, 5L))
         .collect(Collectors.toList());

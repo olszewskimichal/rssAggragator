@@ -8,24 +8,24 @@ import org.springframework.stereotype.Service;
 class BlogActivityUpdater {
 
   private static final Logger log = LoggerFactory.getLogger(BlogActivityUpdater.class);
-  private final BlogFinder blogReactiveRepository;
+  private final BlogRepository blogRepository;
   private final BlogWorker blogUpdater;
 
-  BlogActivityUpdater(BlogFinder blogReactiveRepository, BlogWorker blogUpdater) {
-    this.blogReactiveRepository = blogReactiveRepository;
+  BlogActivityUpdater(BlogRepository blogRepository, BlogWorker blogUpdater) {
+    this.blogRepository = blogRepository;
     this.blogUpdater = blogUpdater;
   }
 
   Blog activateBlog(String id) {
     log.debug("Activate blog by id {}", id);
-    return blogReactiveRepository.findById(id)
+    return blogRepository.findById(id)
         .map(blogUpdater::activateBlog)
         .orElseThrow(() -> new BlogNotFoundException(id));
   }
 
   Blog deactivateBlog(String id) {
     log.debug("Deactivate blog by id {}", id);
-    return blogReactiveRepository.findById(id)
+    return blogRepository.findById(id)
         .map(blogUpdater::deactivateBlog)
         .orElseThrow(() -> new BlogNotFoundException(id));
   }

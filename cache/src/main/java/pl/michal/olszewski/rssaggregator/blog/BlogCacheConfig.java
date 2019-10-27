@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 class BlogCacheConfig {
 
   @Bean(name = "blogCache")
-  Cache blogByIdCacheProd(MeterRegistry registry, BlogFinder blogFinder) {
+  Cache blogByIdCacheProd(MeterRegistry registry, BlogRepository blogRepository) {
     Cache<String, BlogDTO> cache = Caffeine.newBuilder()
         .maximumSize(30000)
         .build();
-    blogFinder.findAll()
+    blogRepository.findAll()
         .forEach(blog -> cache.put(blog.getId(), BlogToDtoMapper.mapToBlogDto(blog)));
     registry.gauge("blogByIdCache", cache, Cache::estimatedSize);
     return cache;

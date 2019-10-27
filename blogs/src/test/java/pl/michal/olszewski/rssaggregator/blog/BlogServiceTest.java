@@ -43,7 +43,7 @@ class BlogServiceTest {
         }
     );
     blogService = new BlogService(
-        new BlogFinder(blogRepository),
+        blogRepository,
         new BlogWorker(blogRepository),
         Caffeine.newBuilder().build(),
         (blogUrl, feedUrl) -> {
