@@ -17,16 +17,16 @@ import org.springframework.stereotype.Service;
 class DuplicateItemsFixer {
 
   private static final Logger log = LoggerFactory.getLogger(DuplicateItemsFixer.class);
-  private final ItemFinder itemFinder;
+  private final ItemRepository itemRepository;
   private final MongoTemplate mongoTemplate;
   private final Cache<BlogItemLink, ItemDTO> itemCache;
 
   DuplicateItemsFixer(
-      ItemFinder itemFinder,
+      ItemRepository itemRepository,
       MongoTemplate mongoTemplate,
       @Qualifier("itemCache") Cache<BlogItemLink, ItemDTO> itemCache
   ) {
-    this.itemFinder = itemFinder;
+    this.itemRepository = itemRepository;
     this.mongoTemplate = mongoTemplate;
     this.itemCache = itemCache;
   }
@@ -34,7 +34,7 @@ class DuplicateItemsFixer {
   @Scheduled(initialDelay = 1000 * 60 * 60 * 6, fixedDelay = 1000 * 60 * 60 * 6)
   void removeDuplicatesFromLastWeek() {
     log.debug("Scheduler started");
-    itemFinder.findItemsFromDateOrderByCreatedAt(Instant.now().minus(7, DAYS))
+    itemRepository.findItemsFromDateOrderByCreatedAt(Instant.now().minus(7, DAYS))
         .forEach(this::removeIfIsDuplicate);
     log.debug("Scheduler finished");
   }

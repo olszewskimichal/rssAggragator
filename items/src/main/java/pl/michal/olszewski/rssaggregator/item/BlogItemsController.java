@@ -20,10 +20,10 @@ import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
 public class BlogItemsController {
 
   private static final Logger log = LoggerFactory.getLogger(BlogItemsController.class);
-  private final ItemFinder itemFinder;
+  private final ItemRepository itemRepository;
 
-  public BlogItemsController(ItemFinder itemFinder) {
-    this.itemFinder = itemFinder;
+  public BlogItemsController(ItemRepository itemRepository) {
+    this.itemRepository = itemRepository;
   }
 
   @GetMapping(value = "/{id}/items")
@@ -42,6 +42,6 @@ public class BlogItemsController {
       @RequestParam(value = "page", required = false) Integer page
   ) {
     log.debug("GET blogItems for id {}", blogId);
-    return itemFinder.getBlogItemsForBlog(blogId, limit, page);
+    return itemRepository.getBlogItemsForBlog(blogId, limit, page);
   }
 }

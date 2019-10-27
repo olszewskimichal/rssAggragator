@@ -16,13 +16,13 @@ import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.blog.BlogBuilder;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 
-class ItemFinderTest extends IntegrationTestBase {
+class ItemRepositoryTest extends IntegrationTestBase {
 
   @Autowired
   protected MongoTemplate mongoTemplate;
 
   @Autowired
-  private ItemFinder itemFinder;
+  private ItemRepository itemRepository;
 
   @BeforeEach
   void setUp() {
@@ -43,7 +43,7 @@ class ItemFinderTest extends IntegrationTestBase {
         new Item(new ItemDTOBuilder().link("title2").date(instant.minusSeconds(10)).build())
     ));
     //when
-    List<Item> items = itemFinder.findAllOrderByPublishedDate(2, 0);
+    List<Item> items = itemRepository.findAllOrderByPublishedDate(2, 0);
 
     //then
     assertThat(items).hasSize(2).contains(newestItem, presentItem);
@@ -57,7 +57,7 @@ class ItemFinderTest extends IntegrationTestBase {
     Item title3 = mongoTemplate.save(new Item(new ItemDTOBuilder().link("title3").build()));
 
     //when
-    List<Item> items = itemFinder.findAllOrderByCreatedAt(2, 0);
+    List<Item> items = itemRepository.findAllOrderByCreatedAt(2, 0);
 
     //then
     assertThat(items).hasSize(2).contains(title3, title1);
@@ -74,7 +74,7 @@ class ItemFinderTest extends IntegrationTestBase {
     ));
 
     //when
-    List<Item> items = itemFinder.findAllOrderByPublishedDate(2, 0);
+    List<Item> items = itemRepository.findAllOrderByPublishedDate(2, 0);
     //then
     assertThat(items).hasSize(2);
   }
@@ -108,7 +108,7 @@ class ItemFinderTest extends IntegrationTestBase {
     ));
 
     //when
-    PageBlogItemDTO byBlogId = itemFinder.getBlogItemsForBlog("id1", null, null);
+    PageBlogItemDTO byBlogId = itemRepository.getBlogItemsForBlog("id1", null, null);
     //then
     assertThat(byBlogId.getTotalElements()).isEqualTo(2L);
   }
@@ -121,7 +121,7 @@ class ItemFinderTest extends IntegrationTestBase {
     mongoTemplate.save(new Item(new ItemDTOBuilder().blogId("id3").link("link1").build()));
 
     //when
-    List<Item> itemList = itemFinder.findItemsFromDateOrderByCreatedAt(item2.getCreatedAt());
+    List<Item> itemList = itemRepository.findItemsFromDateOrderByCreatedAt(item2.getCreatedAt());
 
     //then
     assertThat(itemList.size()).isEqualTo(2);
@@ -135,7 +135,7 @@ class ItemFinderTest extends IntegrationTestBase {
     mongoTemplate.save(new Item(new ItemDTOBuilder().blogId("id3").link("link1").build()));
 
     //when
-    List<Item> itemList = itemFinder.findItemsFromDateOrderByCreatedAt(null);
+    List<Item> itemList = itemRepository.findItemsFromDateOrderByCreatedAt(null);
 
     //then
     assertThat(itemList.size()).isEqualTo(3);

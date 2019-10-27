@@ -23,7 +23,7 @@ class ReadItemServiceTest {
   private ReadItemService readItemService;
 
   @Mock
-  private ItemFinder itemRepository;
+  private ItemRepository itemRepository;
 
   @Mock
   private ItemUpdater itemUpdater;
@@ -36,7 +36,7 @@ class ReadItemServiceTest {
 
   @Test
   void shouldMarkItemAsRead() {
-    given(itemRepository.findItemById("itemId")).willReturn(Optional.of(new Item()));
+    given(itemRepository.findById("itemId")).willReturn(Optional.of(new Item()));
     var readItemDTO = new ReadItemDTO("itemId", true);
 
     //when
@@ -48,7 +48,7 @@ class ReadItemServiceTest {
 
   @Test
   void shouldMarkItemAsUnread() {
-    given(itemRepository.findItemById("itemId")).willReturn(Optional.of(new Item()));
+    given(itemRepository.findById("itemId")).willReturn(Optional.of(new Item()));
     var readItemDTO = new ReadItemDTO("itemId", false);
 
     //when
@@ -61,7 +61,7 @@ class ReadItemServiceTest {
 
   @Test
   void shouldThrowExceptionWhenItemByIdNotExists() {
-    given(itemRepository.findItemById("itemId2")).willReturn(Optional.empty());
+    given(itemRepository.findById("itemId2")).willReturn(Optional.empty());
     var readItemDTO = new ReadItemDTO("itemId2", false);
 
     //when

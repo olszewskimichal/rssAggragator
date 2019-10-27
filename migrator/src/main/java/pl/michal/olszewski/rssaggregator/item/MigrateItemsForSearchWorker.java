@@ -8,16 +8,16 @@ import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEventBuilder;
 @Service
 class MigrateItemsForSearchWorker {
 
-  private final ItemFinder itemFinder;
+  private final ItemRepository itemRepository;
   private final MigrateItemForSearchEventProducer newItemForSearchEventProducer;
 
-  MigrateItemsForSearchWorker(ItemFinder itemFinder, MigrateItemForSearchEventProducer newItemForSearchEventProducer) {
-    this.itemFinder = itemFinder;
+  MigrateItemsForSearchWorker(ItemRepository itemRepository, MigrateItemForSearchEventProducer newItemForSearchEventProducer) {
+    this.itemRepository = itemRepository;
     this.newItemForSearchEventProducer = newItemForSearchEventProducer;
   }
 
   void migrateItemsForSearch() {
-    itemFinder.findAllOrderByPublishedDate(Integer.MAX_VALUE, 0)
+    itemRepository.findAllOrderByPublishedDate(Integer.MAX_VALUE, 0)
         .forEach(item -> newItemForSearchEventProducer.writeEventToQueue(new NewItemForSearchEventBuilder()
             .itemDescription(item.getDescription())
             .itemTitle(item.getTitle())

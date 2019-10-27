@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-interface ItemRepository extends MongoRepository<Item, String> {
+interface ItemRepository extends MongoRepository<Item, String>, CustomItemRepository {
 
   String DATE = "date";
   String CREATED_AT = "createdAt";
@@ -24,6 +24,4 @@ interface ItemRepository extends MongoRepository<Item, String> {
   default List<Item> findAllOrderByCreatedAt(Integer limit, Integer page) {
     return findAllBy(PageRequest.of(page, limit, new Sort(Sort.Direction.DESC, CREATED_AT)));
   }
-
-
 }

@@ -9,21 +9,17 @@ import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
 @Service
 class UpdateItemsImageUrlWorker {
 
-  private final ItemFinder itemFinder;
   private final OgTagInfoUpdater ogTagInfoUpdater;
   private final ItemRepository itemRepository;
 
-  UpdateItemsImageUrlWorker(ItemFinder itemFinder, OgTagInfoUpdater ogTagInfoUpdater, ItemRepository itemRepository) {
-    this.itemFinder = itemFinder;
+  UpdateItemsImageUrlWorker(OgTagInfoUpdater ogTagInfoUpdater, ItemRepository itemRepository) {
     this.ogTagInfoUpdater = ogTagInfoUpdater;
     this.itemRepository = itemRepository;
   }
 
   void updateImageUrls() {
-    itemFinder.findItemsFromDateOrderByCreatedAt(Instant.now().minus(100, DAYS)).stream()
-        .map(item -> {
-          item.updateImageUrl(ogTagInfoUpdater.updateItemByOgTagInfo(ItemToDtoMapper.mapItemToItemDTO(item)).getImageURL());
-          return item;
-        }).forEach(itemRepository::save);
+    itemRepository.findItemsFromDateOrderByCreatedAt(Instant.now().minus(100, DAYS)).stream()
+        .peek(item -> item.updateImageUrl(ogTagInfoUpdater.updateItemByOgTagInfo(ItemToDtoMapper.mapItemToItemDTO(item)).getImageURL()))
+        .forEach(itemRepository::save);
   }
 }

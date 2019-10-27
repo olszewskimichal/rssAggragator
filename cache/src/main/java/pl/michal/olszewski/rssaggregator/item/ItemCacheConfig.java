@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 class ItemCacheConfig {
 
   @Bean(name = "itemCache")
-  Cache<BlogItemLink, ItemDTO> itemCache(MeterRegistry registry, ItemFinder finder) {
+  Cache<BlogItemLink, ItemDTO> itemCache(MeterRegistry registry, ItemRepository itemRepository) {
     Cache<BlogItemLink, ItemDTO> cache = Caffeine.newBuilder()
         .maximumSize(30000)
         .build();
-    finder.findAllOrderByPublishedDate(200, 0)
+    itemRepository.findAllOrderByPublishedDate(200, 0)
         .forEach(item -> cache.put(new BlogItemLink(item.getBlogId(), item.getLink()), ItemToDtoMapper.mapItemToItemDTO(item)));
     registry.gauge("itemCache", cache, Cache::estimatedSize);
     return cache;

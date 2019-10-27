@@ -5,16 +5,16 @@ import org.springframework.stereotype.Component;
 @Component
 class ReadItemService {
 
-  private final ItemFinder itemFinder;
+  private final ItemRepository itemRepository;
   private final ItemUpdater itemUpdater;
 
-  ReadItemService(ItemFinder itemFinder, ItemUpdater itemUpdater) {
-    this.itemFinder = itemFinder;
+  ReadItemService(ItemRepository itemRepository, ItemUpdater itemUpdater) {
+    this.itemRepository = itemRepository;
     this.itemUpdater = itemUpdater;
   }
 
   void processRequest(ReadItemDTO readItemDTO) {
-    Item item = itemFinder.findItemById(readItemDTO.getItemId())
+    Item item = itemRepository.findById(readItemDTO.getItemId())
         .orElseThrow(() -> new ItemNotFoundException(readItemDTO.getItemId()));
     if (readItemDTO.isRead()) {
       markItemAsRead(item);
