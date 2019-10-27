@@ -143,7 +143,7 @@ class BlogServiceTest {
   void shouldChangeActivityBlogWhenWeTryDeleteBlogWithItems() {
     Blog blog = new BlogBuilder().build();
     given(blogRepository.findById("1")).willReturn(Optional.of(blog));
-    BlogAggregationDTO aggregationDTO = new BlogAggregationDTOBuilder().blogItemsCount(1L).build();
+    BlogAggregationDTO aggregationDTO = new BlogAggregationDTOBuilder().blogId("1").blogItemsCount(1L).build();
     given(blogRepository.getBlogWithCount("1")).willReturn(Optional.of(aggregationDTO));
 
     //when
