@@ -23,7 +23,8 @@ class NewItemForSearchEventConsumer {
         .link(event.getLinkUrl())
         .title(event.getItemTitle())
         .description(event.getItemDescription())
-        .build());
+        .build())
+        .block();
     log.info("Event <{}>", event);
   }
 

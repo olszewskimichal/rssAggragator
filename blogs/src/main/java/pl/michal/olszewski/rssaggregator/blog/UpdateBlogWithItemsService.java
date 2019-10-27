@@ -10,7 +10,6 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
-import reactor.core.publisher.Mono;
 
 @Service
 public class UpdateBlogWithItemsService {
@@ -38,12 +37,13 @@ public class UpdateBlogWithItemsService {
     this.ogTagInfoUpdater = ogTagInfoUpdater;
   }
 
-  public Mono<Blog> updateBlog(Blog blogFromDb, UpdateBlogWithItemsDTO blogInfoFromRSS) {
+  public boolean updateBlog(Blog blogFromDb, UpdateBlogWithItemsDTO blogInfoFromRSS) {
     log.debug("aktualizuje bloga {}", blogFromDb.getName());
     blogInfoFromRSS.getItemsList()
         .forEach(item -> addItemToBlog(blogFromDb, item));
-    return blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS.toUpdateBlogDto())
-        .doOnNext(this::putToCache);
+    Blog blog = blogUpdater.updateBlogFromDTO(blogFromDb, blogInfoFromRSS.toUpdateBlogDto());
+    putToCache(blog);
+    return true;
   }
 
   private void addItemToBlog(Blog blog, ItemDTO item) {

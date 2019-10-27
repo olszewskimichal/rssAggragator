@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.mongodb.MongoWriteException;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +13,6 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @DataMongoTest
 @ActiveProfiles("test")
@@ -23,11 +22,11 @@ class BlogRepositoryTest {
   protected MongoTemplate entityManager;
 
   @Autowired
-  private BlogReactiveRepository blogRepository;
+  private BlogRepository blogRepository;
 
   @BeforeEach
   void setUp() {
-    blogRepository.deleteAll().block();
+    blogRepository.deleteAll();
   }
 
   @Test
@@ -37,14 +36,11 @@ class BlogRepositoryTest {
         .withURL("url");
 
     //when
-    Mono<Blog> byBlogURL = blogRepository.findByFeedURL("url");
+    Optional<Blog> byBlogURL = blogRepository.findByFeedURL("url");
 
     //then
-    StepVerifier
-        .create(byBlogURL)
-        .assertNext(v -> assertThat(v.getBlogURL()).isEqualTo("url"))
-        .expectComplete()
-        .verify();
+    assertThat(byBlogURL).isPresent();
+    assertThat(byBlogURL.get().getBlogURL()).isEqualTo("url");
   }
 
   @Test
@@ -54,40 +50,28 @@ class BlogRepositoryTest {
         .withURL("url");
 
     //when
-    Mono<Blog> blogByID = blogRepository.findById(blog.getId());
+    Optional<Blog> blogByID = blogRepository.findById(blog.getId());
 
     //then
-    StepVerifier
-        .create(blogByID)
-        .assertNext(v -> assertThat(v.getBlogURL()).isEqualTo("url"))
-        .expectComplete()
-        .verify();
+    assertThat(blogByID).isPresent();
   }
 
   @Test
   void shouldNotFindBlogByBlogURLWhenNotExists() {
     //when
-    Mono<Blog> byBlogURL = blogRepository.findByFeedURL("url");
+    Optional<Blog> byBlogURL = blogRepository.findByFeedURL("url");
 
     //then
-    StepVerifier
-        .create(byBlogURL)
-        .expectNextCount(0)
-        .expectComplete()
-        .verify();
+    assertThat(byBlogURL).isNotPresent();
   }
 
   @Test
   void shouldNotFindBlogByIdWhenNotExists() {
     //when
-    Mono<Blog> blogById = blogRepository.findById("1");
+    Optional<Blog> blogById = blogRepository.findById("1");
 
     //then
-    StepVerifier
-        .create(blogById)
-        .expectNextCount(0)
-        .expectComplete()
-        .verify();
+    assertThat(blogById).isNotPresent();
   }
 
   @Test
@@ -109,27 +93,19 @@ class BlogRepositoryTest {
         .withName("url");
 
     //when
-    Mono<Blog> byName = blogRepository.findByName("url");
+    Optional<Blog> byName = blogRepository.findByName("url");
 
     //then
-    StepVerifier
-        .create(byName)
-        .assertNext(blog -> assertThat(blog.getName()).isEqualTo("url"))
-        .expectComplete()
-        .verify();
+    assertThat(byName).isPresent();
   }
 
   @Test
   void shouldNotFindBlogByNameWhenNotExists() {
     //when
-    Mono<Blog> byName = blogRepository.findByName("name");
+    Optional<Blog> byName = blogRepository.findByName("name");
 
     //then
-    StepVerifier
-        .create(byName)
-        .expectNextCount(0)
-        .expectComplete()
-        .verify();
+    assertThat(byName).isNotPresent();
   }
 
   @Test
@@ -137,26 +113,18 @@ class BlogRepositoryTest {
     givenBlog()
         .buildNumberOfBlogsAndSave(5);
     //when
-    Flux<Blog> streamAll = blogRepository.findAll();
+    List<Blog> streamAll = blogRepository.findAll();
     //then
-    StepVerifier
-        .create(streamAll)
-        .expectNextCount(5)
-        .expectComplete()
-        .verify();
+    assertThat(streamAll).hasSize(5);
   }
 
   @Test
   void shouldNotReturnNotActiveBlog() {
     givenBlog().notActive();
     //when
-    Flux<Blog> streamAll = blogRepository.findAll();
+    List<Blog> streamAll = blogRepository.findAll();
     //then
-    StepVerifier
-        .create(streamAll)
-        .expectNextCount(0)
-        .expectComplete()
-        .verify();
+    assertThat(streamAll).hasSize(0);
   }
 
   private BlogListFactory givenBlog() {

@@ -3,12 +3,13 @@ package pl.michal.olszewski.rssaggregator.item;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import reactor.test.StepVerifier;
 
 class DuplicateItemFixerTest extends IntegrationTestBase {
 
@@ -23,7 +24,7 @@ class DuplicateItemFixerTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    itemRepository.deleteAll().block();
+    itemRepository.deleteAll();
   }
 
   @Test
@@ -46,10 +47,9 @@ class DuplicateItemFixerTest extends IntegrationTestBase {
     duplicateItemsFixer.removeDuplicatesFromLastWeek();
 
     //then
-    StepVerifier.create(itemRepository.findAll())
-        .assertNext(item -> assertThat(item.getLink()).isEqualTo("https://lafkblogs.wordpress.com/2019/09/29/biggest-error-in-your-maven-project-mvn-clean-install/"))
-        .expectComplete()
-        .verify();
+    assertThat(itemRepository.count()).isEqualTo(1);
+    List<String> linkList = itemRepository.findAll().stream().map(Item::getLink).collect(Collectors.toList());
+    assertThat(linkList).hasSize(1).contains("https://lafkblogs.wordpress.com/2019/09/29/biggest-error-in-your-maven-project-mvn-clean-install/");
   }
 
   @Test
@@ -72,10 +72,7 @@ class DuplicateItemFixerTest extends IntegrationTestBase {
     duplicateItemsFixer.removeDuplicatesFromLastWeek();
 
     //then
-    StepVerifier.create(itemRepository.findAll())
-        .expectNextCount(2L)
-        .expectComplete()
-        .verify();
+    assertThat(itemRepository.count()).isEqualTo(2);
   }
 
 }

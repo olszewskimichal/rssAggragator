@@ -12,12 +12,11 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import org.springframework.web.reactive.function.BodyInserters;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import reactor.test.StepVerifier;
 
 class BlogControllerTest extends IntegrationTestBase {
 
   @Autowired
-  private BlogReactiveRepository blogRepository;
+  private BlogRepository blogRepository;
 
   @Autowired
   private MongoTemplate mongoTemplate;
@@ -27,7 +26,7 @@ class BlogControllerTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    blogRepository.deleteAll().block();
+    blogRepository.deleteAll();
     mongoTemplate.remove(new Query(), "item");
   }
 
@@ -100,10 +99,7 @@ class BlogControllerTest extends IntegrationTestBase {
     thenCreateBlogByApi("test");
 
     //then
-    StepVerifier.create(blogRepository.findAll())
-        .assertNext(blog -> assertThat(blog).isNotNull())
-        .expectComplete()
-        .verify();
+    assertThat(blogRepository.count()).isEqualTo(1);
   }
 
   @Test
@@ -126,7 +122,8 @@ class BlogControllerTest extends IntegrationTestBase {
     thenUpdateBlogByApi(blogDTO, blog.getId());
 
     //then
-    assertThat(blogRepository.findById(blog.getId()).block())
+    assertThat(blogRepository.findById(blog.getId())).isPresent()
+        .get()
         .isNotNull()
         .hasFieldOrPropertyWithValue("description", expectedDescription)
         .hasFieldOrPropertyWithValue("publishedDate", expectedPublishedDate);
@@ -141,9 +138,7 @@ class BlogControllerTest extends IntegrationTestBase {
     thenDeleteOneBlogFromApi(blog.getId());
 
     //then
-    StepVerifier.create(blogRepository.findById(blog.getId()))
-        .expectSubscription()
-        .verifyComplete();
+    assertThat(blogRepository.findById(blog.getId())).isNotPresent();
   }
 
   @Test

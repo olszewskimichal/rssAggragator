@@ -2,8 +2,8 @@ package pl.michal.olszewski.rssaggregator.item;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -14,8 +14,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import pl.michal.olszewski.rssaggregator.blog.BlogNotFoundException;
 import pl.michal.olszewski.rssaggregator.util.Page;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 class ItemFinder {
@@ -23,48 +21,46 @@ class ItemFinder {
   private static final Logger log = LoggerFactory.getLogger(ItemFinder.class);
 
   private final ItemRepository itemRepository;
-  private final ItemRepositorySync itemRepositorySync;
   private final MongoTemplate mongoTemplate;
 
-  ItemFinder(ItemRepository itemRepository, ItemRepositorySync itemRepositorySync, MongoTemplate mongoTemplate) {
+  ItemFinder(ItemRepository itemRepository, MongoTemplate mongoTemplate) {
     this.itemRepository = itemRepository;
-    this.itemRepositorySync = itemRepositorySync;
     this.mongoTemplate = mongoTemplate;
   }
 
-  Mono<Long> countAllItems() {
-    return itemRepository.count().cache();
+  Long countAllItems() {
+    return itemRepository.count();
   }
 
-  Mono<Item> findItemById(String id) {
+  Optional<Item> findItemById(String id) {
     return itemRepository.findById(id);
   }
 
-  Flux<Item> findAllOrderByPublishedDate(Integer limit, Integer page) {
+  List<Item> findAllOrderByPublishedDate(Integer limit, Integer page) {
     return itemRepository.findAllOrderByPublishedDate(limit, page);
   }
 
-  Stream<Item> findAllOrderByPublishedDateBlocking(Integer limit, Integer page) {
-    return itemRepositorySync.findAllOrderByPublishedDate(limit, page);
-  }
-
-  Flux<Item> findAllOrderByCreatedAt(Integer limit, Integer page) {
+  List<Item> findAllOrderByCreatedAt(Integer limit, Integer page) {
     return itemRepository.findAllOrderByCreatedAt(limit, page);
   }
 
-  Mono<PageBlogItemDTO> getBlogItemsForBlog(String blogId, Integer limit, Integer page) {
+  PageBlogItemDTO getBlogItemsForBlog(String blogId, Integer limit, Integer page) {
     Page pageable = new Page(limit, page);
     log.debug("getBlogItemsForBlog {}", blogId);
     boolean exists = mongoTemplate.exists(new Query().addCriteria(Criteria.where("_id").is(blogId)), "blog");
     if (!exists) {
       throw new BlogNotFoundException(blogId);
     }
-    return itemRepository.findAllByBlogId(blogId)
-        .collectList()
-        .map(result -> new PageBlogItemDTO(
-            result.stream().skip(pageable.getLimit() * pageable.getPageForSearch()).limit(pageable.getLimit()).map(ItemToDtoMapper::mapToBlogItemDTO).collect(Collectors.toList()),
-            result.size())
-        );
+    List<Item> allByBlogId = itemRepository.findAllByBlogId(blogId);
+    List<BlogItemDTO> blogItemDTOS = allByBlogId.stream()
+        .skip(pageable.getLimit() * pageable.getPageForSearch())
+        .limit(pageable.getLimit())
+        .map(ItemToDtoMapper::mapToBlogItemDTO)
+        .collect(Collectors.toList());
+    return new PageBlogItemDTO(
+        blogItemDTOS,
+        allByBlogId.size()
+    );
   }
 
   List<Item> findItemsFromDateOrderByCreatedAt(Instant from) {

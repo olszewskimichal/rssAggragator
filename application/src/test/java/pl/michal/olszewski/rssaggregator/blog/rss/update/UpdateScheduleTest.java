@@ -15,9 +15,11 @@ import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.io.FeedException;
 import java.io.IOException;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +36,6 @@ import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 
 class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLogger {
@@ -78,20 +77,13 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .build();
     mongoTemplate.save(blog);
 
-    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+    //when
+    List<Boolean> result = updateBlogService.updateAllBlogs();
 
-    StepVerifier
-        .create(result)
-        .expectNext(true)
-        .expectComplete()
-        .verify();
-
-    Mono<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
-    StepVerifier
-        .create(updatedBlog)
-        .expectNextCount(1L)
-        .expectComplete()
-        .verify();
+    //then
+    assertThat(result).hasSize(1).contains(true);
+    Optional<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
+    assertThat(updatedBlog).isPresent();
     verify(jmsTemplate, times(2)).convertAndSend(anyString(), any(NewItemForSearchEvent.class));
     verify(jmsTemplate, times(2)).convertAndSend(anyString(), any(NewItemInBlogEvent.class));
 
@@ -111,20 +103,13 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .build();
     mongoTemplate.save(blog);
 
-    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+    List<Boolean> result = updateBlogService.updateAllBlogs();
 
-    StepVerifier
-        .create(result)
-        .expectNext(true)
-        .expectComplete()
-        .verify();
+    assertThat(result).hasSize(1).contains(true);
 
-    Mono<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
-    StepVerifier
-        .create(updatedBlog)
-        .assertNext(aggregationDTO -> assertThat(aggregationDTO.getBlogItemsCount()).isEqualTo(0))
-        .expectComplete()
-        .verify();
+    Optional<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
+    assertThat(updatedBlog).isPresent();
+    assertThat(updatedBlog.get().getBlogItemsCount()).isEqualTo(0);
     verify(jmsTemplate, times(0)).convertAndSend(anyString(), any(NewItemForSearchEvent.class));
     verify(jmsTemplate, times(0)).convertAndSend(anyString(), any(NewItemInBlogEvent.class));
 
@@ -139,12 +124,10 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
         .build();
     mongoTemplate.save(blog);
 
-    Mono<Boolean> result = updateBlogService.updateRssBlogItems(blog);
-    StepVerifier.withVirtualTime(() -> result)
-        .thenAwait(Duration.ofSeconds(5))
-        .expectNext(false)
-        .verifyComplete();
+    CompletableFuture<Boolean> result = updateBlogService.getItemsFromRssAndUpdateBlogWithTimeout(blog, 0L);
+    assertThat(result.join()).isFalse();
   }
+
 
   @Test
   void shouldReturnFalseWhenFetcherFailed() throws FetcherException, IOException, FeedException {
@@ -158,12 +141,9 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
 
     mongoTemplate.save(blog);
 
-    Flux<Boolean> result = updateBlogService.updateAllActiveBlogsByRss();
+    List<Boolean> result = updateBlogService.updateAllBlogs();
 
-    StepVerifier
-        .create(result)
-        .expectNext(false)
-        .verifyComplete();
+    assertThat(result).hasSize(1).contains(false);
   }
 
   private SyndFeedImpl buildSyndFeed() {

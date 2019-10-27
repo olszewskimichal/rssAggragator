@@ -20,7 +20,7 @@ class NewestItemsControllerTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    itemRepository.deleteAll().block();
+    itemRepository.deleteAll();
   }
 
   @Test

@@ -14,7 +14,7 @@ class BlogCacheConfig {
     Cache<String, BlogDTO> cache = Caffeine.newBuilder()
         .maximumSize(30000)
         .build();
-    blogFinder.findAllSync()
+    blogFinder.findAll()
         .forEach(blog -> cache.put(blog.getId(), BlogToDtoMapper.mapToBlogDto(blog)));
     registry.gauge("blogByIdCache", cache, Cache::estimatedSize);
     return cache;

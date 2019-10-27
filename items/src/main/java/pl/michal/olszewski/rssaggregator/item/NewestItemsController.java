@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.michal.olszewski.rssaggregator.config.SwaggerDocumented;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/items")
@@ -34,7 +33,7 @@ class NewestItemsController {
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Mono<PageItemDTO> getItemsOrderByPublishedDate(
+  public PageItemDTO getItemsOrderByPublishedDate(
       @ApiParam(name = "limit", value = "okresla ile elementow chcemy pobrac")
       @RequestParam(value = "limit", required = false)
           Integer limit,
@@ -52,7 +51,7 @@ class NewestItemsController {
       @ApiResponse(code = 500, message = "Internal server error")
   })
   @SwaggerDocumented
-  public Mono<PageItemDTO> getItemsOrderByCreatedAt(
+  public PageItemDTO getItemsOrderByCreatedAt(
       @ApiParam(name = "limit", value = "okresla ile elementow chcemy pobrac")
       @RequestParam(value = "limit", required = false)
           Integer limit,

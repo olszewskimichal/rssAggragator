@@ -1,5 +1,6 @@
 package pl.michal.olszewski.rssaggregator.blog;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
@@ -9,6 +10,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -26,8 +28,6 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTOBuilder;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
 import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -39,19 +39,14 @@ class UpdateBlogWithItemsServiceTest {
   private JmsTemplate jmsTemplate;
 
   @Mock
-  private BlogReactiveRepository blogRepository;
+  private BlogRepository blogRepository;
 
   @Mock
   private OgTagInfoUpdater ogTagBlogUpdater;
 
   @BeforeEach
   void setUp() {
-    given(blogRepository.save(any(Blog.class))).willAnswer(i -> {
-          Blog argument = i.getArgument(0);
-          argument.setId(UUID.randomUUID().toString());
-          return Mono.just(argument);
-        }
-    );
+    given(blogRepository.save(any(Blog.class))).willAnswer(i -> i.getArgument(0));
     given(ogTagBlogUpdater.updateItemByOgTagInfo(any(ItemDTO.class))).willAnswer(i -> i.getArgument(0));
     blogService = new UpdateBlogWithItemsService(
         new BlogWorker(blogRepository),
@@ -66,7 +61,7 @@ class UpdateBlogWithItemsServiceTest {
   void shouldUpdateBlogWhenNewItemAdd() {
     //given
     Blog blog = new BlogBuilder().id(UUID.randomUUID().toString()).feedURL("url").name("url").build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
+    given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
 
     List<ItemDTO> itemsList = IntStream.rangeClosed(1, 1)
         .mapToObj(number -> new ItemDTOBuilder().date(Instant.now()).author("autor").description("desc").title(number + "").link("link" + number).build()) //TODO
@@ -79,13 +74,8 @@ class UpdateBlogWithItemsServiceTest {
         .build();
 
     //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blog, blogDTO);
-
     //then
-    StepVerifier.create(updateBlog)
-        .expectNextCount(1L)
-        .expectComplete()
-        .verify();
+    assertTrue(blogService.updateBlog(blog, blogDTO));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
@@ -110,16 +100,11 @@ class UpdateBlogWithItemsServiceTest {
         .feedURL("url")
         .itemsList(Arrays.asList(itemDTO, itemDTO))
         .build();
-    given(blogRepository.findByFeedURL("url")).willReturn(Mono.just(blog));
+    given(blogRepository.findByFeedURL("url")).willReturn(Optional.of(blog));
 
     //when
-    Mono<Blog> updateBlog = blogService.updateBlog(blog, blogDTO);
-
     //then
-    StepVerifier.create(updateBlog)
-        .expectNextCount(1)
-        .expectComplete()
-        .verify();
+    assertTrue(blogService.updateBlog(blog, blogDTO));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }

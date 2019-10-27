@@ -12,6 +12,6 @@ class ItemSaver {
   }
 
   void saveNewItem(ItemDTO itemDTO) {
-    itemRepository.save(new Item(itemDTO)).block();
+    itemRepository.save(new Item(itemDTO));
   }
 }

@@ -17,7 +17,7 @@ class NewItemInBlogConsumerTest extends IntegrationTestBase {
 
   @BeforeEach
   void setUp() {
-    itemRepository.deleteAll().block();
+    itemRepository.deleteAll();
   }
 
   @Test
@@ -29,6 +29,6 @@ class NewItemInBlogConsumerTest extends IntegrationTestBase {
         .build();
     eventConsumer.receiveMessage(new NewItemInBlogEvent(item));
     //then
-    assertThat(itemRepository.count().block()).isEqualTo(1L);
+    assertThat(itemRepository.count()).isEqualTo(1L);
   }
 }

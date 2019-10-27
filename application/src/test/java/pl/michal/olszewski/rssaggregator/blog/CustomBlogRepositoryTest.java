@@ -2,6 +2,7 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,21 +10,19 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.ItemListFactory;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
-class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
+class CustomBlogRepositoryTest extends IntegrationTestBase {
 
   @Autowired
   private MongoTemplate mongoTemplate;
 
   @Autowired
-  private BlogReactiveRepository blogRepository;
+  private BlogRepository blogRepository;
 
   @BeforeEach
   void setUp() {
     mongoTemplate.remove(new Query(), "item");
-    blogRepository.deleteAll().block();
+    blogRepository.deleteAll();
   }
 
   @Test
@@ -33,11 +32,10 @@ class ReactiveAggregationBlogRepositoryTest extends IntegrationTestBase {
     givenItems()
         .buildNumberOfItemsAndSave(2, blog.getId());
 
-    Mono<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogWithCount(blog.getId());
+    Optional<BlogAggregationDTO> blogsWithCount = blogRepository.getBlogWithCount(blog.getId());
 
-    StepVerifier.create(blogsWithCount)
-        .assertNext(aggregationDTO -> assertThat(aggregationDTO.getBlogItemsCount()).isEqualTo(2))
-        .verifyComplete();
+    assertThat(blogsWithCount).isPresent();
+    assertThat(blogsWithCount.get().getBlogItemsCount()).isEqualTo(2L);
   }
 
   private BlogListFactory givenBlog() {

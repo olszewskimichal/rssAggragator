@@ -14,7 +14,7 @@ class ItemCacheConfig {
     Cache<BlogItemLink, ItemDTO> cache = Caffeine.newBuilder()
         .maximumSize(30000)
         .build();
-    finder.findAllOrderByPublishedDateBlocking(200, 0)
+    finder.findAllOrderByPublishedDate(200, 0)
         .forEach(item -> cache.put(new BlogItemLink(item.getBlogId(), item.getLink()), ItemToDtoMapper.mapItemToItemDTO(item)));
     registry.gauge("itemCache", cache, Cache::estimatedSize);
     return cache;

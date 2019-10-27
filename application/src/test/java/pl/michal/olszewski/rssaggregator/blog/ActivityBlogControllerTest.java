@@ -7,16 +7,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import reactor.test.StepVerifier;
 
 class ActivityBlogControllerTest extends IntegrationTestBase {
 
   @Autowired
-  private BlogReactiveRepository blogRepository;
+  private BlogRepository blogRepository;
 
   @BeforeEach
   void setUp() {
-    blogRepository.deleteAll().block();
+    blogRepository.deleteAll();
   }
 
   @Test
@@ -29,10 +28,7 @@ class ActivityBlogControllerTest extends IntegrationTestBase {
     thenEnableBlogByApi(blog.getId());
 
     //then
-    StepVerifier.create(blogRepository.findById(blog.getId()))
-        .assertNext(enabledBlog -> assertTrue(enabledBlog.isActive()))
-        .expectComplete()
-        .verify();
+    assertTrue(blogRepository.findById(blog.getId()).get().isActive());
   }
 
   @Test
@@ -45,10 +41,7 @@ class ActivityBlogControllerTest extends IntegrationTestBase {
     thenDisableBlogByApi(blog.getId());
 
     //then
-    StepVerifier.create(blogRepository.findById(blog.getId()))
-        .assertNext(disabledBlog -> assertFalse(disabledBlog.isActive()))
-        .expectComplete()
-        .verify();
+    assertFalse(blogRepository.findById(blog.getId()).get().isActive());
   }
 
   private BlogListFactory givenBlog() {

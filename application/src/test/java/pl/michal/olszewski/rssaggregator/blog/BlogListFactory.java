@@ -2,13 +2,12 @@ package pl.michal.olszewski.rssaggregator.blog;
 
 import java.util.UUID;
 import java.util.stream.IntStream;
-import reactor.core.publisher.Mono;
 
 class BlogListFactory {
 
-  private final BlogReactiveRepository repository;
+  private final BlogRepository repository;
 
-  BlogListFactory(BlogReactiveRepository repository) {
+  BlogListFactory(BlogRepository repository) {
     this.repository = repository;
   }
 
@@ -17,28 +16,27 @@ class BlogListFactory {
         .id(UUID.randomUUID().toString())
         .name(UUID.randomUUID().toString())
         .build();
-    return repository.save(blog).block();
+    return repository.save(blog);
   }
 
   void buildNumberOfBlogsAndSave(int numberOfBlogs) {
     IntStream.range(0, numberOfBlogs)
         .parallel()
         .mapToObj(number -> new BlogBuilder().blogURL("blog" + number).feedURL("blog" + number).build())
-        .map(repository::save)
-        .forEach(Mono::block);
+        .forEach(repository::save);
   }
 
   Blog withURL(String url) {
-    return repository.save(new BlogBuilder().blogURL(url).feedURL(url).build()).block();
+    return repository.save(new BlogBuilder().blogURL(url).feedURL(url).build());
   }
 
   void notActive() {
     Blog blog = new BlogBuilder().blogURL("test").feedURL("test").build();
     blog.deactivate();
-    repository.save(blog).block();
+    repository.save(blog);
   }
 
   void withName(String name) {
-    repository.save(new BlogBuilder().blogURL(name).name(name).build()).block();
+    repository.save(new BlogBuilder().blogURL(name).name(name).build());
   }
 }

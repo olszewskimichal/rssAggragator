@@ -15,9 +15,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import pl.michal.olszewski.rssaggregator.blog.BlogBuilder;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 
 class ItemFinderTest extends IntegrationTestBase {
 
@@ -46,14 +43,10 @@ class ItemFinderTest extends IntegrationTestBase {
         new Item(new ItemDTOBuilder().link("title2").date(instant.minusSeconds(10)).build())
     ));
     //when
-    Flux<Item> items = itemFinder.findAllOrderByPublishedDate(2, 0);
+    List<Item> items = itemFinder.findAllOrderByPublishedDate(2, 0);
 
     //then
-    StepVerifier.create(items)
-        .expectNext(newestItem)
-        .expectNext(presentItem)
-        .expectComplete()
-        .verify();
+    assertThat(items).hasSize(2).contains(newestItem, presentItem);
   }
 
   @Test
@@ -64,14 +57,11 @@ class ItemFinderTest extends IntegrationTestBase {
     Item title3 = mongoTemplate.save(new Item(new ItemDTOBuilder().link("title3").build()));
 
     //when
-    Flux<Item> items = itemFinder.findAllOrderByCreatedAt(2, 0);
+    List<Item> items = itemFinder.findAllOrderByCreatedAt(2, 0);
 
     //then
-    StepVerifier.create(items)
-        .expectNext(title3)
-        .expectNext(title1)
-        .expectComplete()
-        .verify();
+    assertThat(items).hasSize(2).contains(title3, title1);
+
   }
 
   @Test
@@ -84,12 +74,9 @@ class ItemFinderTest extends IntegrationTestBase {
     ));
 
     //when
-    Flux<Item> items = itemFinder.findAllOrderByPublishedDate(2, 0);
+    List<Item> items = itemFinder.findAllOrderByPublishedDate(2, 0);
     //then
-    StepVerifier.create(items)
-        .expectNextCount(2)
-        .expectComplete()
-        .verify();
+    assertThat(items).hasSize(2);
   }
 
   @Test
@@ -121,12 +108,9 @@ class ItemFinderTest extends IntegrationTestBase {
     ));
 
     //when
-    Mono<PageBlogItemDTO> byBlogId = itemFinder.getBlogItemsForBlog("id1", null, null);
+    PageBlogItemDTO byBlogId = itemFinder.getBlogItemsForBlog("id1", null, null);
     //then
-    StepVerifier.create(byBlogId)
-        .assertNext(pageBlogItemDTO -> assertThat(pageBlogItemDTO.getTotalElements()).isEqualTo(2L))
-        .expectComplete()
-        .verify();
+    assertThat(byBlogId.getTotalElements()).isEqualTo(2L);
   }
 
   @Test

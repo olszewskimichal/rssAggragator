@@ -1,7 +1,6 @@
 package pl.michal.olszewski.rssaggregator.item;
 
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 @Component
 class ReadItemService {
@@ -14,26 +13,23 @@ class ReadItemService {
     this.itemUpdater = itemUpdater;
   }
 
-  Mono<Void> processRequest(ReadItemDTO readItemDTO) {
-    return itemFinder.findItemById(readItemDTO.getItemId())
-        .switchIfEmpty(Mono.error(new ItemNotFoundException(readItemDTO.getItemId())))
-        .flatMap(item -> {
-          if (readItemDTO.isRead()) {
-            return markItemAsRead(item);
-          }
-          return markItemAsUnread(item);
-        });
+  void processRequest(ReadItemDTO readItemDTO) {
+    Item item = itemFinder.findItemById(readItemDTO.getItemId())
+        .orElseThrow(() -> new ItemNotFoundException(readItemDTO.getItemId()));
+    if (readItemDTO.isRead()) {
+      markItemAsRead(item);
+    } else {
+      markItemAsUnread(item);
+    }
   }
 
-  private Mono<Void> markItemAsRead(Item item) {
-    return Mono.fromCallable(item::markAsRead)
-        .flatMap(itemUpdater::updateItem)
-        .then();
+  private void markItemAsRead(Item item) {
+    item.markAsRead();
+    itemUpdater.updateItem(item);
   }
 
-  private Mono<Void> markItemAsUnread(Item item) {
-    return Mono.fromCallable(item::markAsUnread)
-        .flatMap(itemUpdater::updateItem)
-        .then();
+  private void markItemAsUnread(Item item) {
+    item.markAsUnread();
+    itemUpdater.updateItem(item);
   }
 }
