@@ -2,6 +2,54 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <artifactId>rss-aggregator</artifactId>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </configuration>
+        <version>2.22.2</version>
+      </plugin>
+      <plugin>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <append>true</append>
+          <destFile>${sonar.jacoco.reportPath}</destFile>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <goals>
+              <goal>report-aggregate</goal>
+            </goals>
+            <id>report</id>
+            <phase>test</phase>
+          </execution>
+        </executions>
+        <groupId>org.jacoco</groupId>
+        <version>0.8.4</version>
+      </plugin>
+      <plugin>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <configuration>
+          <failOnNoGitDirectory>false</failOnNoGitDirectory>
+          <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+          <format>properties</format>
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+          <injectAllReactorProjects>true</injectAllReactorProjects>
+        </configuration>
+        <groupId>pl.project13.maven</groupId>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <artifactId>reactor-test</artifactId>
@@ -148,6 +196,7 @@
     <module>modelPersistence</module>
     <!--<module>migrator</module>-->
   </modules>
+
   <name>rss-aggregator</name>
 
   <packaging>pom</packaging>
@@ -160,7 +209,7 @@
   </parent>
 
   <properties>
-    <java.version>12</java.version>
+    <java.version>13</java.version>
     <junit.jupiter.version>5.5.2</junit.jupiter.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
