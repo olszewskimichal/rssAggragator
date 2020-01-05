@@ -18,6 +18,7 @@
         <configuration>
           <append>true</append>
           <destFile>${sonar.jacoco.reportPath}</destFile>
+          <outputDirectory>${sonar.jacoco.outputreportPath}</outputDirectory>
         </configuration>
         <executions>
           <execution>
@@ -217,7 +218,8 @@
     <elasticsearch.version>6.8.0</elasticsearch.version>
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
+    <sonar.jacoco.reportPath>${project.basedir}/../target/JACOCO/jacoco.exec</sonar.jacoco.reportPath>
+    <sonar.jacoco.outputreportPath>${project.basedir}/../target/JACOCO</sonar.jacoco.outputreportPath>
     <sonar.language>java</sonar.language>
   </properties>
 
