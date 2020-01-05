@@ -209,13 +209,13 @@
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
     <sonar.coverage.jacoco.xmlReportPaths>
-      /../application/target/site/jacoco-aggregate/jacoco.xml,
-      /../blogs/target/site/jacoco-aggregate/jacoco.xml,
-      /../cache/target/site/jacoco-aggregate/jacoco.xml,
-      /../items/target/site/jacoco-aggregate/jacoco.xml,
-      /../model/target/site/jacoco-aggregate/jacoco.xml,
-      /../modelPersistance/target/site/jacoco-aggregate/jacoco.xml,
-      /../search/target/site/jacoco-aggregate/jacoco.xml
+      ../application/target/site/jacoco-aggregate/jacoco.xml,
+      ../blogs/target/site/jacoco-aggregate/jacoco.xml,
+      ../cache/target/site/jacoco-aggregate/jacoco.xml,
+      ../items/target/site/jacoco-aggregate/jacoco.xml,
+      ../model/target/site/jacoco-aggregate/jacoco.xml,
+      ../modelPersistance/target/site/jacoco-aggregate/jacoco.xml,
+      ../search/target/site/jacoco-aggregate/jacoco.xml
     </sonar.coverage.jacoco.xmlReportPaths>
     <sonar.language>java</sonar.language>
   </properties>
