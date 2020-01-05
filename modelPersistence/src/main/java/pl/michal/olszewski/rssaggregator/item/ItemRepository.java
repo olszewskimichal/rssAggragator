@@ -18,11 +18,11 @@ interface ItemRepository extends MongoRepository<Item, String> {
   List<Item> findAllByBlogId(String blogId);
 
   default List<Item> findAllOrderByPublishedDate(Integer limit, Integer page) {
-    return findAllBy(PageRequest.of(page, limit, new Sort(Sort.Direction.DESC, DATE)));
+    return findAllBy(PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, DATE)));
   }
 
   default List<Item> findAllOrderByCreatedAt(Integer limit, Integer page) {
-    return findAllBy(PageRequest.of(page, limit, new Sort(Sort.Direction.DESC, CREATED_AT)));
+    return findAllBy(PageRequest.of(page, limit, Sort.by(Sort.Direction.DESC, CREATED_AT)));
   }
 
 
