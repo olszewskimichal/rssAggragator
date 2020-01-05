@@ -15,17 +15,7 @@
       </plugin>
       <plugin>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <append>true</append>
-          <destFile>${sonar.jacoco.reportPath}</destFile>
-          <destFile>${sonar.coverage.jacoco.xmlReportPaths}</destFile>
-        </configuration>
         <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
           <execution>
             <goals>
               <goal>report-aggregate</goal>
@@ -35,7 +25,7 @@
           </execution>
         </executions>
         <groupId>org.jacoco</groupId>
-        <version>0.8.4</version>
+        <version>0.8.5</version>
       </plugin>
       <plugin>
         <artifactId>git-commit-id-plugin</artifactId>
@@ -218,9 +208,15 @@
     <elasticsearch.version>6.8.0</elasticsearch.version>
     <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
     <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
-    <sonar.jacoco.reportPath>application/target/jacoco.exec</sonar.jacoco.reportPath>
-    <sonar.coverage.jacoco.reportPath>application/target/jacoco.exec</sonar.coverage.jacoco.reportPath>
-    <sonar.coverage.jacoco.xmlReportPath>application/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPath>
+    <sonar.coverage.jacoco.xmlReportPaths>
+      application/target/site/jacoco-aggregate/jacoco.xml,
+      blogs/target/site/jacoco-aggregate/jacoco.xml,
+      cache/target/site/jacoco-aggregate/jacoco.xml,
+      items/target/site/jacoco-aggregate/jacoco.xml,
+      model/target/site/jacoco-aggregate/jacoco.xml,
+      modelPersistance/target/site/jacoco-aggregate/jacoco.xml,
+      search/target/site/jacoco-aggregate/jacoco.xml
+    </sonar.coverage.jacoco.xmlReportPaths>
     <sonar.language>java</sonar.language>
   </properties>
 
