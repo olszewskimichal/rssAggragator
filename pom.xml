@@ -15,6 +15,10 @@
       </plugin>
       <plugin>
         <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <append>true</append>
+          <destFile>${jacoco.destFile}</destFile>
+        </configuration>
         <executions>
           <execution>
             <goals>
@@ -22,10 +26,11 @@
             </goals>
             <id>report</id>
             <phase>test</phase>
-            <configuration>
-              <append>true</append>
-              <destFile>${jacoco.destFile}</destFile>
-            </configuration>
+          </execution>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
           </execution>
         </executions>
         <groupId>org.jacoco</groupId>
@@ -212,7 +217,7 @@
     <elasticsearch.version>6.8.0</elasticsearch.version>
     <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
     <sonar.jacoco.reportPath>${jacoco.destFile}</sonar.jacoco.reportPath>
-    <jacoco.destFile>${maven.multiModuleProjectDirectory}/target/jacoco_analysis/jacoco.exec</jacoco.destFile>
+    <jacoco.destFile>${maven.multiModuleProjectDirectory}/target/jacoco.exec</jacoco.destFile>
     <sonar.language>java</sonar.language>
   </properties>
 
