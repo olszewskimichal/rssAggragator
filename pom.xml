@@ -2,48 +2,6 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <artifactId>rss-aggregator</artifactId>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*.java</include>
-          </includes>
-          <argLine>${argLine}</argLine>
-        </configuration>
-        <version>2.22.2</version>
-      </plugin>
-      <plugin>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <append>true</append>
-          <destFile>${jacoco.destFile}</destFile>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-        </executions>
-        <groupId>org.jacoco</groupId>
-        <version>0.8.5</version>
-      </plugin>
-      <plugin>
-        <artifactId>git-commit-id-plugin</artifactId>
-        <configuration>
-          <failOnNoGitDirectory>false</failOnNoGitDirectory>
-          <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
-          <format>properties</format>
-          <generateGitPropertiesFile>true</generateGitPropertiesFile>
-          <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
-          <injectAllReactorProjects>true</injectAllReactorProjects>
-        </configuration>
-        <groupId>pl.project13.maven</groupId>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <artifactId>reactor-test</artifactId>
@@ -209,11 +167,60 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <start-class>pl.michal.olszewski.rssaggregator.RssAggregatorApplication</start-class>
     <elasticsearch.version>6.8.0</elasticsearch.version>
-    <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
-    <jacoco.destFile>${project.basedir}/../target/jacoco.exec</jacoco.destFile>
-    <sonar.jacoco.reportPath>${jacoco.destFile}</sonar.jacoco.reportPath>
-    <sonar.language>java</sonar.language>
+    <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
   </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*.java</include>
+          </includes>
+        </configuration>
+        <version>2.22.2</version>
+      </plugin>
+      <plugin>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>
+              **/pl/michal/olszewski/rssaggregator/config/**
+            </exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <goals>
+              <goal>report-aggregate</goal>
+            </goals>
+            <id>report</id>
+            <phase>test</phase>
+          </execution>
+        </executions>
+        <groupId>org.jacoco</groupId>
+        <version>0.8.4</version>
+      </plugin>
+      <plugin>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <configuration>
+          <failOnNoGitDirectory>false</failOnNoGitDirectory>
+          <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+          <format>properties</format>
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+          <injectAllReactorProjects>true</injectAllReactorProjects>
+        </configuration>
+        <groupId>pl.project13.maven</groupId>
+      </plugin>
+    </plugins>
+  </build>
 
   <version>0.0.11-SNAPSHOT</version>
 
