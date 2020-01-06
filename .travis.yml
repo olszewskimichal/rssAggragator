@@ -27,8 +27,9 @@ jobs:
   include:
     - stage: test
       script:
-        - mvn test sonar:sonar -Dsonar.coverage.exclusions=**/pl/michal/olszewski/rssaggregator/config/** -B
+        - mvn test -B
       after_success:
+        - mvn sonar:sonar -Dsonar.coverage.exclusions=**/pl/michal/olszewski/rssaggregator/config/**
         - bash <(curl -s https://codecov.io/bash)
 notifications:
   email:
