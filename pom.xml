@@ -10,6 +10,7 @@
           <includes>
             <include>**/*.java</include>
           </includes>
+          <argLine>${argLine}</argLine>
         </configuration>
         <version>2.22.2</version>
       </plugin>
@@ -20,13 +21,6 @@
           <destFile>${jacoco.destFile}</destFile>
         </configuration>
         <executions>
-          <execution>
-            <goals>
-              <goal>report-aggregate</goal>
-            </goals>
-            <id>report</id>
-            <phase>test</phase>
-          </execution>
           <execution>
             <goals>
               <goal>prepare-agent</goal>
@@ -216,8 +210,8 @@
     <start-class>pl.michal.olszewski.rssaggregator.RssAggregatorApplication</start-class>
     <elasticsearch.version>6.8.0</elasticsearch.version>
     <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
+    <jacoco.destFile>${project.basedir}/../target/jacoco.exec</jacoco.destFile>
     <sonar.jacoco.reportPath>${jacoco.destFile}</sonar.jacoco.reportPath>
-    <jacoco.destFile>${maven.multiModuleProjectDirectory}/target/jacoco.exec</jacoco.destFile>
     <sonar.language>java</sonar.language>
   </properties>
 
