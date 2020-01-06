@@ -167,7 +167,6 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <start-class>pl.michal.olszewski.rssaggregator.RssAggregatorApplication</start-class>
     <elasticsearch.version>6.8.0</elasticsearch.version>
-    <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
   </properties>
 
   <build>
