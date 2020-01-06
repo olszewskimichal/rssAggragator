@@ -29,7 +29,7 @@ jobs:
       script:
         - mvn test -B
       after_success:
-        - mvn sonar:sonar -Dsonar.coverage.exclusions=**/pl/michal/olszewski/rssaggregator/config/** -Dsonar.coverage.jacoco.xmlReportPaths=./model/target/site/jacoco-aggregate/jacoco.xml,./modelPersistence/target/site/jacoco-aggregate/jacoco.xml,./items/target/site/jacoco-aggregate/jacoco.xml,./search/target/site/jacoco-aggregate/jacoco.xml,./blogs/target/site/jacoco-aggregate/jacoco.xml,./application/target/site/jacoco-aggregate/jacoco.xml,./target/site/jacoco-aggregate/jacoco.xml,./cache/target/site/jacoco-aggregate/jacoco.xml
+        - mvn sonar:sonar -Dsonar.coverage.exclusions=**/pl/michal/olszewski/rssaggregator/config/** -Dsonar.jacoco.reportPaths=/home/travis/build/olszewskimichal/rssAggragator/application/target/jacoco.exec,/home/travis/build/olszewskimichal/rssAggragator/items/target/jacoco.exec,/home/travis/build/olszewskimichal/rssAggragator/blogs/target/jacoco.exec,/home/travis/build/olszewskimichal/rssAggragator/search/target/jacoco.exec
         - bash <(curl -s https://codecov.io/bash)
 notifications:
   email:
