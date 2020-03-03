@@ -169,7 +169,7 @@
     <dependency>
       <artifactId>sentry-spring</artifactId>
       <groupId>io.sentry</groupId>
-      <version>1.7.23</version>
+      <version>1.7.30</version>
     </dependency>
   </dependencies>
   <description>Agregator RSS</description>
@@ -196,7 +196,7 @@
         <groupId>org.springframework.cloud</groupId>
         <scope>import</scope>
         <type>pom</type>
-        <version>2.1.2.RELEASE</version>
+        <version>2.2.1.RELEASE</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -205,12 +205,12 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <groupId>org.springframework.boot</groupId>
     <relativePath/>
-    <version>2.1.8.RELEASE</version>
+    <version>2.2.2.RELEASE</version>
   </parent>
 
   <properties>
     <java.version>12</java.version>
-    <junit.jupiter.version>5.5.2</junit.jupiter.version>
+    <junit.jupiter.version>5.6.0</junit.jupiter.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <start-class>pl.michal.olszewski.rssaggregator.RssAggregatorApplication</start-class>
