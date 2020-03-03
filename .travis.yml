@@ -27,9 +27,10 @@ jobs:
   include:
     - stage: test
       script:
-        - mvn test sonar:sonar -Dsonar.coverage.exclusions=**/pl/michal/olszewski/rssaggregator/config/** -B
+        - mvn test -B
       after_success:
-        - bash <(curl -s https://codecov.io/bash) -s "application/target"
+        - mvn sonar:sonar -Dsonar.coverage.exclusions=**/pl/michal/olszewski/rssaggregator/config/** -Dsonar.jacoco.reportPaths=/home/travis/build/olszewskimichal/rssAggragator/application/target/jacoco.exec,/home/travis/build/olszewskimichal/rssAggragator/items/target/jacoco.exec,/home/travis/build/olszewskimichal/rssAggragator/blogs/target/jacoco.exec,/home/travis/build/olszewskimichal/rssAggragator/search/target/jacoco.exec
+        - bash <(curl -s https://codecov.io/bash)
 notifications:
   email:
     recipients:
