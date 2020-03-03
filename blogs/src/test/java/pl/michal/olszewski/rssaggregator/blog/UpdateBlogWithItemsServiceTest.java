@@ -27,7 +27,6 @@ import pl.michal.olszewski.rssaggregator.item.ItemDTO;
 import pl.michal.olszewski.rssaggregator.item.ItemDTOBuilder;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
 import pl.michal.olszewski.rssaggregator.ogtags.OgTagInfoUpdater;
-import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -53,8 +52,8 @@ class UpdateBlogWithItemsServiceTest {
         Caffeine.newBuilder().build(),
         Caffeine.newBuilder().build(),
         new NewItemInBlogEventProducer(jmsTemplate),
-        new NewItemForSearchEventProducer(jmsTemplate),
-        ogTagBlogUpdater);
+        ogTagBlogUpdater
+    );
   }
 
   @Test
@@ -77,7 +76,6 @@ class UpdateBlogWithItemsServiceTest {
     //then
     assertTrue(blogService.updateBlog(blog, blogDTO));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
-    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
 
   @Test
@@ -106,7 +104,6 @@ class UpdateBlogWithItemsServiceTest {
     //then
     assertTrue(blogService.updateBlog(blog, blogDTO));
     verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemInBlogEvent.class));
-    verify(jmsTemplate, times(1)).convertAndSend(Mockito.anyString(), Mockito.any(NewItemForSearchEvent.class));
   }
 
 }

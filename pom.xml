@@ -180,10 +180,8 @@
     <module>application</module>
     <module>blogs</module>
     <module>model</module>
-    <module>search</module>
     <module>cache</module>
     <module>modelPersistence</module>
-    <!--<module>migrator</module>-->
   </modules>
   <name>rss-aggregator</name>
 
@@ -214,7 +212,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <start-class>pl.michal.olszewski.rssaggregator.RssAggregatorApplication</start-class>
-    <elasticsearch.version>6.8.0</elasticsearch.version>
     <sonar.jacoco.reportMissing.force.zero>true</sonar.jacoco.reportMissing.force.zero>
     <sonar.jacoco.reportPath>${jacoco.destFile}</sonar.jacoco.reportPath>
     <jacoco.destFile>${maven.multiModuleProjectDirectory}/target/jacoco.exec</jacoco.destFile>

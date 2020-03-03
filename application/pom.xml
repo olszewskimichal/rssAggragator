@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <artifactId>application</artifactId>
   <dependencies>
     <dependency>
@@ -29,11 +29,11 @@
       <artifactId>search</artifactId>
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
-<!--    <dependency>
-      <artifactId>migrator</artifactId>
-      <groupId>pl.michal.olszewski</groupId>
-      <version>0.0.11-SNAPSHOT</version>
-    </dependency>-->
+    <!--    <dependency>
+          <artifactId>migrator</artifactId>
+          <groupId>pl.michal.olszewski</groupId>
+          <version>0.0.11-SNAPSHOT</version>
+        </dependency>-->
     <dependency>
       <artifactId>de.flapdoodle.embed.mongo</artifactId>
       <groupId>de.flapdoodle.embed</groupId>
@@ -42,17 +42,6 @@
     <dependency>
       <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
       <groupId>org.springframework.boot</groupId>
-    </dependency>
-    <dependency>
-      <artifactId>spring-data-elasticsearch</artifactId>
-      <groupId>org.springframework.data</groupId>
-      <version>3.2.4.RELEASE</version>
-    </dependency>
-    <dependency>
-      <artifactId>embedded-elasticsearch</artifactId>
-      <groupId>pl.allegro.tech</groupId>
-      <scope>test</scope>
-      <version>2.10.0</version>
     </dependency>
     <dependency>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>

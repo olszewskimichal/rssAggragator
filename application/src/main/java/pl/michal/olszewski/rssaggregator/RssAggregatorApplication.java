@@ -4,8 +4,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
@@ -18,12 +16,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-@SpringBootApplication(
-    exclude = {
-        ElasticsearchRepositoriesAutoConfiguration.class,
-        MongoRepositoriesAutoConfiguration.class
-    }
-)
+@SpringBootApplication()
 @EnableCaching
 @EnableAsync
 @EntityScan(

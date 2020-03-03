@@ -35,7 +35,6 @@ import pl.michal.olszewski.rssaggregator.blog.BlogFinder;
 import pl.michal.olszewski.rssaggregator.extenstions.TimeExecutionLogger;
 import pl.michal.olszewski.rssaggregator.integration.IntegrationTestBase;
 import pl.michal.olszewski.rssaggregator.item.NewItemInBlogEvent;
-import pl.michal.olszewski.rssaggregator.search.NewItemForSearchEvent;
 
 
 class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLogger {
@@ -84,7 +83,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     assertThat(result).hasSize(1).contains(true);
     Optional<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
     assertThat(updatedBlog).isPresent();
-    verify(jmsTemplate, times(2)).convertAndSend(anyString(), any(NewItemForSearchEvent.class));
     verify(jmsTemplate, times(2)).convertAndSend(anyString(), any(NewItemInBlogEvent.class));
 
   }
@@ -110,7 +108,6 @@ class UpdateScheduleTest extends IntegrationTestBase implements TimeExecutionLog
     Optional<BlogAggregationDTO> updatedBlog = blogRepository.getBlogWithCount(blog.getId());
     assertThat(updatedBlog).isPresent();
     assertThat(updatedBlog.get().getBlogItemsCount()).isEqualTo(0);
-    verify(jmsTemplate, times(0)).convertAndSend(anyString(), any(NewItemForSearchEvent.class));
     verify(jmsTemplate, times(0)).convertAndSend(anyString(), any(NewItemInBlogEvent.class));
 
   }
