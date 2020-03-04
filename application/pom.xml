@@ -25,16 +25,6 @@
       <version>0.0.11-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>pl.michal.olszewski</groupId>
-      <artifactId>search</artifactId>
-      <version>0.0.11-SNAPSHOT</version>
-    </dependency>
-    <!--    <dependency>
-          <artifactId>migrator</artifactId>
-          <groupId>pl.michal.olszewski</groupId>
-          <version>0.0.11-SNAPSHOT</version>
-        </dependency>-->
-    <dependency>
       <artifactId>de.flapdoodle.embed.mongo</artifactId>
       <groupId>de.flapdoodle.embed</groupId>
       <scope>test</scope>
